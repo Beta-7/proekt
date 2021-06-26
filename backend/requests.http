@@ -1,0 +1,48 @@
+POST http://localhost:5000/auth/register HTTP/1.1
+content-type: application/json
+
+{
+    "username":"asd",
+    "password":"notadmin",
+    "ime":"david",
+    "prezime":"david",
+    "isAdmin":false
+}
+
+###
+POST http://localhost:5000/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username":"notadmin",
+    "password":"notadmin"
+}
+###
+POST http://localhost:5000/auth/ HTTP/1.1
+Cookie: connect.sid=s%3AJadWgequ3BSzRpjJ5GTtlfnAa8Q-bgWC.wTtpW%2Fo7gVj%2Fw1MijeXRey5YNP2tvtH4Y7%2BSyTdK%2BDw;
+
+
+###
+POST http://localhost:5000/auth/ChangePassword HTTP/1.1
+content-type: application/json
+
+{
+    "password":"changeme",
+    "newPassword":"notadmin"
+}
+
+###
+POST http://localhost:5000/auth/admin HTTP/1.1
+
+
+
+###
+POST http://localhost:5000/auth/resetPassword HTTP/1.1
+content-type: application/json
+
+{
+    "username":"notadmin"
+}
+###
+POST http://localhost:5000/auth/whoami HTTP/1.1
+content-type: application/json
