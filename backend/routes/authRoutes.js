@@ -7,6 +7,7 @@ const auth = require("../controllers/authController.js")
 app.post("/changePassword",auth.authMiddleware,auth.changePassword)
 app.post("/register",auth.register);
 app.post("/login",auth.login)
+app.post("/logout",auth.logout)
 app.post("/whoami",auth.authMiddleware,auth.whoAmI)
 app.post("/admin",auth.isAdmin, (req,res)=>{
     res.json({"asd":"asd"})

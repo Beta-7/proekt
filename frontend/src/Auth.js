@@ -1,6 +1,7 @@
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:5000';
 
+
 class Auth{
 
 constructor () {
@@ -9,30 +10,41 @@ constructor () {
 }
 
 login(username, password){
-    axios.post("/auth/login", {
+    console.log('login reqest')
+    return axios.post("/auth/login", {
         username:username,
         password:password
     },{withCredentials: true}).then((res)=>{
+        console.log(res.data);
         if(res.data.message==="Logged in"){
             
-            axios.post("/auth/whoami",{},{withCredentials:true}).then((res=>{
+             axios.post("/auth/whoami",{},{withCredentials:true}).then((res=>{
                 this.authenticated=true;
                 this.username=res.data.username;
                 console.log("From login:" + this.username)
+                localStorage.setItem('Authenticated', 'True');
             })).then(()=>{
-                return
+                return 
             })
-
-
         }else{
-
+            
         }
     })
 }
 
+logout(){
+    
+    axios.post("/auth/logout").then((res)=>{
+        localStorage.setItem('Authenticated', 'False');
+    })
+    
+}
+
+
 getUsername(){
     console.log("From getUsername:" + this.username)
 }
+
 
 
 }

@@ -14,14 +14,15 @@ const Login =  () => {
     const [ username, setUsername ] = useState("");
     const [ password, setPassword ] = useState("");
 
-    const onSubmitForm = async(e) => {
+    const onSubmitForm = async e => {
         e.preventDefault();
         try {
-            auth.login(username, password)
-            // this.props.history.push("/");
+            auth.login(username, password).then(()=>{window.location.reload();})
+            
         } catch (err) {
             console.error(err);
         }
+        
     }
   
         return (

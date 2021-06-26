@@ -2,36 +2,34 @@
 import React from 'react';
 import './Navbar.css';
 import axios from 'axios';
+import auth from "../Auth.js"
 axios.defaults.baseURL = 'http://localhost:5000';
-class Navbar extends React.Component {
-    
-    
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLoggedIn: false
-        };
-        this.getButton = this.getButton.bind(this);
-        this.getButton();
-      }
-  
-      getButton(){
 
-    
-            
-      }
+const Navbar = () => {
+  const [logged, setLogged] = React.useState('');  
+  const Authenticated = localStorage.getItem('Authenticated');
 
-    render = () =>{
+  const logoutBtn = (e) => {
+    e.preventDefault();
+    auth.logout();
+    window.location.reload();
+  };
 
-        const user = (
-            <li><a href="https://google.com/"><span className="glyphicon glyphicon-user"></span> Logout</a></li>
-            )
+  const loginBtn = (e) => {
+    e.preventDefault();
+    console.log('The link was clicked.');
+  };
+
+  const formatStatus = () => {
+    console.log(Authenticated)
+        if (Authenticated === 'True'){
+          return <div className="" onClick={logoutBtn}>logout</div>
+        }
+        else {
+          return <div className="" onClick={loginBtn}>login</div>
+        }
     
-        const guest = (
-            <li><a href="https://google.com/"><span className="glyphicon glyphicon-user"></span> Login</a></li>
-            )
-        
-        
+  }     
         
         return (
 <nav className="navbar navbar-default">
@@ -46,11 +44,11 @@ class Navbar extends React.Component {
       <li><a href="https://google.com/">Page 3</a></li>
     </ul>
     <ul className="nav navbar-nav navbar-right">
-      { this.getButton? user : guest}
+      {formatStatus(logged)}
     </ul>
   </div>
 </nav>
   );
-}}
+}
 
 export default Navbar;

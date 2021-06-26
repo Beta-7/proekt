@@ -2,7 +2,7 @@ POST http://localhost:5000/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "username":"asd",
+    "username":"notadmin",
     "password":"notadmin",
     "ime":"david",
     "prezime":"david",
@@ -45,4 +45,8 @@ content-type: application/json
 }
 ###
 POST http://localhost:5000/auth/whoami HTTP/1.1
+content-type: application/json
+
+###
+POST http://localhost:5000/auth/logout HTTP/1.1
 content-type: application/json

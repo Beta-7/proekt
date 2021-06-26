@@ -1,7 +1,7 @@
 const express = require("express")
 const db = require("../db.js")
 const User = require("../models/users.js")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcryptjs")
 const app = express()
 const session=require("express-session")
 
@@ -23,6 +23,12 @@ const login = async function(req,res){
         return res.json({"message":"wrong password","detail":"wrong password"})
     }
 
+}
+
+const logout = async function(req,res){
+    req.session.isLoggedIn=false;
+    req.session.username='';
+    return res.json({"message":"Logged out"})
 }
 
 const whoAmI = async function (req, res){
@@ -121,4 +127,4 @@ const authMiddleware = async function(req, res, next){
 }
 
 
-module.exports={login,register,changePassword,authMiddleware,isAdmin, resetPassword, whoAmI}
+module.exports={login,register,changePassword,authMiddleware,isAdmin, resetPassword, whoAmI, logout}
