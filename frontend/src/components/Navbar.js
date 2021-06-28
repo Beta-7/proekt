@@ -5,9 +5,8 @@ import axios from 'axios';
 import auth from "../Auth.js"
 axios.defaults.baseURL = 'http://localhost:5000';
 
-const Navbar = () => {
-  const [logged, setLogged] = React.useState('');  
-  const Authenticated = localStorage.getItem('Authenticated');
+const Navbar = ({loggedStatus}) => {
+  // const Authenticated = localStorage.getItem('Authenticated');
 
   const logoutBtn = (e) => {
     e.preventDefault();
@@ -15,18 +14,15 @@ const Navbar = () => {
     window.location.reload();
   };
 
-  const loginBtn = (e) => {
-    e.preventDefault();
-    console.log('The link was clicked.');
-  };
+
 
   const formatStatus = () => {
-    console.log(Authenticated)
-        if (Authenticated === 'True'){
-          return <div className="" onClick={logoutBtn}>logout</div>
+    
+        if (loggedStatus  ){
+          return <li><a href="/#" onClick={logoutBtn}><button className="btn btn-lg btn-primary btn-block" type="submit">Одјави се</button></a></li>
         }
         else {
-          return <div className="" onClick={loginBtn}>login</div>
+          return <li><a href="/login"><button className="btn btn-lg btn-primary btn-block" type="submit">Најави се</button></a></li>
         }
     
   }     
@@ -35,7 +31,7 @@ const Navbar = () => {
 <nav className="navbar navbar-default">
   <div className="container-fluid">
     <div className="navbar-header">
-      <a className="navbar-brand" href="https://google.com/">WebSiteName</a>
+      <a className="navbar-brand" href="/">WebSiteName</a>
     </div>
     <ul className="nav navbar-nav">
       <li className="active"><a href="https://google.com/">Home</a></li>
@@ -44,7 +40,7 @@ const Navbar = () => {
       <li><a href="https://google.com/">Page 3</a></li>
     </ul>
     <ul className="nav navbar-nav navbar-right">
-      {formatStatus(logged)}
+      {formatStatus()}
     </ul>
   </div>
 </nav>

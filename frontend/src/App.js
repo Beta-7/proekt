@@ -1,49 +1,36 @@
 import Navbar from './components/Navbar';
 import Login from './components/Login';
-import './App.css';
-import React from 'react';
+import ProtectedRoute from './components/LoggedInRoute';
+import Home from './components/Home';
+import React, { useState } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
+import './App.css';
+
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:5000';
 
-class App extends React.Component {
 
-  state = {};
-
-  componentDidMount () {
-
-    axios.post('/auth/whoami',{},{withCredentials:true})
-              .then(function (response) {
-                  if(response.data.message==="Unauthenticated"){
-                     this.setState({isLoggedIn: false})
-                    console.log("Unauth")
-                    return false;
-                    }
-                  else{
-                    this.setState({isLoggedIn: true})
-                       console.log("auth")
-                       return true;
-                  }
-                
-              })
-              .catch(function (error) {
-                console.error(error);
-              });
-  }
-
-  render(){
+export default function App () {
+      const [loggedIn, setLoggedIn] = useState(false);
+  
+      const changeStatus = (newLoggedInStatus) =>{
+          setLoggedIn(newLoggedInStatus);
+      }
       return (
           <div>
-            <Navbar/>
+            <Navbar loggedStatus={loggedIn} changeStatus={setLoggedIn}/>
           <BrowserRouter>
-          <Route path="/login" component={Login}/>
-          </BrowserRouter>
-            
+          <Route
+          path='/login'
+          component={() => <Login loggedStatus={loggedIn} changeStatus={changeStatus} />}
+          />
+
+          
+          <ProtectedRoute exact path="/" loggedStatus={loggedIn} component={Home}></ProtectedRoute>
+          </BrowserRouter >
           
           </div>
 
 
 );
-}}
-
-export default App;
+}

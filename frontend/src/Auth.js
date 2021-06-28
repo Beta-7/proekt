@@ -10,26 +10,27 @@ constructor () {
 }
 
 login(username, password){
-    console.log('login reqest')
-    return axios.post("/auth/login", {
+    return new Promise((success, failure)=>{
+     axios.post("/auth/login", {
         username:username,
         password:password
     },{withCredentials: true}).then((res)=>{
-        console.log(res.data);
+
         if(res.data.message==="Logged in"){
             
              axios.post("/auth/whoami",{},{withCredentials:true}).then((res=>{
                 this.authenticated=true;
                 this.username=res.data.username;
-                console.log("From login:" + this.username)
                 localStorage.setItem('Authenticated', 'True');
+                success();
             })).then(()=>{
                 return 
             })
         }else{
-            
+            failure();            
         }
     })
+})
 }
 
 logout(){
@@ -41,9 +42,6 @@ logout(){
 }
 
 
-getUsername(){
-    console.log("From getUsername:" + this.username)
-}
 
 
 

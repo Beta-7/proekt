@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-module.exports =  new Sequelize("postgres://postgres:admin@localhost:5432/proekt", {
+module.exports =  new Sequelize("postgres://backend:backend@localhost:5432/proekt", {
   host: 'localhost',
   dialect: 'postgres',
   operatorsAliases: false,
