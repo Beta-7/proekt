@@ -1,6 +1,7 @@
 import Navbar from './components/Navbar';
 import Login from './components/Login';
-import ProtectedRoute from './components/LoggedInRoute';
+import LoggedInRoute from './components/LoggedInRoute';
+import AdminRoute from './components/AdminRoute';
 import Home from './components/Home';
 import AdminPanel from './components/AdminPanel';
 import React, { useState } from 'react';
@@ -26,9 +27,9 @@ export default function App () {
           <Route path='/login' component={() => <Login loggedStatus={loggedIn} changeStatus={changeStatus} />}/>
           
           
-          <ProtectedRoute exact path="/home" loggedStatus={loggedIn} isAdmin={isAdmin} component={Home}></ProtectedRoute>
-          <ProtectedRoute exact path="/" loggedStatus={loggedIn} isAdmin={isAdmin} component={Home}></ProtectedRoute>
-          <ProtectedRoute exact path="/adminpanel" loggedStatus={loggedIn} isAdmin={isAdmin} component={AdminPanel}></ProtectedRoute>
+          <LoggedInRoute exact path="/home" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
+          <LoggedInRoute exact path="/" loggedStatus={loggedIn} isAdmin={isAdmin} component={Home}></LoggedInRoute>
+          <AdminRoute exact path="/adminpanel" isAdmin={isAdmin} component={AdminPanel}></AdminRoute>
           <Route path="*" component={() => "404 NOT FOUND"} />
           </Switch>
           </BrowserRouter >
