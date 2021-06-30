@@ -78,8 +78,8 @@ const register = async function(req,res){
         ime,
         prezime,
         isAdmin
-    }).then(()=>{return res.send("Successfully regustered")}).catch(err=>{
-      
+    }).then(()=>{return res.send("Successfully registered")}).catch(err=>{
+        
         console.error( 'Captured validation error: ', err.errors[0]);
         
         return res.json({"code":err.code,"message":err.errors[0].message,"detail":err.errors[0].message});

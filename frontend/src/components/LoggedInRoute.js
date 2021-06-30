@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, Route,  Switch } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 
 export default function ProtectedRoute({loggedStatus, isAdmin, component: Component, ...restOfProps }){ 
   
