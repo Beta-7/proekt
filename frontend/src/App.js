@@ -11,8 +11,10 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 
 export default function App () {
-      const [loggedIn, setLoggedIn] = useState(false);
-  
+      const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("isAuthenticated")));
+      const [isAdmin, setIsAdmin] = useState(localStorage.getItem("isAdmin"));
+      const [username, setUsername] = useState(localStorage.getItem("Username"));
+
       const changeStatus = (newLoggedInStatus) =>{
           setLoggedIn(newLoggedInStatus);
       }

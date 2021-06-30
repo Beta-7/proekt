@@ -1,25 +1,22 @@
 
 import React from 'react';
 import './Navbar.css';
-import axios from 'axios';
 import auth from "../Auth.js"
-axios.defaults.baseURL = 'http://localhost:5000';
 
-const Navbar = ({loggedStatus}) => {
-  // const Authenticated = localStorage.getItem('Authenticated');
+
+const Navbar = ({loggedStatus,changeStatus}) => {
 
   const logoutBtn = (e) => {
     e.preventDefault();
     auth.logout();
-    window.location.reload();
+    changeStatus(false);
   };
 
 
 
   const formatStatus = () => {
-    
-        if (loggedStatus  ){
-          return <li><a href="/#" onClick={logoutBtn}><button className="btn btn-lg btn-primary btn-block" type="submit">Одјави се</button></a></li>
+        if (loggedStatus){
+          return <li><a href="/#" onClick={logoutBtn}><button className="btn btn-lg btn-danger btn-block" type="submit">Одјави се</button></a></li>
         }
         else {
           return <li><a href="/login"><button className="btn btn-lg btn-primary btn-block" type="submit">Најави се</button></a></li>
