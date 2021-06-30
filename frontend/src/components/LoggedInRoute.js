@@ -8,11 +8,10 @@ export default function ProtectedRoute({loggedStatus, component: Component, ...r
     <Route
       {...restOfProps}
       render={(props) =>{
-          console.log("status" +loggedStatus)
           if(loggedStatus)
-          return (<Component {...props} />)
+            return (<Component {...props} />)
           else{
-              return(<Redirect to="/login" /> )
+            return(<Redirect to="/login" /> )
       
       }
       }

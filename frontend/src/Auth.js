@@ -19,9 +19,9 @@ login(username, password){
         if(res.data.message==="Logged in"){
             
              axios.post("/auth/whoami",{},{withCredentials:true}).then((res=>{
-                this.authenticated=true;
-                this.username=res.data.username;
-                localStorage.setItem('Authenticated', 'True');
+                localStorage.setItem("isAuthenticated", true);
+                localStorage.setItem("Username", res.data.username);
+                localStorage.setItem("isAdmin", res.data.isAdmin);
                 success();
             })).then(()=>{
                 return 

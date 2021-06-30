@@ -6,19 +6,19 @@ import auth from "../Auth.js"
 axios.defaults.baseURL = 'http://localhost:5000';
 
 const Navbar = ({loggedStatus}) => {
-  // const Authenticated = localStorage.getItem('Authenticated');
 
   const logoutBtn = (e) => {
     e.preventDefault();
     auth.logout();
     window.location.reload();
+    localStorage.setItem("isAuthenticated", false);
   };
 
 
 
   const formatStatus = () => {
     
-        if (loggedStatus  ){
+        if (loggedStatus){
           return <li><a href="/#" onClick={logoutBtn}><button className="btn btn-lg btn-primary btn-block" type="submit">Одјави се</button></a></li>
         }
         else {
