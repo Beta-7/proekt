@@ -4,10 +4,6 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 class Auth{
 
-constructor () {
-    this.authenticated = false;
-    this.username = "";
-}
 
 login(username, password){
     return new Promise((success, failure)=>{
@@ -19,9 +15,15 @@ login(username, password){
         if(res.data.message==="Logged in"){
             
              axios.post("/auth/whoami",{},{withCredentials:true}).then((res=>{
+<<<<<<< HEAD
                 localStorage.setItem("isAuthenticated", true);
                 localStorage.setItem("Username", res.data.username);
                 localStorage.setItem("isAdmin", res.data.isAdmin);
+=======
+                localStorage.setItem('isAuthenticated', true);
+                localStorage.setItem('Username', res.data.username);
+                localStorage.setItem('isAdmin', res.data.isAdmin);
+>>>>>>> main
                 success();
             })).then(()=>{
                 return 
@@ -36,7 +38,9 @@ login(username, password){
 logout(){
     
     axios.post("/auth/logout").then((res)=>{
-        localStorage.setItem('Authenticated', 'False');
+        localStorage.setItem('isAuthenticated', false);
+        localStorage.setItem('Username', null);
+        localStorage.setItem('isAdmin', false);
     })
     
 }

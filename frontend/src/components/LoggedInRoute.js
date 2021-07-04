@@ -2,6 +2,8 @@ import React from "react";
 import { Redirect, Route } from "react-router-dom";
 
 export default function LoggedInRoute({loggedStatus, component: Component, ...restOfProps }){ 
+  
+
   return (
     <Route
       {...restOfProps}
