@@ -9,6 +9,7 @@ app.post("/register",auth.register);
 app.post("/login",auth.login)
 app.post("/logout",auth.logout)
 app.post("/whoami",auth.authMiddleware,auth.whoAmI)
+app.post("/getUsers",auth.authMiddleware,auth.getUsers)
 app.post("/admin",auth.isAdmin, (req,res)=>{
     res.json({"asd":"asd"})
 })

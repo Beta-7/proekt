@@ -25,6 +25,11 @@ const login = async function(req,res){
 
 }
 
+const getUsers= async function(req,res){
+    const users = await User.findAll({attributes:["username", "ime", "prezime"],raw : true})
+    return res.json(users)
+}
+
 const logout = async function(req,res){
     req.session.isLoggedIn=false;
     req.session.username='';
@@ -127,4 +132,4 @@ const authMiddleware = async function(req, res, next){
 }
 
 
-module.exports={login,register,changePassword,authMiddleware,isAdmin, resetPassword, whoAmI, logout}
+module.exports={login,register,changePassword,authMiddleware,isAdmin, resetPassword, whoAmI, logout,getUsers}

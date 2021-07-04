@@ -32,7 +32,7 @@ const Navbar = ({loggedStatus,changeStatus}) => {
     </div>
     <ul className="nav navbar-nav">
       <li className="active"><a href="https://google.com/">Home</a></li>
-      <li><a href="https://google.com/">Page 1</a></li>
+      <li><a href="/dodadiData">Додади податоци</a></li>
       <li><a href="https://google.com/">Page 2</a></li>
       <li><a href="https://google.com/">Page 3</a></li>
     </ul>

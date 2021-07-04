@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const db = require("./db.js");
 const authRoutes = require("./routes/authRoutes.js")
+const firmaRoutes = require("./routes/firmaRoutes.js")
 const session=require("express-session")
 
 
@@ -31,3 +32,4 @@ db.sync();
 db.authenticate().then(()=>{console.log("DB connected")}).catch(()=>{console.log("Error: " +err)})
 
 app.use("/auth",authRoutes)
+app.use("/firmi",firmaRoutes)
