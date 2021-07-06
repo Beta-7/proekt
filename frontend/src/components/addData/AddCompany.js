@@ -22,6 +22,7 @@ export default class Login extends Component {
        componentDidMount(){
         let users=[];
         axios.post("/auth/getUsers",{},{withCredentials:true}).then((res)=>{
+            if(res.data.message==="Unauthenticated"){return;}
             res.data.map((elem)=>{
                 var joined = this.state.users.concat(elem);
                 this.setState({ users: joined })

@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes.js")
 const firmaRoutes = require("./routes/firmaRoutes.js")
 const session=require("express-session")
 
+const fileUpload = require('express-fileupload');
 
 app.use(cors({credentials: true, origin: true}));
 
@@ -29,7 +30,15 @@ app.listen(5000, ()=>{
 
 db.sync();
 
+
+
+
 db.authenticate().then(()=>{console.log("DB connected")}).catch(()=>{console.log("Error: " +err)})
+
+app.use(fileUpload({
+    limits: { fileSize: 500 * 1024 * 1024 },
+  }));
+
 
 app.use("/auth",authRoutes)
 app.use("/firmi",firmaRoutes)

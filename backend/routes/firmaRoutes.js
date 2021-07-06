@@ -5,6 +5,6 @@ const auth = require("../controllers/authController.js")
 
 // localhost:5000/auth/*
 app.post("/dodadiFirma",auth.authMiddleware,firma.dodadiFirma)
-// app.post("/uploadFile",auth.authMiddleware,firma.uploadFile)
+app.post("/uploadFile",firma.uploadFile)
 
 module.exports = app;

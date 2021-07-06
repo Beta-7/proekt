@@ -16,12 +16,12 @@ class UploadSensorData extends Component {
       const formData = new FormData();
       if(this.state.selectedFile!==null){
       formData.append(
-        "myFile",
+        "sensorData",
         this.state.selectedFile,
         this.state.selectedFile.name
       );
     
-      axios.post("api/firmi/uploadfile", formData);
+      axios.post("/firmi/uploadfile", formData);
       }
     };
     
@@ -49,7 +49,7 @@ class UploadSensorData extends Component {
               Прикачи документ (сензор дата)<br/><br/>
             </h1>
             <div>
-                <input type="file" onChange={this.onFileChange} /><br/>
+                <input type="file" name="sensorData" onChange={this.onFileChange} /><br/>
                 <button onClick={this.onFileUpload}>
                   Прикачи!
                 </button>
