@@ -1,10 +1,9 @@
 const express = require("express")
-const db = require("../db.js")
+
 const Firma = require("../models/firma.js")
 const User = require("../models/users")
-const bcrypt = require("bcryptjs")
-const app = express()
-const session=require("express-session")
+const BroiloStatus = require("../models/broiloStatus")
+
 const csv=require("csvtojson");
 
 const _ = require('lodash');
@@ -76,22 +75,43 @@ csv({
                     // console.log(brojBroilo)
                     // console.log(tarifa)
                     niza[brojac]=grupirani[brojBroilo][tarifa][merka]
-                    niza[brojac].kolicina=parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))
                     prv=false
                 }else{
                     
                     niza[brojac].krajnaSostojba=grupirani[brojBroilo][tarifa][merka].krajnaSostojba
-                    niza[brojac].kolicina=parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))
+                    niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(2)
                     niza[brojac].datumKraj=grupirani[brojBroilo][tarifa][merka].datumKraj
+                    niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(2)  
                     
         }
         }
     }
-        niza[brojac].kolicina=parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))
-        console.log(brojac)
+        niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(2)
+        // console.log(niza[brojac].kolicina)
+        niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(2)
+        
         
     }
-    console.log(JSON.stringify(niza))
+    for( var red in niza){
+
+
+        BroiloStatus.create({
+           brojMernaTocka: niza[red].brojMernaTocka,
+           mesec: niza[red].mesec,
+           tarifa: niza[red].tarifa,
+           datumPocetok: niza[red].datumPocetok,
+           datumKraj: niza[red].datumKraj,
+           pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
+           krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
+           kolicina: niza[red].kolicina.replace(",","."),
+           multiplikator: niza[red].multiplikator,
+           vkupnoKolicina: niza[red].vkupnoKolicina,
+           nebitno: niza[red].nebitno,
+           brojMernoMesto: niza[red].brojMernoMesto,
+           brojBroilo: niza[red].brojBroilo,
+           datumOdEvn: niza[red].datumOdEvn
+        })
+    }
     
 })
  
