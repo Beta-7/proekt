@@ -32,6 +32,37 @@ const dodadiFirma = (req, res) => {
     
 
 }
+const promeniFirma = (req,res) =>{
+    const firma = Firma.findOne({id:req.id});
+    Agent.findOne({name:req.agent}).then((agent)=>{
+        if(agent===null){
+           return res.json({message:"No agent",detail:"No agent with that name"})
+        }
+
+    firma.name=req.name;
+    firma.broj=req.broj;
+    firma.agent=req.agent;
+    firma.reload().then(()=>{
+        return res.json({message:"Success",detail:"Updated firma"})
+    })
+    })
+    
+
+}
+const izbrisiFirma = (req,res) =>{
+
+}
+
+const zemiFirmi = async (req,res) =>{
+    
+    const firmi = await Firma.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id", "name", "broj","agent"],raw : true})
+    return res.json(firmi)
+}
+
+
+
+
+
 const uploadFile = async (req,res)=>{
 
 csv({
@@ -119,4 +150,4 @@ csv({
     
 }
 
-module.exports={dodadiFirma, uploadFile}
+module.exports={dodadiFirma, promeniFirma, izbrisiFirma, zemiFirmi, uploadFile}

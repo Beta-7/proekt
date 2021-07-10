@@ -18,6 +18,7 @@ app.use((req, res, next) => {
 
 
 app.use(express.json());
+//TODO: podobar session secret
 app.use(session({
     secret: "asdasdasd",
     resave: false,
