@@ -31,7 +31,7 @@ login(username, password){
 
 logout(){
     
-    axios.post("/auth/logout").then((res)=>{
+    axios.post("/auth/logout",{},{withCredentials:true}).then((res)=>{
         localStorage.setItem('isAuthenticated', false);
         localStorage.setItem('Username', null);
         localStorage.setItem('isAdmin', false);

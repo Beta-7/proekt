@@ -4,7 +4,7 @@ import LoggedInRoute from './components/LoggedInRoute';
 import Home from './components/Home';
 import AddData from './components/AddData'
 import Table from './components/Table'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
 
@@ -16,6 +16,18 @@ export default function App () {
       const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("isAuthenticated")));
       const [isAdmin, setIsAdmin] = useState(JSON.parse(localStorage.getItem("isAdmin")));
       const [username, setUsername] = useState(localStorage.getItem("Username"));
+
+      useEffect(() => {
+        axios.post("/auth/whoami",{},{withCredentials:true}).then((res)=>{
+          if(res.data.username!=="undefined"){
+            setLoggedIn(false);
+            setIsAdmin(false);
+            setUsername("");
+            
+          }
+        })
+        }, [])
+
 
       const changeStatus = (newLoggedInStatus) =>{
           setLoggedIn(newLoggedInStatus);

@@ -1,27 +1,77 @@
 
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import MaterialTable from 'material-table';
+
+import MaterialTable, { MaterialTableProps } from 'material-table';
+import { TablePagination, TablePaginationProps } from '@material-ui/core';
+
+
+//Fix to the broken pagination
+function PatchedPagination(props) {
+  const {
+    ActionsComponent,
+    onChangePage,
+    onChangeRowsPerPage,
+    ...tablePaginationProps
+  } = props;
+
+  return (
+    <TablePagination
+      {...tablePaginationProps}
+      // @ts-expect-error onChangePage was renamed to onPageChange
+      onPageChange={onChangePage}
+      onRowsPerPageChange={onChangeRowsPerPage}
+      ActionsComponent={(subprops) => {
+        const { onPageChange, ...actionsComponentProps } = subprops;
+        return (
+          // @ts-expect-error ActionsComponent is provided by material-table
+          <ActionsComponent
+            {...actionsComponentProps}
+            onChangePage={onPageChange}
+          />
+        );
+      }}
+    />
+  );
+}
+
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
 export default function Table () {
     const [data, setData] = useState([])
-    const [page, setPage] = useState(0)
+    const [vraboteni, setVraboteni] = useState([])
     const [itemsPerPage, setItemsPerPage] = useState(0)
     useEffect(() => {
-        getKompanii(0, 50)
+      getVraboteni()
+      getKompanii()
       }, [])
-    const getKompanii=()=>{
-        const offset = (page - 1) * itemsPerPage
-        axios.post("/firmi/zemiFirmi",{limit:50, offset:offset},{withCredentials:true}).then((response)=>{
+    function getKompanii(){
+        axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
             setData(response.data.rows)
         
         })
-    }
+      }
+       async function getVraboteni(){
+          axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
+            var users = {} 
+            response.data.map((user,idx)=>{
+                users[idx] = user.username  
+              })
+              console.log(users)
+              setVraboteni(users)
+          })
+      }
+
+    
+
+    
 
     const columns = [
-        { title: "id", field: "id", validate: rowData => rowData.id === undefined || rowData.id === "" ? "Required" : true },
+        { title: "id", field: "id",
+         hidden:true,
+         defaultSort:"desc"
+         },
         {
           title: "Ime", field: "name",
           validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true
@@ -32,7 +82,8 @@ export default function Table () {
         },
         {
           title: "Agent", field: 'agent',
-          validate: rowData => rowData.agent === undefined || rowData.agent === "" ? "Required" : true
+          validate: rowData => rowData.agent === undefined || rowData.agent === "" ? "Required" : true,
+          lookup:{...vraboteni}
         }]
     
     
@@ -41,16 +92,48 @@ export default function Table () {
               title="Student Details"
               columns={columns}
               data={data}
-              onChangePage={(newPage) => {
-                    setPage(newPage)
-                    console.log(newPage)
+              components={{
+                Pagination: PatchedPagination,
               }}
-              onChangeRowsPerPage={(newRowsPerPage) => {
-                setItemsPerPage(newRowsPerPage)
-                console.log(newRowsPerPage)
+              editable={{
+                onRowAdd: (newRow) => new Promise((resolve, reject) => {
+                  // console.log(vraboteni[newRow.agent])
+                  axios.post("/firmi/dodadiFirma",{
+                    name:newRow.name,
+                    broj:newRow.broj,
+                    agent:vraboteni[newRow.agent]
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                  
+                }),
+                onRowDelete: selectedRow => new Promise((resolve, reject) => {
+                  axios.post("/firmi/izbrisiFirma",{
+                    id:selectedRow.id
+                    
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                  resolve()
+                }),
+                onRowUpdate:(updatedRow,oldRow)=>new Promise((resolve,reject)=>{
+                  axios.post("/firmi/promeniFirma",{
+                    id:oldRow.id,
+                    name:updatedRow.name,
+                    broj:updatedRow.broj,
+                    agent:vraboteni[updatedRow.agent]
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                })
+      
               }}
-      
-      
+                options={{
+                  actionsColumnIndex: -1, addRowPosition: "first"
+                }}
             />
     );
         
