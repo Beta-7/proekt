@@ -33,16 +33,19 @@ const dodadiFirma = (req, res) => {
 
 }
 const promeniFirma = (req,res) =>{
-    const firma = Firma.findOne({id:req.id});
-    Agent.findOne({name:req.agent}).then((agent)=>{
+    
+    const firma = Firma.findOne({where:{id:req.body.id}});
+    User.findOne({where:{username:req.body.agent}}).then((agent)=>{
         if(agent===null){
            return res.json({message:"No agent",detail:"No agent with that name"})
         }
 
-    firma.name=req.name;
-    firma.broj=req.broj;
-    firma.agent=req.agent;
-    firma.reload().then(()=>{
+    firma.name=req.body.name;
+    firma.broj=req.body.broj;
+    firma.agent=req.body.agent;
+    Firma.update(firma, {
+        where:{id:req.body.id}
+    }).then(()=>{
         return res.json({message:"Success",detail:"Updated firma"})
     })
     })
@@ -50,7 +53,15 @@ const promeniFirma = (req,res) =>{
 
 }
 const izbrisiFirma = (req,res) =>{
-
+    Firma.destroy({
+        where: {
+            id:req.body.id
+        }
+    }).then(()=>{
+        return res.json({message:"Success",detail:"Deleted company"})
+    }).catch(()=>{
+        return res.json({message:"Error",detail:"Failed to delete company"})
+    })
 }
 
 const zemiFirmi = async (req,res) =>{

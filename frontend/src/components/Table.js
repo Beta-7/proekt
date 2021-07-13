@@ -1,10 +1,39 @@
 import MUIDataTable from "mui-datatables";
 import React, {forwardRef, useState, useEffect} from 'react';
 import axios from 'axios';
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+
+import MaterialTable, { MaterialTableProps } from 'material-table';
+import { TablePagination, TablePaginationProps } from '@material-ui/core';
+
+
+//Fix to the broken pagination
+function PatchedPagination(props) {
+  const {
+    ActionsComponent,
+    onChangePage,
+    onChangeRowsPerPage,
+    ...tablePaginationProps
+  } = props;
+
+  return (
+    <TablePagination
+      {...tablePaginationProps}
+      // @ts-expect-error onChangePage was renamed to onPageChange
+      onPageChange={onChangePage}
+      onRowsPerPageChange={onChangeRowsPerPage}
+      ActionsComponent={(subprops) => {
+        const { onPageChange, ...actionsComponentProps } = subprops;
+        return (
+          // @ts-expect-error ActionsComponent is provided by material-table
+          <ActionsComponent
+            {...actionsComponentProps}
+            onChangePage={onPageChange}
+          />
+        );
+      }}
+    />
+  );
+}
 
 
 axios.defaults.baseURL = 'http://localhost:5000';
@@ -14,7 +43,7 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 export default function Table () {
     const [data, setData] = useState([])
-    const [page, setPage] = useState(0)
+    const [vraboteni, setVraboteni] = useState([])
     const [itemsPerPage, setItemsPerPage] = useState(0)
     const [responsive, setResponsive] = useState("vertical");
     const [tableBodyHeight, setTableBodyHeight] = useState("400px");
@@ -33,61 +62,98 @@ export default function Table () {
     };
 
     useEffect(() => {
-        getKompanii(0, 50)
+      getVraboteni()
+      getKompanii()
       }, [])
-    const getKompanii=()=>{
-        const offset = (page - 1) * itemsPerPage
-        axios.post("/firmi/zemiFirmi",{limit:50, offset:offset},{withCredentials:true}).then((response)=>{
+    function getKompanii(){
+        axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
             setData(response.data.rows)
             console.log(response.data.rows);
         })
-    }
+      }
+       async function getVraboteni(){
+          axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
+            var users = {} 
+            response.data.map((user,idx)=>{
+                users[idx] = user.username  
+              })
+              console.log(users)
+              setVraboteni(users)
+          })
+      }
+
+    
+
+    
+
+    const columns = [
+        { title: "id", field: "id",
+         hidden:true,
+         defaultSort:"desc"
+         },
+        {
+          title: "Ime", field: "name",
+          validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true
+        },
+        {
+          title: "Broj", field: "broj",
+          validate: rowData => rowData.broj === undefined || rowData.broj === "" ? "Required" : true
+        },
+        {
+          title: "Agent", field: 'agent',
+          validate: rowData => rowData.agent === undefined || rowData.agent === "" ? "Required" : true,
+          lookup:{...vraboteni}
+        }]
     
     
         return (
-          <React.Fragment>
-      <FormControl>
-        <InputLabel id="demo-simple-select-label">Responsive Option</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={responsive}
-          style={{ width: "200px", marginBottom: "10px", marginRight: 10 }}
-          onChange={(e) => setResponsive(e.target.value)}
-        >
-          <MenuItem value={"vertical"}>vertical</MenuItem>
-          <MenuItem value={"standard"}>standard</MenuItem>
-          <MenuItem value={"simple"}>simple</MenuItem>
-
-          <MenuItem value={"scroll"}>scroll (deprecated)</MenuItem>
-          <MenuItem value={"scrollMaxHeight"}>
-            scrollMaxHeight (deprecated)
-          </MenuItem>
-          <MenuItem value={"stacked"}>stacked (deprecated)</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl>
-        <InputLabel id="demo-simple-select-label">Table Body Height</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={tableBodyHeight}
-          style={{ width: "200px", marginBottom: "10px", marginRight: 10 }}
-          onChange={(e) => setTableBodyHeight(e.target.value)}
-        >
-          <MenuItem value={""}>[blank]</MenuItem>
-          <MenuItem value={"400px"}>400px</MenuItem>
-          <MenuItem value={"800px"}>800px</MenuItem>
-          <MenuItem value={"100%"}>100%</MenuItem>
-        </Select>
-      </FormControl>
-      <MUIDataTable
-        title={"Table"}
-        data={data}
-        columns={columns}
-        options={options}
-      />
-    </React.Fragment>
+            <MaterialTable
+              title="Student Details"
+              columns={columns}
+              data={data}
+              components={{
+                Pagination: PatchedPagination,
+              }}
+              editable={{
+                onRowAdd: (newRow) => new Promise((resolve, reject) => {
+                  // console.log(vraboteni[newRow.agent])
+                  axios.post("/firmi/dodadiFirma",{
+                    name:newRow.name,
+                    broj:newRow.broj,
+                    agent:vraboteni[newRow.agent]
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                  
+                }),
+                onRowDelete: selectedRow => new Promise((resolve, reject) => {
+                  axios.post("/firmi/izbrisiFirma",{
+                    id:selectedRow.id
+                    
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                  resolve()
+                }),
+                onRowUpdate:(updatedRow,oldRow)=>new Promise((resolve,reject)=>{
+                  axios.post("/firmi/promeniFirma",{
+                    id:oldRow.id,
+                    name:updatedRow.name,
+                    broj:updatedRow.broj,
+                    agent:vraboteni[updatedRow.agent]
+                  },{withCredentials:true}).then(()=>{
+                    getKompanii()
+                    resolve()
+                  })
+                })
+      
+              }}
+                options={{
+                  actionsColumnIndex: -1, addRowPosition: "first"
+                }}
+            />
     );
         
 
