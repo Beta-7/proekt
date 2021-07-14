@@ -44,22 +44,7 @@ axios.defaults.baseURL = 'http://localhost:5000';
 export default function Table () {
     const [data, setData] = useState([])
     const [vraboteni, setVraboteni] = useState([])
-    const [itemsPerPage, setItemsPerPage] = useState(0)
-    const [responsive, setResponsive] = useState("vertical");
-    const [tableBodyHeight, setTableBodyHeight] = useState("400px");
-    const [tableBodyMaxHeight, setTableBodyMaxHeight] = useState("");
-
-    const columns = ["id", "name", "broj", "agent"];
-
-    const options = {
-      filter: true,
-      filterType: "dropdown",
-      responsive,
-      tableBodyHeight,
-      tableBodyMaxHeight,
-      rowsPerPageOptions: [5,15,100],
-      rowsPerPage: 5
-    };
+    
 
     useEffect(() => {
       getVraboteni()

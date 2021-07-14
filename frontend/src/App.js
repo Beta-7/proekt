@@ -3,7 +3,7 @@ import Login from './components/Login';
 import LoggedInRoute from './components/LoggedInRoute';
 import Home from './components/Home';
 import AddData from './components/AddData'
-import Table from './components/Table'
+import Table from './components/FirmiTable'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -17,15 +17,17 @@ export default function App () {
       const [isAdmin, setIsAdmin] = useState(JSON.parse(localStorage.getItem("isAdmin")));
       const [username, setUsername] = useState(localStorage.getItem("Username"));
 
+
       useEffect(() => {
         axios.post("/auth/whoami",{},{withCredentials:true}).then((res)=>{
-          if(res.data.username!=="undefined"){
+          if(res.data.message!=="Authenticated"){
             setLoggedIn(false);
             setIsAdmin(false);
             setUsername("");
             
           }
-        })
+        }
+        )
         }, [])
 
 
@@ -40,7 +42,7 @@ export default function App () {
           path='/login'
           component={() => <Login loggedStatus={loggedIn} changeStatus={changeStatus} />}
           />
-          <Route path="/table">
+          <Route path="/FirmiTable">
             <Table/>
           </Route>
           
