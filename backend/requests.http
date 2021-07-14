@@ -6,7 +6,7 @@ content-type: application/json
     "password":"notadmin",
     "ime":"david",
     "prezime":"david",
-    "isAdmin":false
+    "isAdmin":true
 }
 
 ###

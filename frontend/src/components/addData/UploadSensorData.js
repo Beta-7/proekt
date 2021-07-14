@@ -21,7 +21,7 @@ class UploadSensorData extends Component {
         this.state.selectedFile.name
       );
     
-      axios.post("/firmi/uploadfile", formData);
+      axios.post("/broilo/uploadfile", formData);
       }
     };
     

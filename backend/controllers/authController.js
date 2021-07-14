@@ -26,7 +26,7 @@ const login = async function(req,res){
 }
 
 const getUsers= async function(req,res){
-    const users = await User.findAll({attributes:["id","username", "ime", "prezime"],raw : true})
+    const users = await User.findAll({attributes:["id","username", "ime", "prezime", "isAdmin"],raw : true})
     return res.json(users)
 }
 

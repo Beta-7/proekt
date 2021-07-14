@@ -4,6 +4,8 @@ const cors = require("cors");
 const db = require("./db.js");
 const authRoutes = require("./routes/authRoutes.js")
 const firmaRoutes = require("./routes/firmaRoutes.js")
+const userRoutes = require("./routes/usersRoutes.js")
+const broiloRoutes = require("./routes/broiloRoutes.js")
 const session=require("express-session")
 
 const fileUpload = require('express-fileupload');
@@ -43,3 +45,5 @@ app.use(fileUpload({
 
 app.use("/auth",authRoutes)
 app.use("/firmi",firmaRoutes)
+app.use("/user",userRoutes)
+app.use("/broilo",broiloRoutes)

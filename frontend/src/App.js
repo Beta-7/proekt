@@ -3,7 +3,9 @@ import Login from './components/Login';
 import LoggedInRoute from './components/LoggedInRoute';
 import Home from './components/Home';
 import AddData from './components/AddData'
-import Table from './components/Table'
+import FirmiTable from './components/FirmiTable'
+import UsersTable from './components/UsersTable'
+import BroilosTable from './components/BroilosTable'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -44,10 +46,18 @@ export default function App () {
           path='/login'
           component={() => <Login loggedStatus={loggedIn} changeStatus={changeStatus} />}
           />
-          <Route path="/table">
-            <Table/>
+          <Route path="/Firmitable">
+            <FirmiTable/>
           </Route>
-          
+
+          <Route path="/Userstable">
+            <UsersTable/>
+          </Route>
+
+          <Route path="/broilosTable">
+            <BroilosTable/>
+          </Route>
+
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
           <LoggedInRoute exact path="/dodadiData" loggedStatus={loggedIn} component={AddData}></LoggedInRoute>
           </BrowserRouter >
