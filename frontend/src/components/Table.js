@@ -1,5 +1,4 @@
-import MUIDataTable from "mui-datatables";
-import React, {forwardRef, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 import MaterialTable, { MaterialTableProps } from 'material-table';
@@ -44,41 +43,37 @@ axios.defaults.baseURL = 'http://localhost:5000';
 export default function Table () {
     const [data, setData] = useState([])
     const [vraboteni, setVraboteni] = useState([])
-    const [itemsPerPage, setItemsPerPage] = useState(0)
-    const [responsive, setResponsive] = useState("vertical");
-    const [tableBodyHeight, setTableBodyHeight] = useState("400px");
-    const [tableBodyMaxHeight, setTableBodyMaxHeight] = useState("");
 
-    const columns = ["id", "name", "broj", "agent"];
-
-    const options = {
-      filter: true,
-      filterType: "dropdown",
-      responsive,
-      tableBodyHeight,
-      tableBodyMaxHeight,
-      rowsPerPageOptions: [5,15,100],
-      rowsPerPage: 5
-    };
 
     useEffect(() => {
-      getVraboteni()
-      getKompanii()
+      getData()
       }, [])
-    function getKompanii(){
-        axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
-            setData(response.data.rows)
-            console.log(response.data.rows);
-        })
-      }
-       async function getVraboteni(){
+
+
+
+      
+       function getData(){
+         var users = {}
+         var usersid = {}
           axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
-            var users = {} 
-            response.data.map((user,idx)=>{
-                users[idx] = user.username  
+            response.data.map((user)=>{
+                users[user.id] = user.username
+                //{id:username}
+                usersid[user.username]=user.id
+                //{username:id}  
               })
-              console.log(users)
               setVraboteni(users)
+          }).then(()=>{
+            axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
+              response.data.rows.map(row=>{
+                row.agent=usersid[row.agent]
+              })   
+              
+              setData(response.data.rows)
+            })
+
+
+
           })
       }
 
@@ -93,11 +88,13 @@ export default function Table () {
          },
         {
           title: "Ime", field: "name",
-          validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true
+          validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true,
+          filtering:false
         },
         {
           title: "Broj", field: "broj",
-          validate: rowData => rowData.broj === undefined || rowData.broj === "" ? "Required" : true
+          validate: rowData => rowData.broj === undefined || rowData.broj === "" ? "Required" : true,
+          filtering:false
         },
         {
           title: "Agent", field: 'agent',
@@ -122,7 +119,7 @@ export default function Table () {
                     broj:newRow.broj,
                     agent:vraboteni[newRow.agent]
                   },{withCredentials:true}).then(()=>{
-                    getKompanii()
+                    getData()
                     resolve()
                   })
                   
@@ -132,7 +129,7 @@ export default function Table () {
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
-                    getKompanii()
+                    getData()
                     resolve()
                   })
                   resolve()
@@ -144,14 +141,15 @@ export default function Table () {
                     broj:updatedRow.broj,
                     agent:vraboteni[updatedRow.agent]
                   },{withCredentials:true}).then(()=>{
-                    getKompanii()
+                    getData()
                     resolve()
                   })
                 })
       
               }}
                 options={{
-                  actionsColumnIndex: -1, addRowPosition: "first"
+                  actionsColumnIndex: -1, addRowPosition: "first",
+                  filtering:true
                 }}
             />
     );

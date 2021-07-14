@@ -19,10 +19,14 @@ export default function App () {
 
       useEffect(() => {
         axios.post("/auth/whoami",{},{withCredentials:true}).then((res)=>{
-          if(res.data.username!=="undefined"){
+          console.log("Logged in with user "+res.data.username)
+          if(res.data.message!=="Authenticated"){
             setLoggedIn(false);
+            localStorage.setItem("isAuthenticated",false);
             setIsAdmin(false);
+            localStorage.setItem("isAdmin",false);
             setUsername("");
+            localStorage.setItem("Username","");
             
           }
         })
