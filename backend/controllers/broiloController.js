@@ -1,11 +1,6 @@
-const express = require("express")
-
-const Firma = require("../models/firma.js")
-const User = require("../models/users.js")
 const BroiloStatus = require("../models/broiloStatus")
-
+const MernaTocka = require("../models/mernaTocka")
 const csv=require("csvtojson");
-
 const _ = require('lodash');
 
 const getBroilos= async function(req,res){
@@ -73,7 +68,16 @@ const uploadFile = async (req,res)=>{
             
         }
         for( var red in niza){
-    
+            MernaTocka.findOne({ where: { tockaID: niza[red].brojMernaTocka }}).then((MT)=>{
+                if(MT !== null){
+                    console.log("Mernata tocka postoi")
+                }
+                else{
+                    console.log("Mernata tocka ne postoi`")
+                }
+            });
+            
+
     
             BroiloStatus.create({
                brojMernaTocka: niza[red].brojMernaTocka,
