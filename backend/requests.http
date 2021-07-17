@@ -76,13 +76,22 @@ content-type: application/json
 {
     "tockaID":"MK0331003003303000100103000052892",
     "cena":"5.00",
-    "firmaID":"4"
+    "firmaID":"1"
 }
 ###
 POST http://localhost:5000/mernaTocka/asocirajMernaTocka HTTP/1.1
 content-type: application/json
 
 {
-    "tockaID":"MK0001000000000000000103000052892",
-    "firmaId":"14"
+    "tockaID":"MK0331003003303000100103000052892",
+    "firmaId":"6"
+}
+
+###
+POST http://localhost:5000/broilo/asocirajBroilo HTTP/1.1
+content-type: application/json
+
+{
+    "brojBroilo":"70486895",
+    "firmaId":"6"
 }

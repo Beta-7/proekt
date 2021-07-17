@@ -33,13 +33,13 @@ const dodadiMernaTocka = (req, res) => {
 async function asocirajMernaTocka(req,res){
         //tockaID
         //firmaID
-    const MT = await MernaTocka.findOne({where:{
+    const MT = await MernaTocka.findAll({where:{
         tockaID:req.body.tockaID
     }})
     const firma = await Firma.findOne({where:{
         id:req.body.firmaId
     }})
-    if(MT === null || firma === null){
+    if(MT.length === null || firma === null){
         return res.json({"message":"error","detail":"MernaTocka or Firma doesn't exist"})
     }
 

@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require("../db.js");
 
+const Firma = require("./firma")
 
 const BroiloStatus = db.define('broilostatus',{
     brojMernaTocka:{
@@ -67,5 +68,7 @@ const BroiloStatus = db.define('broilostatus',{
     
 })
 
+Firma.hasMany(BroiloStatus, {as: "broilaStatuses"})
+BroiloStatus.belongsTo(Firma)
 
 module.exports = BroiloStatus;

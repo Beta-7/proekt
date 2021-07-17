@@ -1,5 +1,6 @@
 const BroiloStatus = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
+const Firma = require("../models/firma")
 const csv=require("csvtojson");
 const _ = require('lodash');
 
@@ -105,9 +106,29 @@ const uploadFile = async (req,res)=>{
 
 
 
+async function asocirajBroilo(req,res){
+        //brojBroilo
+        //firmaID
+    const broilo = await BroiloStatus.findAll({where:{
+        brojBroilo:req.body.brojBroilo
+    }})
+    const firma = await Firma.findOne({where:{
+        id:req.body.firmaId
+    }})
+    if(broilo.length === 0 || firma === null){
+        return res.json({"message":"error","detail":"Broilo or Firma doesn't exist"})
+    }
+
+    BroiloStatus.update({firmaId:req.body.firmaId}, {
+        where:{brojBroilo:req.body.brojBroilo}
+    }).then(()=>{
+        return res.json({message:"Success",detail:"Updated Broilo"})
+    })
+
+}
 
 
 
 
 
-module.exports={getBroilos, uploadFile}
+module.exports={getBroilos, uploadFile, asocirajBroilo}
