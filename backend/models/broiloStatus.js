@@ -68,7 +68,7 @@ const BroiloStatus = db.define('broilostatus',{
     
 })
 
-Firma.hasMany(BroiloStatus, {as: "broilaStatuses"})
+Firma.hasMany(BroiloStatus, {as: "Broilo"})
 BroiloStatus.belongsTo(Firma)
 
 module.exports = BroiloStatus;

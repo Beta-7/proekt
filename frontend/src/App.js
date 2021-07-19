@@ -6,6 +6,7 @@ import AddData from './components/AddData'
 import FirmiTable from './components/FirmiTable'
 import UsersTable from './components/UsersTable'
 import BroilosTable from './components/BroilosTable'
+import MernaTocka from './components/MerniTockiTable'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -56,6 +57,10 @@ export default function App () {
 
           <Route path="/broilosTable">
             <BroilosTable/>
+          </Route>
+
+          <Route path="/MerniTockiTable">
+            <MernaTocka/>
           </Route>
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>

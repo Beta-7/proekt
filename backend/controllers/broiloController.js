@@ -69,15 +69,15 @@ const uploadFile = async (req,res)=>{
             
         }
         for( var red in niza){
-            MernaTocka.findOne({ where: { tockaID: niza[red].brojMernaTocka }}).then((MT)=>{
-                if(MT !== null){
-                    console.log("Mernata tocka postoi")
+            // console.log(niza[red].brojMernaTocka)
+            MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
+                defaults: {
+                    tockaID:niza[red].brojMernaTocka,
+                    cena:0,
+                    tarifa:niza[red].tarifa
                 }
-                else{
-                    console.log("Mernata tocka ne postoi`")
-                }
-            });
-            
+            }
+            )
 
     
             BroiloStatus.create({
@@ -95,34 +95,37 @@ const uploadFile = async (req,res)=>{
                brojMernoMesto: niza[red].brojMernoMesto,
                brojBroilo: niza[red].brojBroilo,
                datumOdEvn: niza[red].datumOdEvn
+            }).then(()=>{
+                asocirajBroiloSoKompanija()
             })
+
         }
         
     })
-     
+    
     
         
     }
 
 
 
-async function asocirajBroilo(req,res){
-        //brojBroilo
-        //firmaID
-    const broilo = await BroiloStatus.findAll({where:{
-        brojBroilo:req.body.brojBroilo
-    }})
-    const firma = await Firma.findOne({where:{
-        id:req.body.firmaId
-    }})
-    if(broilo.length === 0 || firma === null){
-        return res.json({"message":"error","detail":"Broilo or Firma doesn't exist"})
-    }
-
-    BroiloStatus.update({firmaId:req.body.firmaId}, {
-        where:{brojBroilo:req.body.brojBroilo}
-    }).then(()=>{
-        return res.json({message:"Success",detail:"Updated Broilo"})
+async function asocirajBroiloSoKompanija(){
+    // pomini gi site broilostatus,
+    // zemi merna tocka od broilo status, zemi firma id preku tabela merna tocka i asociraj ja kompanijata so broilostatus
+    console.log("Asociram")
+    
+    BroiloStatus.findAll().then((broilos)=>{
+        broilos.forEach(broilo => {
+            MernaTocka.findOne({where:{
+               tockaID:broilo.brojMernaTocka 
+            }}).then((mernatocka)=>{
+                BroiloStatus.update({firmaId:mernatocka.firmaId},{where:{
+                    id:broilo.id
+                }}).then(()=>{
+                    return
+                })
+            })
+        });
     })
 
 }
@@ -131,4 +134,8 @@ async function asocirajBroilo(req,res){
 
 
 
-module.exports={getBroilos, uploadFile, asocirajBroilo}
+
+
+
+
+module.exports={getBroilos, uploadFile, asocirajBroiloSoKompanija}

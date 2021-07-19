@@ -10,4 +10,5 @@ app.post("/dodadiFirma",auth.authMiddleware,firma.dodadiFirma)
 app.post("/promeniFirma", firma.promeniFirma)
 app.post("/zemiFirmi",firma.zemiFirmi)
 app.post("/izbrisiFirma",firma.izbrisiFirma)
+app.post("/zemiBroilaNaFirma",firma.zemiBroilaNaFirma)
 module.exports = app;

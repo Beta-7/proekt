@@ -1,0 +1,8 @@
+//upload na CSV, (upload file)
+popolnuvanje na merni tocki so firmi, (kreiranje na firmi po potreba) (kreiranje merna tocka, promena na merna tocka, brisenje na merna tocka)
+asocijacija na broilo so firmi (avtomatsko dokolku nema neasocirani),
+dobivanje na broila po firma
+
+generiranje fakturi (funkcija, potrebni podatoci)
+dolgovi
+nagrada po agent

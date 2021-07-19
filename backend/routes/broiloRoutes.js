@@ -8,5 +8,5 @@ const auth = require("../controllers/authController.js")
 
 app.post("/getBroilos",auth.authMiddleware,broilo.getBroilos)
 app.post("/uploadFile",broilo.uploadFile)
-app.post("/asocirajBroilo",broilo.asocirajBroilo)
+app.post("/asocirajBroilo",broilo.asocirajBroiloSoKompanija)
 module.exports = app;

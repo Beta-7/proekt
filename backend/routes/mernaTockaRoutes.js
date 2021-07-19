@@ -7,5 +7,7 @@ const auth = require("../controllers/authController.js")
 
 //TODO: remove route - will be used internally. currently added for testing
 app.post("/dodadiMernaTocka",mernaTocka.dodadiMernaTocka)
-app.post("/asocirajMernaTocka",mernaTocka.asocirajMernaTocka)
+app.post("/PromeniMernaTocka",mernaTocka.promeniMernaTocka)
+app.post("/getMerniTocki",mernaTocka.getMerniTocki)
+app.post("/izbrisiMernaTocka",mernaTocka.izbrisiMernaTocka)
 module.exports = app;

@@ -6,7 +6,11 @@ const Firma = require("./firma")
 const MernaTocka = db.define('mernaTocka',{
     tockaID:{
         type:Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
+    },
+    tarifa:{
+        type:Sequelize.STRING,
+
     },
     cena:{
         type:Sequelize.FLOAT,

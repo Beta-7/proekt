@@ -1,6 +1,8 @@
 
+const BroiloStatus = require("../models/broiloStatus")
 const Firma = require("../models/firma")
 const MernaTocka = require("../models/mernaTocka")
+const BroiloController = require("./broiloController")
 
 const dodadiMernaTocka = (req, res) => {
     //tockaID
@@ -30,11 +32,12 @@ const dodadiMernaTocka = (req, res) => {
     
 }
 
-async function asocirajMernaTocka(req,res){
-        //tockaID
+async function promeniMernaTocka(req,res){
+        //id
         //firmaID
-    const MT = await MernaTocka.findAll({where:{
-        tockaID:req.body.tockaID
+        //cena
+    const MT = await MernaTocka.findOne({where:{
+        id:req.body.id
     }})
     const firma = await Firma.findOne({where:{
         id:req.body.firmaId
@@ -43,16 +46,29 @@ async function asocirajMernaTocka(req,res){
         return res.json({"message":"error","detail":"MernaTocka or Firma doesn't exist"})
     }
 
-    MernaTocka.update({firmaId:req.body.firmaId}, {
-        where:{tockaID:req.body.tockaID}
+    MernaTocka.update({firmaId:req.body.firmaId,cena:req.body.cena}, {
+        where:{id:req.body.id}
     }).then(()=>{
         return res.json({message:"Success",detail:"Updated Merna Tocka"})
     })
 
 }
-
-const smeniCenaNaMernaTocka=(req,res)=>{
-
+const izbrisiMernaTocka = (req, res) =>{
+    MernaTocka.destroy({
+        where: {
+            id:req.body.id
+        }
+    }).then(()=>{
+        return res.json({message:"Success",detail:"Deleted Merna Tocka"})
+    }).catch(()=>{
+        return res.json({message:"Error",detail:"Failed to delete Merna Tocka"})
+    })
 }
 
-module.exports={dodadiMernaTocka,asocirajMernaTocka,smeniCenaNaMernaTocka}
+const getMerniTocki= async function(req,res){
+    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cena","tarifa" ,"firmaId"],raw : true})
+    BroiloController.asocirajBroiloSoKompanija()
+    return res.json(tocki)
+}
+
+module.exports={dodadiMernaTocka,promeniMernaTocka,izbrisiMernaTocka,getMerniTocki}

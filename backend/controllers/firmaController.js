@@ -7,6 +7,7 @@ const BroiloStatus = require("../models/broiloStatus")
 const csv=require("csvtojson");
 
 const _ = require('lodash');
+const { forEach } = require("lodash");
 
 const dodadiFirma = (req, res) => {
     const name=req.body.name;
@@ -70,6 +71,21 @@ const zemiFirmi = async (req,res) =>{
     return res.json(firmi)
 }
 
+function zemiBroilaNaFirma  (req, res){
+    var id = req.body.id
+    var mesec = req.body.mesec
+    BroiloStatus.findAll({where:
+    {
+        firmaId:id,
+        mesec
+
+    },
+    raw:true
+}).then((result)=>{
+    return res.json(result)
+})
+}
 
 
-module.exports={dodadiFirma, promeniFirma, izbrisiFirma, zemiFirmi}
+
+module.exports={dodadiFirma, promeniFirma, izbrisiFirma, zemiFirmi, zemiBroilaNaFirma}
