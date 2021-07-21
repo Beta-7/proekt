@@ -71,7 +71,6 @@ export default function FirmiTable () {
 
     const columns = [
         { title: "id", field: "id",
-         hidden:true,
          defaultSort:"desc"
          },
         {
