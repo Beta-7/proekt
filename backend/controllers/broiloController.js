@@ -37,6 +37,7 @@ const uploadFile = async (req,res)=>{
         var niza=[]
         var brojac=-1
         var prv
+        
         for(var brojBroilo in grupirani){
             // console.log(brojBroilo)
             
@@ -61,10 +62,11 @@ const uploadFile = async (req,res)=>{
                         
             }
             }
-        }
             niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(2)
             // console.log(niza[brojac].kolicina)
             niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(2)
+        }
+            
             
             
         }
