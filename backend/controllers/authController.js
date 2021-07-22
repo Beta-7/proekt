@@ -1,8 +1,5 @@
-const express = require("express")
-const db = require("../db.js")
 const User = require("../models/users.js")
 const bcrypt = require("bcryptjs")
-const app = express()
 const session=require("express-session")
 
 const login = async function(req,res){

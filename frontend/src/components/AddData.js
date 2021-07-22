@@ -8,6 +8,7 @@ import BroilosTable from "./BroilosTable"
 import FirmiTable from "./FirmiTable"
 import UsersTable from "./UsersTable"
 import ZelenaEnergijaData from "./ZelenaEnergijaData"
+import MerniTockiTable from "./MerniTockiTable"
 axios.defaults.baseURL = 'http://localhost:5000';
 
 export default class Login extends Component {
@@ -20,8 +21,9 @@ export default class Login extends Component {
             <UploadSensorData/>
             <BroilosTable/>
             <ZelenaEnergijaData/>
-            {/* <FirmiTable/> */}
-            {/* <UsersTable/> */}
+            <FirmiTable/>
+            <UsersTable/>
+            <MerniTockiTable/>
             </div>
     );
         }

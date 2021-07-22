@@ -114,3 +114,24 @@ Content-Type: application/json
     "id":"5",
     "mesec":"2021.03-03"
 }
+
+
+
+###
+POST http://localhost:5000/faktura/generirajFakturi HTTP/1.1
+Content-Type: application/json
+
+{
+    "id":"5",
+    "mesec":"2021.03-03"
+}
+
+
+###
+POST http://localhost:5000/faktura/zemiFaktura HTTP/1.1
+Content-Type: application/json
+
+{
+    "id":"5",
+    "mesec":"2021.03-03"
+}

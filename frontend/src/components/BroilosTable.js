@@ -4,6 +4,9 @@ import axios from 'axios';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import { TablePagination, TablePaginationProps } from '@material-ui/core';
 
+import { makeStyles } from "@material-ui/core";
+
+
 
 //Fix to the broken pagination
 function PatchedPagination(props) {
@@ -147,45 +150,12 @@ export default function FirmiTable () {
               components={{
                 Pagination: PatchedPagination,
               }}
-              editable={{
-                onRowAdd: (newRow) => new Promise((resolve, reject) => {
-                  axios.post("/user/dodadiUser",{
-                    username:newRow.username,
-                    ime:newRow.ime,
-                    prezime:newRow.prezime,
-                    isAdmin:newRow.isAdmin  
-                  },{withCredentials:true}).then(()=>{
-                    getData()
-                    resolve()
-                  })
-                  
-                }),
-                onRowDelete: selectedRow => new Promise((resolve, reject) => {
-                  axios.post("/user/izbrisiUser",{
-                    id:selectedRow.id
-                    
-                  },{withCredentials:true}).then(()=>{
-                    getData()
-                    resolve()
-                  })
-                  resolve()
-                }),
-                onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
-                  axios.post("/user/promeniUser",{
-                    id:oldRow.id,
-                    username:updatedRow.username,
-                    ime:updatedRow.ime,
-                    prezime:updatedRow.prezime,
-                    isAdmin:updatedRow.isAdmin
-                  },{withCredentials:true}).then(()=>{
-                    getData()
-                    resolve()
-                  })
-                })
-      
-              }}
+              
                 options={{
                   actionsColumnIndex: -1, addRowPosition: "first",
+                  headerStyle: {
+                    fontSize: 13,
+                  }
 
                 }}
             />

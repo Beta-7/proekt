@@ -4,10 +4,18 @@ const db = require("../db.js");
 const Firma = require("./firma")
 const BroiloStatus = require("./broiloStatus")
 
-const Farktura = db.define('faktura',{
+const Faktura = db.define('faktura',{
     brojNaFaktura:{
         type:Sequelize.STRING,
         allowNull: false
+    },
+    mesec:{
+        type:Sequelize.INTEGER,
+        allowNull:false
+    },
+    godina:{
+        type:Sequelize.INTEGER,
+        allowNull:false
     },
     platena:{
         type:Sequelize.BOOLEAN,
@@ -66,8 +74,11 @@ const Farktura = db.define('faktura',{
     }
 })
 
-Farktura.hasOne(Firma)
-Firma.belongsTo(Farktura)
+Faktura.hasOne(Firma)
+Firma.belongsTo(Faktura)
 
-Farktura.hasMany(BroiloStatus)
-BroiloStatus.belongsTo(Farktura)
+Faktura.hasMany(BroiloStatus)
+BroiloStatus.belongsTo(Faktura)
+
+
+module.exports = Faktura

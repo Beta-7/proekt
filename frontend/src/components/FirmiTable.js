@@ -150,7 +150,10 @@ export default function FirmiTable () {
               }}
                 options={{
                   actionsColumnIndex: -1, addRowPosition: "first",
-                  filtering:true
+                  filtering:true,
+                  headerStyle: {
+                    fontSize: 13,
+                  }
                 }}
             />
     );

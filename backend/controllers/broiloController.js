@@ -145,12 +145,13 @@ function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
 async function asocirajBroiloSoKompanija(){
     // pomini gi site broilostatus,
     // zemi merna tocka od broilo status, zemi firma id preku tabela merna tocka i asociraj ja kompanijata so broilostatus
-    
     BroiloStatus.findAll().then((broilos)=>{
         broilos.forEach(broilo => {
             MernaTocka.findOne({where:{
-               tockaID:broilo.brojMernaTocka 
+                tockaID:broilo.brojMernaTocka 
             }}).then((mernatocka)=>{
+                console.log("Asociram " + mernatocka.firmaId+" so "+ broilo.id)
+                console.log(mernatocka)
                 BroiloStatus.update({firmaId:mernatocka.firmaId},{where:{
                     id:broilo.id
                 }}).then(()=>{
