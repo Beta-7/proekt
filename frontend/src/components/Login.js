@@ -2,12 +2,9 @@
 import React, { Component} from 'react';
 import './Login.css';
 import {Redirect} from "react-router-dom";
-import axios from 'axios';
-
 
 import auth from "../Auth.js"
 
-axios.defaults.baseURL = 'http://localhost:5000';
 
 export default class Login extends Component {
     

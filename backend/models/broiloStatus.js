@@ -1,3 +1,4 @@
+const { FLOAT } = require('sequelize');
 const Sequelize = require('sequelize');
 const db = require("../db.js");
 
@@ -61,6 +62,12 @@ const BroiloStatus = db.define('broilostatus',{
         type:Sequelize.STRING,
         allowNull: false,
     },
+    procentOdVkupnoPotrosenaEnergija:{
+        type:Sequelize.FLOAT
+    },
+    potrosenaZelenaEnergija:{
+        type:Sequelize.FLOAT
+    }
     
     
     

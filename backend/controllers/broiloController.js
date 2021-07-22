@@ -1,6 +1,6 @@
 const BroiloStatus = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
-const Firma = require("../models/firma")
+const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const csv=require("csvtojson");
 const _ = require('lodash');
 
@@ -10,6 +10,9 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
+    var vkupnoPotrosena=0
+    var mesec
+    var godina
     csv({
         noheader: true,
         headers: ['brojMernaTocka','mesec','tarifa','datumPocetok','datumKraj','pocetnaSostojba','krajnaSostojba','kolicina','multiplikator','vkupnoKolicina','nebitno','brojMernoMesto','brojBroilo','prazno','datumOdEvn'],
@@ -62,6 +65,8 @@ const uploadFile = async (req,res)=>{
                         
             }
             }
+
+            
             niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(2)
             // console.log(niza[brojac].kolicina)
             niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(2)
@@ -71,7 +76,10 @@ const uploadFile = async (req,res)=>{
             
         }
         for( var red in niza){
-            // console.log(niza[red].brojMernaTocka)
+            // console.log(niza[red].vkupnoKolicina)
+            vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(2)
+            mesec=niza[red].mesec.slice(5,7)
+            godina=niza[red].mesec.slice(0,4)
             MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
                 defaults: {
                     tockaID:niza[red].brojMernaTocka,
@@ -80,7 +88,7 @@ const uploadFile = async (req,res)=>{
                 }
             }
             )
-
+            
     
             BroiloStatus.create({
                brojMernaTocka: niza[red].brojMernaTocka,
@@ -98,10 +106,19 @@ const uploadFile = async (req,res)=>{
                brojBroilo: niza[red].brojBroilo,
                datumOdEvn: niza[red].datumOdEvn
             }).then(()=>{
-                asocirajBroiloSoKompanija()
+               
             })
 
         }
+        VkupnoPotrosena.create({
+            mesec,
+            godina,
+            vkupnoPotrosena
+        }).then(()=>{
+            asocirajBroiloSoKompanija()
+        })
+
+
         
     })
     
@@ -109,12 +126,25 @@ const uploadFile = async (req,res)=>{
         
     }
 
+function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
+    BroiloStatus.findAll({where:{
+        mesec:godina+"."+mesec+"-"+mesec
+    }}).then((results)=>{
+        results.map((row)=>{
+            const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100).toFixed(2)
+            const vkupnaPotroshenaZelenaOdKlient = parseFloat(procentOdVkupnoPotrosenaEnergija * (parseFloat(vkupnaZelenaEnergija)/100.00)).toFixed(2)
+            row.update({
+                procentOdVkupnoPotrosenaEnergija:procentOdVkupnoPotrosenaEnergija,
+                potrosenaZelenaEnergija:vkupnaPotroshenaZelenaOdKlient
+            })
 
+        })
+    })
+}
 
 async function asocirajBroiloSoKompanija(){
     // pomini gi site broilostatus,
     // zemi merna tocka od broilo status, zemi firma id preku tabela merna tocka i asociraj ja kompanijata so broilostatus
-    console.log("Asociram")
     
     BroiloStatus.findAll().then((broilos)=>{
         broilos.forEach(broilo => {
@@ -140,4 +170,4 @@ async function asocirajBroiloSoKompanija(){
 
 
 
-module.exports={getBroilos, uploadFile, asocirajBroiloSoKompanija}
+module.exports={getBroilos, uploadFile, asocirajBroiloSoKompanija,presmetajProcent}
