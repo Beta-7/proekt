@@ -74,10 +74,10 @@ const Faktura = db.define('faktura',{
     }
 })
 
-Faktura.hasOne(Firma)
-Firma.belongsTo(Faktura)
+Firma.hasMany(Faktura)
+Faktura.belongsTo(Firma)
 
-Faktura.hasMany(BroiloStatus)
+Faktura.hasMany(BroiloStatus, {as: "Broilo"})
 BroiloStatus.belongsTo(Faktura)
 
 

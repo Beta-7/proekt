@@ -3,6 +3,13 @@ const BroiloController=require("../controllers/broiloController")
 //TODO: kamatna stapka
 const updateZelenaEnergija = (req, res) => {
     var vkupnoPotrosena=0
+
+    req.body.mesec=parseInt(req.body.mesec)
+    if(req.body.mesec<10){
+        req.body.mesec="0"+req.body.mesec
+    }
+    
+    console.log(req.body.mesec)
     VkupnoPotrosena.findOne({
         where:
         {
