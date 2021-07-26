@@ -27,12 +27,12 @@ app.use(express.json());
 app.use(session({
     secret: "asdasdasd",
     resave: false,
-    saveUnInitialized: false
+    saveUninitialized: false
 }))
 
 app.listen(5000, ()=>{
     console.log("Listening on 5000");
-})
+})  
 
 db.sync();
 

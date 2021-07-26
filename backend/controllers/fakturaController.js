@@ -2,6 +2,13 @@ const Firma = require("../models/firma.js")
 const Faktura = require("../models/faktura")
 const BroiloStatus = require("../models/broiloStatus")
 
+function formatDate(date){
+    var newDate = new Date(date)
+    console.log(newDate)
+    console.log(newDate.getDay() + "-" + newDate.getMonth()+1 + "-" + newDate.getYear())
+    
+    return newDate.getDay() + "-" + newDate.getMonth()+1 + "-" + newDate.getYear()
+}
 
 const generirajFakturi = async function(req, res){
     // 1. Pomini gi site firmi
@@ -9,7 +16,6 @@ const generirajFakturi = async function(req, res){
     // 3. Ako ima spoj gi i kreiraj red vo tabelata
     var godina = req.body.godina
     var mesec = req.body.mesec
-
     godina="2021"
     mesec="03"
     // console.log("asd "+Faktura.Instance.Prototype)
@@ -18,10 +24,13 @@ const generirajFakturi = async function(req, res){
         //TODO: da raboti
     }).then((result)=>{
         result.map((firma)=>{
+            var date = new Date()
             Faktura.create({
                 brojNaFaktura:"05-2021",
                 mesec:03,
                 godina:2021,
+                datumNaIzdavanje: formatDate(new Date()),
+                rokZaNaplata: formatDate(date.getDate()+10),
                 firmaId:firma.id
             }).then((faktura)=>{
                 console.log(godina+"."+mesec+"-"+mesec)
