@@ -21,6 +21,9 @@ const Faktura = db.define('faktura',{
         type:Sequelize.BOOLEAN,
         defaultValue: false
     },
+    platenaNaDatum:{
+        type:Sequelize.STRING,
+    },
     dolg:{
         type:Sequelize.FLOAT
     },

@@ -133,7 +133,7 @@ Content-Type: application/json
 
 {
 
-    "firmaId":"1",
+    "firmaId":"2",
     "mesec":"3",
     "godina":"2021"
 }

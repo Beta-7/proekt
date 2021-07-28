@@ -1,0 +1,1 @@
+vnesi fajl -> merna tocka (so firma) -> vnesi vkupno potrosena -> storno -> proverka na plakanje/dolgovi ->kreiraj fakturi

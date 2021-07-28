@@ -23,6 +23,10 @@ export default function ZelenaEnergijaData() {
   const [godina, setGodina] = React.useState('');
   const [vkupno, setVkupno] = React.useState('');
   const [cena, setCena] = React.useState('');
+  const [kamata, setKamata] = React.useState('');
+  const [organizacija, setOrganizacija] = React.useState('');
+  const [DDVProcent, setDDVProcent] = React.useState('');
+  
 
   const handleChange = (event) => {
     //   console.log(event.target)
@@ -36,7 +40,10 @@ export default function ZelenaEnergijaData() {
         mesec,
         godina,
         vkupno,
-        cena
+        cena,
+        kamata,
+        organizacija,
+        DDVProcent
     },{withCredentials: true}).then(()=>{
 
     }).catch((err)=>{
@@ -97,6 +104,30 @@ export default function ZelenaEnergijaData() {
           variant="outlined"
           type="number"
           onChange={(e)=>{setCena(e.target.value)}}
+        /><br/>
+        <TextField
+          id="kamata"
+          label="Kamatna stapka za kasnenje"
+          placeholder="Kamata"
+          variant="outlined"
+          type="number"
+          onChange={(e)=>{setKamata(e.target.value)}}
+        /><br/>
+        <TextField
+          id="organizacija"
+          label="Nadomest za organizacija"
+          placeholder="Nadomest"
+          variant="outlined"
+          type="number"
+          onChange={(e)=>{setOrganizacija(e.target.value)}}
+        /><br/>
+        <TextField
+          id="DDV"
+          label="NDDV Procent"
+          placeholder="DDVProcent"  
+          variant="outlined"
+          type="number"
+          onChange={(e)=>{setDDVProcent(e.target.value)}}
         /><br/>
         <button variant="outlined" color="primary" type="submit">Submit</button>
       </div>

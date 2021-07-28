@@ -25,6 +25,12 @@ const VkupnoPotrosena = db.define('vkupnopotrosena',{
     },
     kamatnaStapka:{
         type:FLOAT
+    },
+    nadomestZaOrganizacija:{
+        type:FLOAT
+    },
+    DDVProcent:{
+        type:FLOAT
     }
 })
 

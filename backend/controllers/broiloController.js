@@ -132,6 +132,7 @@ function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
     }}).then((results)=>{
         results.map((row)=>{
             const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100).toFixed(2)
+            console.log(procentOdVkupnoPotrosenaEnergija)
             const vkupnaPotroshenaZelenaOdKlient = parseFloat(procentOdVkupnoPotrosenaEnergija * (parseFloat(vkupnaZelenaEnergija)/100.00)).toFixed(2)
             row.update({
                 procentOdVkupnoPotrosenaEnergija:procentOdVkupnoPotrosenaEnergija,
