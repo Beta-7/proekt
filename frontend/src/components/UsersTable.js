@@ -74,21 +74,21 @@ export default function FirmiTable () {
          defaultSort:"desc"
          },
         {
-          title: "username", field: "username",
+          title: "Корисничко име", field: "username",
           validate: rowData => rowData.username === undefined || rowData.username === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "ime", field: "ime",
+          title: "Име", field: "ime",
           validate: rowData => rowData.ime === undefined || rowData.ime === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "prezime", field: 'prezime',
+          title: "Презиме", field: 'prezime',
           validate: rowData => rowData.prezime === undefined || rowData.prezime === "" ? "Required" : true,
         },
         {
-          title: "Admin", field: 'isAdmin',
+          title: "Администратор", field: 'isAdmin',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
           type: 'boolean'
         }
@@ -97,7 +97,7 @@ export default function FirmiTable () {
     
         return (
             <MaterialTable
-              title="Student Details"
+              title="Кориснички сметки"
               columns={columns}
               data={data}
               components={{

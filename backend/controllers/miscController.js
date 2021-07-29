@@ -2,9 +2,19 @@ const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const BroiloController=require("../controllers/broiloController")
 //TODO: kamatna stapka
 const updateZelenaEnergija = (req, res) => {
+    req.body.mesec=parseInt(req.body.mesec)
+    
+    if(req.body.mesec < 1 && req.body.mesec > 12 || isNaN(req.body.mesec)){
+        return res.json({"message":"error","detail":"bad format"})        
+    }
+    if(req.body.godina < 2020 && req.body.godina > 2100 || isNaN(req.body.mesec)){
+        return res.json({"message":"error","detail":"bad format"})        
+    }
+    
+
+    try{
     var vkupnoPotrosena=0
 
-    req.body.mesec=parseInt(req.body.mesec)
     if(req.body.mesec<10){
         req.body.mesec="0"+req.body.mesec
     }
@@ -33,7 +43,12 @@ const updateZelenaEnergija = (req, res) => {
         BroiloController.presmetajProcent(req.body.mesec,req.body.godina, vkupnoPotrosena, req.body.vkupno)
 
     })
+    return res.json({"message":"success","detail":"updated"})
+    }
+    catch{
 
+        return res.json({"message":"error","detail":"error"})
+    }
 
 }
 

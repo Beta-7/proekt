@@ -88,17 +88,17 @@ export default function FirmiTable () {
          defaultSort:"desc"
          },
         {
-          title: "Ime", field: "name",
+          title: "Назив на фирма", field: "name",
           validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "Broj", field: "broj",
+          title: "Број", field: "broj",
           validate: rowData => rowData.broj === undefined || rowData.broj === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "Agent", field: 'agent',
+          title: "Агент", field: 'agent',
           validate: rowData => rowData.agent === undefined || rowData.agent === "" ? "Required" : true,
           lookup:{...vraboteni}
         }]
@@ -106,7 +106,7 @@ export default function FirmiTable () {
     
         return (
             <MaterialTable
-              title="Student Details"
+              title="Фирми"
               columns={columns}
               data={data}
               components={{

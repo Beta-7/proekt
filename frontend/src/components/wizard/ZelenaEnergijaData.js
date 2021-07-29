@@ -10,14 +10,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
-      width: '25ch',
+      width: '50ch',
     },
   },
 }));
 
 
 
-export default function ZelenaEnergijaData() {
+export default function ZelenaEnergijaData(props) {
   const classes = useStyles();
   const [mesec, setMesec] = React.useState('');
   const [godina, setGodina] = React.useState('');
@@ -33,9 +33,14 @@ export default function ZelenaEnergijaData() {
     // setValue(event.target.value);
   };
 
+  const test = (asd) =>{
+    props.editStep(props.step,asd)
+  }
+
 
   const onSubmitForm = (e) => {
     e.preventDefault();
+    test(0)
     axios.post("/misc/AddZelenaData", {
         mesec,
         godina,
@@ -44,8 +49,12 @@ export default function ZelenaEnergijaData() {
         kamata,
         organizacija,
         DDVProcent
-    },{withCredentials: true}).then(()=>{
-
+    },{withCredentials: true}).then((res)=>{
+      if(res.data.message==="success"){
+        test(0)
+      }else{
+        test(1)
+      }
     }).catch((err)=>{
         console.error(err)
     })

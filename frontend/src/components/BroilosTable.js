@@ -78,65 +78,67 @@ export default function FirmiTable () {
          defaultSort:"desc"
          },
         {
-          title: "brojMernaTocka", field: "brojMernaTocka",
+          title: "Број на мерна точка", field: "brojMernaTocka",
           validate: rowData => rowData.username === undefined || rowData.username === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "mesec", field: "mesec",
+          title: "Месец", field: "mesec",
           validate: rowData => rowData.ime === undefined || rowData.ime === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "tarifa", field: 'tarifa',
+          title: "Тарифа", field: 'tarifa',
           validate: rowData => rowData.prezime === undefined || rowData.prezime === "" ? "Required" : true,
         },
         {
-          title: "datumPocetok", field: 'datumPocetok',
+          title: "Датум почеток", field: 'datumPocetok',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "datumKraj", field: 'datumKraj',
+          title: "Датум крај", field: 'datumKraj',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "pocetnaSostojba", field: 'pocetnaSostojba',
+          title: "Почетна состојба", field: 'pocetnaSostojba',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "krajnaSostojba", field: 'krajnaSostojba',
+          title: "Крајна состојба", field: 'krajnaSostojba',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "kolicina", field: 'kolicina',
+          title: "Количина", field: 'kolicina',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "multiplikator", field: 'multiplikator',
+          title: "Мултипликатор", field: 'multiplikator',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "vkupnoKolicina", field: 'vkupnoKolicina',
+          title: "Вкупна количина", field: 'vkupnoKolicina',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
           title: "nebitno", field: 'nebitno',
+          hidden:true,
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "brojMernoMesto", field: 'brojMernoMesto',
+          title: "Број на мерно место", field: 'brojMernoMesto',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "brojBroilo", field: 'brojBroilo',
+          title: "Број на броило", field: 'brojBroilo',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
           title: "prazno", field: 'prazno',
+          hidden:true,
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         },
         {
-          title: "datumOdEvn", field: 'datumOdEvn',
+          title: "Датум од евн", field: 'datumOdEvn',
           validate: rowData => rowData.isAdmin === undefined || rowData.isAdmin === "" ? "Required" : true,
         }
     ]
@@ -144,7 +146,7 @@ export default function FirmiTable () {
     
         return (
             <MaterialTable
-              title="Student Details"
+              title="Броила"
               columns={columns}
               data={data}
               components={{

@@ -10,6 +10,8 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
+   new Promise((reject, success)=>{
+
     var vkupnoPotrosena=0
     var mesec
     var godina
@@ -123,7 +125,8 @@ const uploadFile = async (req,res)=>{
     })
     
     
-        
+    return res.json({"message":"success","detail":"uploaded file"})
+})     
     }
 
 function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){

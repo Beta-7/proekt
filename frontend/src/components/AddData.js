@@ -1,14 +1,12 @@
 
 import React, { Component} from 'react';
 import axios from 'axios';
-
-import AddCompany from "./addData/AddCompany"
-import UploadSensorData from "./addData/UploadSensorData"
+import UploadSensorData from "./wizard/UploadSensorData"
 import BroilosTable from "./BroilosTable"
-import FirmiTable from "./FirmiTable"
+import FirmiTable from "./wizard/FirmiTable"
 import UsersTable from "./UsersTable"
-import ZelenaEnergijaData from "./ZelenaEnergijaData"
-import MerniTockiTable from "./MerniTockiTable"
+import ZelenaEnergijaData from "./wizard/ZelenaEnergijaData"
+import MerniTockiTable from "./wizard/MerniTockiTable"
 axios.defaults.baseURL = 'http://localhost:5000';
 
 export default class Login extends Component {
@@ -18,12 +16,12 @@ export default class Login extends Component {
         return (
             <div>
             {/* <AddCompany/> */}
-            <UploadSensorData/>
-            <BroilosTable/>
-            <ZelenaEnergijaData/>
-            <FirmiTable/>
-            <UsersTable/>
-            <MerniTockiTable/>
+            <UploadSensorData step={2} stepState={1} editStep={()=>{}}/>
+            <BroilosTable step={2} stepState={1} editStep={()=>{}}/>
+            <ZelenaEnergijaData step={2} stepState={1} editStep={()=>{}}/>
+            <FirmiTable step={2} stepState={1} editStep={()=>{}}/>
+            <UsersTable step={2} stepState={1} editStep={()=>{}}/>
+            <MerniTockiTable step={2} stepState={1} editStep={()=>{}}/>
             </div>
     );
         }

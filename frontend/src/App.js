@@ -3,10 +3,11 @@ import Login from './components/Login';
 import LoggedInRoute from './components/LoggedInRoute';
 import Home from './components/Home';
 import AddData from './components/AddData'
-import FirmiTable from './components/FirmiTable'
+import FirmiTable from './components/wizard/FirmiTable'
 import UsersTable from './components/UsersTable'
 import BroilosTable from './components/BroilosTable'
-import MernaTocka from './components/MerniTockiTable'
+import MernaTocka from './components/wizard/MerniTockiTable'
+import WizardRoot from './components/wizard/WizardRoot'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -19,7 +20,7 @@ export default function App () {
       const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("isAuthenticated")));
       const [isAdmin, setIsAdmin] = useState(JSON.parse(localStorage.getItem("isAdmin")));
       const [username, setUsername] = useState(localStorage.getItem("Username"));
-
+      const [route, setRoute]=useState("")
       useEffect(() => {
         axios.post("/auth/whoami",{},{withCredentials:true}).then((res)=>{
           console.log("Logged in with user "+res.data.username)
@@ -41,7 +42,7 @@ export default function App () {
       }
       return (
           <div>
-            <Navbar loggedStatus={loggedIn} changeStatus={setLoggedIn}/>
+            <Navbar loggedStatus={loggedIn} changeStatus={setLoggedIn} route={route} setRoute={setRoute}/>
           <BrowserRouter>
           <Route
           path='/login'
@@ -61,6 +62,10 @@ export default function App () {
 
           <Route path="/MerniTockiTable">
             <MernaTocka/>
+          </Route>
+
+          <Route path="/wizard">
+            <WizardRoot/>
           </Route>
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>

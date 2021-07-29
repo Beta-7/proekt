@@ -1,17 +1,47 @@
+import React, { useEffect, useState } from 'react';
 
-import React from 'react';
 import './Navbar.css';
 import auth from "../Auth.js"
 
 
-const Navbar = ({loggedStatus,changeStatus}) => {
+const Navbar = ({loggedStatus,changeStatus, route, setRoute }) => {
 
+  const [active, setActive] = useState([0,0,0,0])
   const logoutBtn = (e) => {
     e.preventDefault();
     auth.logout();
     changeStatus(false);
   };
+  useEffect(() => {
+   var loc = window.location.pathname
+   console.log(loc)
+   switch (loc) {
+    case "/":
+      var newState=active;
+      newState[0]=1
+      setActive([...newState])
+      return;
+    case "/dodadiData":
+      var newState=active;
+      newState[1]=1
+      setActive([...newState])
+      return
+    case "/wizard":
+      var newState=active;
+      newState[2]=1
+      setActive([...newState])
+      return
+    case 3:
+      var newState=active;
+      newState[3]=1
+      setActive([...newState])
+      return
+    default:
+      return ;
+  }
 
+
+    }, [])
 
 
   const formatStatus = () => {
@@ -25,16 +55,16 @@ const Navbar = ({loggedStatus,changeStatus}) => {
   }     
         
         return (
-<nav className="navbar navbar-default">
+          <nav className="navbar navbar-default">
+
   <div className="container-fluid">
     <div className="navbar-header">
       <a className="navbar-brand" href="/">WebSiteName</a>
     </div>
     <ul className="nav navbar-nav">
-      <li className="active"><a href="https://google.com/">Home</a></li>
-      <li><a href="/dodadiData">Додади податоци</a></li>
-      <li><a href="https://google.com/">Page 2</a></li>
-      <li><a href="https://google.com/">Page 3</a></li>
+      <li className={active[1]?"active":""}><a href="/dodadiData" onClick={setRoute("/dodadiData")}>Додади податоци</a></li>
+      <li className={active[2]?"active":""}><a href="/wizard" onClick={setRoute("/wizard")}>Волшебник</a></li>
+      
     </ul>
     <ul className="nav navbar-nav navbar-right">
       {formatStatus()}
