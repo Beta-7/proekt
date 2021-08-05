@@ -74,6 +74,7 @@ const generirajFakturi = async function(req, res){
                                     vkupenIznosNaFakturaBezDDV:parseFloat(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))).toFixed(2),
                                     DDV:parseFloat(parseFloat(vkupnoPotrosena.DDVProcent)/100.0*(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija)))).toFixed(2),
                                     vkupnaNaplata:parseFloat(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))+parseFloat(parseFloat(vkupnoPotrosena.DDVProcent)/100.0*(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))))).toFixed(2)
+                                    
                                 }
                                 Faktura.update(promeni,{where:{
                                     id:faktura.id
@@ -123,6 +124,58 @@ const zemiFaktura = async function(req, res){
 
 }
 
+function getDaysInMonth(m, y) {
+    return m===2 ? y & 3 || !(y%25) && y & 15 ? 28 : 29 : 30 + (m+(m>>3)&1);
+}
+
+const platiFaktura = async function(req, res){
+    const fakturaid=req.body.fakturaid;
+    const platena = req.body.platena;
+    var den = req.body.den;
+    var mesec = req.body.mesec;
+    var godina = req.body.godina;
+
+    if(fakturaid===undefined){
+        return res.json({"error":"missing fakturaid","details":"supply fakturaid parameter"})
+    }
+    if(platena===undefined){
+        return res.json({"error":"missing platena","details":"supply platena parameter"})
+    }
+
+    den = (den<1 || den>31) ? undefined : den
+    mesec = (mesec<1 || mesec>12) ? undefined : mesec
+    godina = (godina<2020 || godina>2100) ? undefined : godina
+    
+    if((den===undefined || mesec===undefined || godina===undefined) && platena){
+        den = new Date().getDate()
+        mesec = new Date().getMonth()+1
+        godina = new Date().getFullYear()
+    }
+    
+    const faktura = await Faktura.findOne({where:{
+        id: fakturaid
+    }})
+    if (faktura.platena){
+        return res.json({"error":"already paid","details":"this invoice has been paid already"})
+    }
+    
+    const fakturaDen = faktura.rokZaNaplata.split("-")[0]
+    const fakturaMesec = faktura.rokZaNaplata.split("-")[1]
+    const fakturaGodina = faktura.rokZaNaplata.split("-")[2]
+
+    console.log(den, mesec, godina, fakturaDen, fakturaMesec, fakturaGodina)
+
+    // 20-1-2020
+    // 3-2-2020
+
+    //proveri dali mesecot i godinata se isti
+    //ako ne se
+
+    // for(let den1 = fakturaDen; den<getDaysInMonth(mesec, godina); den++){
+    //     for(let mesec1 = fakturaMesec; mesec1 < )
+    // }
+
+}
 
 
-module.exports={generirajFakturi, zemiFaktura}
+module.exports={generirajFakturi, zemiFaktura, platiFaktura}

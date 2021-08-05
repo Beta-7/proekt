@@ -14,9 +14,10 @@ import ZelenaEnergijaData from './ZelenaEnergijaData';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    fontSize: "100px",
   },
-  step_label_root: {
-    fontSize: '10px',
+  test:{
+      fontSize: "100px",
   },
   button: {
     marginRight: theme.spacing(1),
@@ -134,7 +135,7 @@ export default function HorizontalNonLinearStepperWithError() {
   };
 
   return (
-      <div className={classes.root}>
+      <div className={classes.test}>
         
       <Stepper activeStep={activeStep}
       >
@@ -147,7 +148,7 @@ export default function HorizontalNonLinearStepperWithError() {
                 {errorMessages}
               </Typography>
             );
-            <StepLabel classes={{ label: classes.step_label_root }}> // HERE add this
+            <StepLabel classes={{label: classes.customLabelStyle}}> // HERE add this
       {label}
     </StepLabel>
           }

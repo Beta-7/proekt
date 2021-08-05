@@ -5,5 +5,5 @@ const auth = require("../controllers/authController.js")
 
 app.post("/generirajFakturi",faktura.generirajFakturi)
 app.post("/zemiFaktura",faktura.zemiFaktura)
-
+app.post("/platiFaktura",faktura.platiFaktura)
 module.exports = app;

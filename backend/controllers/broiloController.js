@@ -3,6 +3,7 @@ const MernaTocka = require("../models/mernaTocka")
 const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const csv=require("csvtojson");
 const _ = require('lodash');
+const { isNull } = require("lodash");
 
 const getBroilos= async function(req,res){
     const broilos = await BroiloStatus.findAll({attributes:["id","brojMernaTocka","mesec", "tarifa", "datumPocetok", "datumKraj", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojMernoMesto", "brojBroilo", "datumOdEvn"],raw : true})
@@ -44,18 +45,16 @@ const uploadFile = async (req,res)=>{
         var prv
         
         for(var brojBroilo in grupirani){
-            // console.log(brojBroilo)
+
             
             
             for(var tarifa in grupirani[brojBroilo]){
                 prv=true
                 brojac++;
                 for(var merka in grupirani[brojBroilo][tarifa]){
-                //    console.log(tarifa)
-                //    console.log(brojac)
+
                    if(prv){
-                        // console.log(brojBroilo)
-                        // console.log(tarifa)
+
                         niza[brojac]=grupirani[brojBroilo][tarifa][merka]
                         prv=false
                     }else{
@@ -70,7 +69,7 @@ const uploadFile = async (req,res)=>{
 
             
             niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(2)
-            // console.log(niza[brojac].kolicina)
+
             niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(2)
         }
             
@@ -78,7 +77,6 @@ const uploadFile = async (req,res)=>{
             
         }
         for( var red in niza){
-            // console.log(niza[red].vkupnoKolicina)
             vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(2)
             mesec=niza[red].mesec.slice(5,7)
             godina=niza[red].mesec.slice(0,4)
@@ -112,13 +110,23 @@ const uploadFile = async (req,res)=>{
             })
 
         }
-        VkupnoPotrosena.create({
-            mesec,
-            godina,
-            vkupnoPotrosena
-        }).then(()=>{
-            asocirajBroiloSoKompanija()
+        VkupnoPotrosena.findOne({where:{
+            mesec, godina
+        }}).then((rezultat)=>{
+            if(isNull(rezultat)){
+                VkupnoPotrosena.create({
+                    mesec,
+                    godina,
+                    vkupnoPotrosena
+                }).then(()=>{
+                    asocirajBroiloSoKompanija()
+                })
+            }
+            else{
+                asocirajBroiloSoKompanija()
+            }
         })
+        
 
 
         
@@ -135,7 +143,7 @@ function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
     }}).then((results)=>{
         results.map((row)=>{
             const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100).toFixed(2)
-            console.log(procentOdVkupnoPotrosenaEnergija)
+
             const vkupnaPotroshenaZelenaOdKlient = parseFloat(procentOdVkupnoPotrosenaEnergija * (parseFloat(vkupnaZelenaEnergija)/100.00)).toFixed(2)
             row.update({
                 procentOdVkupnoPotrosenaEnergija:procentOdVkupnoPotrosenaEnergija,
@@ -154,8 +162,6 @@ async function asocirajBroiloSoKompanija(){
             MernaTocka.findOne({where:{
                 tockaID:broilo.brojMernaTocka 
             }}).then((mernatocka)=>{
-                console.log("Asociram " + mernatocka.firmaId+" so "+ broilo.id)
-                console.log(mernatocka)
                 BroiloStatus.update({firmaId:mernatocka.firmaId},{where:{
                     id:broilo.id
                 }}).then(()=>{

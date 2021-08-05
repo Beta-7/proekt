@@ -137,3 +137,17 @@ Content-Type: application/json
     "mesec":"3",
     "godina":"2021"
 }
+
+
+
+###
+POST http://localhost:5000/faktura/platiFaktura HTTP/1.1
+Content-Type: application/json
+
+{
+
+    "fakturaid":"4",
+    "platena":true,
+    "den":40
+
+}

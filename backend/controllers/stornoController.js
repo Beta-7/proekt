@@ -1,8 +1,6 @@
 const Storno = require("../models/storno")
 const csv=require("csvtojson");
 const _ = require('lodash');
-const Faktura = require("../models/faktura");
-const Firma = require("../models/firma")
 const Broilos = require("../models/broiloStatus")
 
 const uploadStornoFile = async (req,res)=>{
@@ -15,8 +13,7 @@ const uploadStornoFile = async (req,res)=>{
     .fromString(req.files.stornoData.data.toString('utf8'))
     .then((jsonObj)=>{
 
-        for( var red in jsonObj){
-            var temp 
+        for( var red in jsonObj){ 
             Broilos.findOne({where:{brojMernaTocka:jsonObj[red].bronNaMernaTocka}}).then((res)=>{
                 Storno.create({
                     bronNaMernaTocka: jsonObj[red].bronNaMernaTocka,
