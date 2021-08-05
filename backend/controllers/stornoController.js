@@ -1,7 +1,9 @@
 const Storno = require("../models/storno")
 const csv=require("csvtojson");
 const _ = require('lodash');
-const Broilos = require("../models/broiloStatus")
+const Broilos = require("../models/broiloStatus");
+const MernaTocka = require("../models/mernaTocka");
+const Faktura = require("../models/faktura");
 
 const uploadStornoFile = async (req,res)=>{
    new Promise((reject, success)=>{
@@ -14,7 +16,17 @@ const uploadStornoFile = async (req,res)=>{
     .then((jsonObj)=>{
 
         for( var red in jsonObj){ 
-            Broilos.findOne({where:{brojMernaTocka:jsonObj[red].bronNaMernaTocka}}).then((res)=>{
+            
+            console.log(red)
+            MernaTocka.findOne({where:{tockaID:jsonObj[red].bronNaMernaTocka}}).then((mernatocka)=>{
+                Faktura.findOne({where:{
+                    firmaId:mernatocka.dataValues.firmaId
+                },
+                order: [
+                    ['id', 'DESC'],
+                ],
+                
+            }).then((faktura)=>{
                 Storno.create({
                     bronNaMernaTocka: jsonObj[red].bronNaMernaTocka,
                     mesecNaFakturiranje: jsonObj[red].mesecNaFakturiranje,
@@ -31,11 +43,12 @@ const uploadStornoFile = async (req,res)=>{
                     brojNaBroilo: jsonObj[red].brojNaBroilo,
                     nebitno2: jsonObj[red].nebitno2,
                     datumNaIzrabotkaEVN: jsonObj[red].datumNaIzrabotkaEVN,
-                    fakturaId: res.dataValues.fakturaId
-                 }).then(()=>{
-                    
+                    fakturaId: faktura.id
                  })
+                })
             })
+
+
             
 
         }
