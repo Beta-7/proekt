@@ -15,6 +15,10 @@ const Firma = db.define('firma',{
     agent:{
         type:Sequelize.STRING,
         allowNull: false
+    },
+    nagrada:{
+        type:Sequelize.DOUBLE,
+        allowNull: false
     }
 })
 

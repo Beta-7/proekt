@@ -101,7 +101,12 @@ export default function FirmiTable () {
           title: "Агент", field: 'agent',
           validate: rowData => rowData.agent === undefined || rowData.agent === "" ? "Required" : true,
           lookup:{...vraboteni}
-        }]
+        },
+        {
+          title: "Награда за агент по kWh", field: 'nagrada',
+          validate: rowData => rowData.nagrada === undefined || rowData.nagrada === "" ? "Required" : true
+        }
+      ]
     
     
         return (
@@ -114,11 +119,11 @@ export default function FirmiTable () {
               }}
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
-                  // console.log(vraboteni[newRow.agent])
                   axios.post("/firmi/dodadiFirma",{
                     name:newRow.name,
                     broj:newRow.broj,
-                    agent:vraboteni[newRow.agent]
+                    agent:vraboteni[newRow.agent],
+                    nagrada:newRow.nagrada
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()
@@ -140,7 +145,8 @@ export default function FirmiTable () {
                     id:oldRow.id,
                     name:updatedRow.name,
                     broj:updatedRow.broj,
-                    agent:vraboteni[updatedRow.agent]
+                    agent:vraboteni[updatedRow.agent],
+                    nagrada:updatedRow.nagrada
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()
