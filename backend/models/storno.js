@@ -4,7 +4,7 @@ const Faktura = require('./faktura.js');
 
 
 const Storno = db.define('storno',{
-    bronNaMernaTocka:{
+    brojNaMernaTocka:{
         type:Sequelize.STRING,
         allowNull: false,
     },

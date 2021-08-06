@@ -1,56 +1,57 @@
 const Storno = require("../models/storno")
 const csv=require("csvtojson");
 const _ = require('lodash');
-const Broilos = require("../models/broiloStatus");
-const MernaTocka = require("../models/mernaTocka");
 const Faktura = require("../models/faktura");
+const Firma = require("../models/firma")
+const Broilos = require("../models/broiloStatus")
+const MernaTocka = require("../models/mernaTocka")
 
+const updateID = async (created)=>{
+    MernaTocka.findOne({where:{
+        tockaID:created.brojNaMernaTocka
+    }}).then((res)=>{
+        Faktura.findOne({order: [ [ 'id', 'DESC' ]],
+        where:{
+            firmaId:res.dataValues.firmaId
+        }}).then((resu)=>{
+            created.update({
+                fakturaId:resu.dataValues.id
+            })
+        })
+    })
+}
 const uploadStornoFile = async (req,res)=>{
    new Promise((reject, success)=>{
     csv({
         noheader: true,
-        headers: ['bronNaMernaTocka','mesecNaFakturiranje','tarifa','datumNaPocetokNaMerenje','datumNaZavrshuvanjeNaMerenje','pocetnaSostojba','krajnaSostojba','kolicina','multiplikator','vkupnoKolicina','nebitno','brojNaMernoMesto','brojNaBroilo','nebitno2','datumNaIzrabotkaEVN'],
+        headers: ['brojNaMernaTocka','mesecNaFakturiranje','tarifa','datumNaPocetokNaMerenje','datumNaZavrshuvanjeNaMerenje','pocetnaSostojba','krajnaSostojba','kolicina','multiplikator','vkupnoKolicina','nebitno','brojNaMernoMesto','brojNaBroilo','nebitno2','datumNaIzrabotkaEVN'],
         delimiter: ";"
     })
     .fromString(req.files.stornoData.data.toString('utf8'))
     .then((jsonObj)=>{
 
-        for( var red in jsonObj){ 
+        for( var red in jsonObj){
             
-            console.log(red)
-            MernaTocka.findOne({where:{tockaID:jsonObj[red].bronNaMernaTocka}}).then((mernatocka)=>{
-                Faktura.findOne({where:{
-                    firmaId:mernatocka.dataValues.firmaId
-                },
-                order: [
-                    ['id', 'DESC'],
-                ],
+            Storno.create({
+                brojNaMernaTocka: jsonObj[red].brojNaMernaTocka,
+                mesecNaFakturiranje: jsonObj[red].mesecNaFakturiranje,
+                tarifa: jsonObj[red].tarifa,
+                datumNaPocetokNaMerenje: jsonObj[red].datumNaPocetokNaMerenje,
+                datumNaZavrshuvanjeNaMerenje: jsonObj[red].datumNaZavrshuvanjeNaMerenje,
+                pocetnaSostojba: parseFloat(jsonObj[red].pocetnaSostojba.replace(",",".")),
+                krajnaSostojba: parseFloat(jsonObj[red].krajnaSostojba.replace(",",".")),
+                kolicina: parseFloat(jsonObj[red].kolicina.replace(",",".")),
+                multiplikator: parseFloat(jsonObj[red].multiplikator.replace(",",".")),
+                vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina.replace(",",".")),
+                nebitno: jsonObj[red].nebitno,
+                brojNaMernoMesto: jsonObj[red].brojNaMernoMesto,
+                brojNaBroilo: jsonObj[red].brojNaBroilo,
+                nebitno2: jsonObj[red].nebitno2,
+                datumNaIzrabotkaEVN: jsonObj[red].datumNaIzrabotkaEVN,
+             }).then((created)=>{
+                updateID(created)
+             })
                 
-            }).then((faktura)=>{
-                Storno.create({
-                    bronNaMernaTocka: jsonObj[red].bronNaMernaTocka,
-                    mesecNaFakturiranje: jsonObj[red].mesecNaFakturiranje,
-                    tarifa: jsonObj[red].tarifa,
-                    datumNaPocetokNaMerenje: jsonObj[red].datumNaPocetokNaMerenje,
-                    datumNaZavrshuvanjeNaMerenje: jsonObj[red].datumNaZavrshuvanjeNaMerenje,
-                    pocetnaSostojba: parseFloat(jsonObj[red].pocetnaSostojba.replace(",",".")),
-                    krajnaSostojba: parseFloat(jsonObj[red].krajnaSostojba.replace(",",".")),
-                    kolicina: parseFloat(jsonObj[red].kolicina.replace(",",".")),
-                    multiplikator: parseFloat(jsonObj[red].multiplikator),
-                    vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina),
-                    nebitno: jsonObj[red].nebitno,
-                    brojNaMernoMesto: jsonObj[red].brojNaMernoMesto,
-                    brojNaBroilo: jsonObj[red].brojNaBroilo,
-                    nebitno2: jsonObj[red].nebitno2,
-                    datumNaIzrabotkaEVN: jsonObj[red].datumNaIzrabotkaEVN,
-                    fakturaId: faktura.id
-                 })
-                })
-            })
-
-
-            
-
         }
     })
     
