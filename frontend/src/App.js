@@ -9,6 +9,7 @@ import BroilosTable from './components/BroilosTable'
 import MernaTocka from './components/wizard/MerniTockiTable'
 import WizardRoot from './components/wizard/WizardRoot'
 import Nagradi from './components/Nagradi'
+import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
@@ -69,8 +70,13 @@ export default function App () {
           <Route path="/wizard">
             <WizardRoot/>
           </Route>
+
           <Route path="/nagradi">
             <Nagradi/>
+          </Route>
+
+          <Route path="/logs">
+            <Logs/>
           </Route>
 
           <Route path="/UploadStornoData">

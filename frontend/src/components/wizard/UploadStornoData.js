@@ -29,7 +29,7 @@ class UploadStornoData extends Component {
         this.state.selectedFile.name
       );
     
-      axios.post("/storno/uploadStornoFile", formData).then((res)=>{
+      axios.post("/storno/uploadStornoFile", formData,{withCredentials:true}).then((res)=>{
         if(res.data.message==="success"){
           this.test()
         }

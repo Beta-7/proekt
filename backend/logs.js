@@ -1,19 +1,10 @@
-const Sequelize = require('sequelize');
-const db = require("./db.js");
+const Log = require("./models/log")
 
-const Log = db.define('logs',{
-    message:{
-        type:Sequelize.STRING
-    },
-    actor:{
-        type:Sequelize.STRING
-    }
-})
-
-const generateLog = (message, actor="SYSTEM") =>{
+const generateLog = (message, actor="SYSTEM",actedon=null) =>{
     Log.create({
         message,
-        actor
+        actor,
+        actedon
     })
 }
 

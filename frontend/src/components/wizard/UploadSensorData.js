@@ -29,7 +29,7 @@ class UploadSensorData extends Component {
         this.state.selectedFile.name
       );
     
-      axios.post("/broilo/uploadfile", formData).then((res)=>{
+      axios.post("/broilo/uploadfile", formData,{withCredentials:true}).then((res)=>{
         if(res.data.message==="success"){
           this.test()
         }

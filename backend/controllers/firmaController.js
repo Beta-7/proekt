@@ -24,7 +24,7 @@ const dodadiFirma = (req, res) => {
             agent,
             nagrada
         }).then(()=>{
-            generateLog("dodade nova kompanija", req.session.username)
+            generateLog("Додаде нова компанија", req.session.username, name)
             return res.send({"message":"success","detail":"Successfully added company"})}).catch(err=>{
           
             console.error( 'Captured validation error: ', err.errors[0]);
@@ -50,20 +50,21 @@ const promeniFirma = (req,res) =>{
     Firma.update(firma, {
         where:{id:req.body.id}
     }).then(()=>{
-        generateLog("promeni podatoci za kompanija", req.session.username)
+        generateLog("Промени податоци за компанија", req.session.username, firma.name)
         return res.json({message:"Success",detail:"Updated firma"})
     })
     })
     
 
 }
-const izbrisiFirma = (req,res) =>{
+const izbrisiFirma = async (req,res) =>{
+    const firma = await Firma.findOne({where:{id:req.body.id}})
     Firma.destroy({
         where: {
             id:req.body.id
         }
     }).then(()=>{
-        generateLog("izbrisa kompanija", req.session.username)
+        generateLog("Избриша компанија", req.session.username, firma.name)
         return res.json({message:"Success",detail:"Deleted company"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete company"})

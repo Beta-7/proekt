@@ -12,7 +12,8 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
-    generateLog("prikaci fajl so sostojbi na broila",req.session.username)
+    console.log(req.session)
+    generateLog("Прикачи фајл со состојба на броилата",req.session.username)
    new Promise((reject, success)=>{
 
     var vkupnoPotrosena=0

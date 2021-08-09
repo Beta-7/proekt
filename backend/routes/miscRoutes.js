@@ -7,5 +7,5 @@ const auth = require("../controllers/authController.js")
 app.post("/AddZelenaData",misc.updateZelenaEnergija)
 app.post("/UpdateNagrada",misc.updateNagradi)
 app.post("/GetNagradi",misc.getNagradi)
-
+app.post("/GetLogs",misc.getLogs)
 module.exports = app;

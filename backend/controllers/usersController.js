@@ -27,7 +27,7 @@ const dodadiUser = (req, res) => {
             prezime,
             isAdmin
         }).then(()=>{
-            generateLog("dodade nov korisnik",req.session.username)
+            generateLog("Додаде нов корисник",req.session.username, req.body.username)
             return res.send({"message":"success","detail":"Successfully added user"})}).catch(err=>{
           
             console.error( 'Captured validation error: ', err.errors[0]);
@@ -45,14 +45,13 @@ const promeniUser = (req,res) =>{
         if(id===null){
            return res.json({message:"No user",detail:"No user with that id"})
         }
-    user.username=req.body.username;
     user.ime=req.body.ime;
     user.prezime=req.body.prezime;
     user.isAdmin=req.body.isAdmin;
     User.update(user, {
         where:{id:req.body.id}
     }).then(()=>{
-        generateLog("promeni veke postoecki korisnik",req.session.username)
+        generateLog("Промени веќе постоечки корисник",req.session.username, req.body.username)
         return res.json({message:"Success",detail:"Updated firma"})
         
     })
@@ -60,13 +59,14 @@ const promeniUser = (req,res) =>{
     
 
 }
-const izbrisiUser = (req,res) =>{
+const izbrisiUser = async (req,res) =>{
+    const user = await User.findOne({where:{id:req.body.id}})
     User.destroy({
         where: {
             id:req.body.id
         }
     }).then(()=>{
-        generateLog("izbrisa korisnik",req.session.username)
+        generateLog("Избриша корисник",req.session.username, user.username)
         return res.json({message:"Success",detail:"Deleted User"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete User"})

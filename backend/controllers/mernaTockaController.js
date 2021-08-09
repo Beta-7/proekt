@@ -23,7 +23,7 @@ const dodadiMernaTocka = (req, res) => {
                 cena,
                 "firmaId":firma.id
             }).then(()=>{
-                generateLog("asocira merna tocka so kompanija",req.session.username)
+                generateLog("Асоцира мерна точка со компанија",req.session.username, tockaID)
                 return res.send({"message":"success","detail":"Successfully added company"})})    
         })
 
@@ -50,18 +50,21 @@ async function promeniMernaTocka(req,res){
     MernaTocka.update({firmaId:req.body.firmaId,cena:req.body.cena}, {
         where:{id:req.body.id}
     }).then(()=>{
-        generateLog("asocira merna tocka so kompanija",req.session.username)
+        generateLog("Асоцира мерна точка со компанија",req.session.username, MT.tockaID)
         return res.json({message:"Success",detail:"Updated Merna Tocka"})
     })
 
 }
-const izbrisiMernaTocka = (req, res) =>{
+const izbrisiMernaTocka = async (req, res) =>{
+    const MT = await MernaTocka.findOne({where:{
+        id:req.body.id
+    }})
     MernaTocka.destroy({
         where: {
             id:req.body.id
         }
     }).then(()=>{
-        generateLog("izbrisa merna tocka",req.session.username)
+        generateLog("Избриша мерна точка",req.session.username, MT.tockaID)
         return res.json({message:"Success",detail:"Deleted Merna Tocka"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete Merna Tocka"})

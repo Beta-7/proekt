@@ -15,7 +15,7 @@ const login = async function(req,res){
     if(passwordresult){
         req.session.isLoggedIn=true;
         req.session.username=username;
-        generateLog("se najavi", username)
+        generateLog("Се најави", username)
         return res.json({"message":"Logged in"})
     }
     else{
@@ -32,7 +32,6 @@ const getUsers= async function(req,res){
 const logout = async function(req,res){
     req.session.isLoggedIn=false;
     req.session.username='';
-    generateLog("se odjavi", req.session.username)
     return res.json({"message":"Logged out"})
 }
 
@@ -61,7 +60,7 @@ const changePassword = async function(req,res){
         req.session.isLoggedIn=null;
         req.session.username=null;
         user.update({"password":hashed})
-        generateLog("ja promeni lozinkata", req.session.username)
+        generateLog("Ја промени лозинката", req.session.username, user.username)
         return res.send("Se smeni")
     }
     else{
@@ -85,7 +84,7 @@ const register = async function(req,res){
         prezime,
         isAdmin
     }).then(()=>{
-        generateLog("se kreirase smetka smetka", req.body.username)
+        generateLog("Се креира нова сметка", actedon=req.body.username)
         return res.send("Successfully registered")}).catch(err=>{
       
         console.error( 'Captured validation error: ', err.errors[0]);
