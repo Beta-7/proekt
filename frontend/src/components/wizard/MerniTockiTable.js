@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import { TablePagination, TablePaginationProps } from '@material-ui/core';
-
+import Typography from "@material-ui/core/Typography";
 
 //Fix to the broken pagination
 function PatchedPagination(props) {
@@ -114,7 +113,7 @@ export default function FirmiTable (props) {
     
         return (
             <div>
-                {nemaNeasocirani ? <h1>Нема неасоцирани мерни точки</h1>:<h1>Има неасоцирани мерни точки</h1>}
+                {nemaNeasocirani ? <Typography style={{color:"#00aa00"}} ><h1>Нема неасоцирани мерни точки</h1></Typography>:<Typography style={{color:"#ff0000"}}><h1>Има неасоцирани мерни точки</h1></Typography>}
             
             <MaterialTable
               title="Мерни точки"
@@ -147,7 +146,10 @@ export default function FirmiTable (props) {
               }}
                 options={{
                   actionsColumnIndex: -1, addRowPosition: "first",
-                  filtering:true
+                  filtering:true,
+                  headerStyle: {
+                    fontSize: 13,
+                  }
                 }}
             />
             </div>

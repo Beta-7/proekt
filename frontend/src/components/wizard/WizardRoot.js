@@ -9,15 +9,22 @@ import UploadSensorData from './UploadSensorData';
 import MerniTockiTable from './MerniTockiTable';
 import FirmiTable from './FirmiTable';
 import ZelenaEnergijaData from './ZelenaEnergijaData';
+import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+
+const theme = createMuiTheme({
+  overrides: {
+    MuiTypography: {
+      body2: {
+        fontSize: [16, "!important"]
+      }
+    }
+  }
+});
 
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    fontSize: "100px",
-  },
-  test:{
-      fontSize: "100px",
   },
   button: {
     marginRight: theme.spacing(1),
@@ -58,32 +65,46 @@ export default function HorizontalNonLinearStepperWithError() {
         switch (step) {
           case 0:
             return <div>
+              <Typography variant="h4" >
                 <p>Прикачи го фајлот од елем во кој се запишани податоците за потрошувачите</p>
-                <UploadSensorData step={0} stepState={errors} editStep={editStep}/></div>;
+                </Typography>
+                <Typography variant="h5" >
+                <UploadSensorData step={0} stepState={errors} editStep={editStep}/>
+                </Typography>
+                </div>;
           case 1:
             return <div>
-                <p></p>
-                <FirmiTable/></div>;
+                <Typography variant="h5" >
+                <FirmiTable/>
+                </Typography></div>;
           case 2:
             return <div>
-                <p></p>
-            <MerniTockiTable step={2} stepState={errors} editStep={editStep}/></div>;
+                <Typography variant="h5">
+                <MerniTockiTable step={2} stepState={errors} editStep={editStep}/>
+                </Typography>
+                </div>;
           case 3:
             return <div>
-                <p></p>
-                <ZelenaEnergijaData step={3} stepState={errors} editStep={editStep}/></div>;
+                <ZelenaEnergijaData step={3} stepState={errors} editStep={editStep}/>
+                </div>;
           case 4:
             return <div>
-                <p></p>
-                storno</div>;
+                <Typography variant="h3">
+                storno
+                </Typography>
+                </div>;
           case 5:
             return <div>
-                <p></p>
-                provera na plakjanje</div>;
+                <Typography variant="h3">
+                provera na plakjanje
+                </Typography>
+                </div>;
           case 6:
             return <div>
-                <p></p>
-                generiraj faktura</div>;
+                <Typography variant="h3">
+                generiraj faktura
+                </Typography>
+                </div>;
           default:
             return 'Unknown step';
         }
@@ -135,6 +156,7 @@ export default function HorizontalNonLinearStepperWithError() {
   };
 
   return (
+    <ThemeProvider theme={theme}>
       <div className={classes.test}>
         
       <Stepper activeStep={activeStep}
@@ -144,7 +166,7 @@ export default function HorizontalNonLinearStepperWithError() {
           const labelProps = {};
           if (isStepOptional(index)) {
             labelProps.optional = (
-              <Typography variant="caption" color="error">
+              <Typography variant="h6" color="error">
                 {errorMessages}
               </Typography>
             );
@@ -168,10 +190,10 @@ export default function HorizontalNonLinearStepperWithError() {
       <div>
         {activeStep === steps.length ? (
           <div>
-            <Typography className={classes.instructions}>
+            <Typography className={classes.instructions} variant="h3">
               All steps completed - you&apos;re finished
             </Typography>
-            <Button onClick={handleReset} className={classes.button}>
+            <Button onClick={handleReset} className={classes.button} style={{fontSize:"15px"}}>
               ResetsetActiveStep
             </Button>
           </div>
@@ -210,5 +232,6 @@ export default function HorizontalNonLinearStepperWithError() {
         )}
       </div>
     </div>
+    </ThemeProvider>
   );
 }

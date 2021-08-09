@@ -2,6 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
+import Typography from "@material-ui/core/Typography";
+
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
@@ -10,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
-      width: '50ch',
+      width: '60ch',
     },
   },
 }));
@@ -73,11 +75,14 @@ export default function ZelenaEnergijaData(props) {
           InputProps={{
             inputProps: { 
                 max: 12, min: 1 
-            }
-        }}
+            },
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
           placeholder="Mesec"
           variant="outlined"
-          
           onChange={(e)=>{
             if(e.target.value<10){
                 setMesec("0"+e.target.value)
@@ -93,16 +98,26 @@ export default function ZelenaEnergijaData(props) {
           InputProps={{
             inputProps: { 
                 max: 2100, min: 2020 
-            }
-        }}
+            },
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
           type="number"
           onChange={(e)=>{setGodina(e.target.value)}}
         /><br/>
         <TextField
-          id="vkupno"
+          id="Vkupno"
           label="Vkupno kolicestvo zelena energija"
           placeholder="Vkupno kolicestvo zelena energija"
           variant="outlined"
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
           type="number"
           onChange={(e)=>{setVkupno(e.target.value)}}
         /><br/>
@@ -111,8 +126,15 @@ export default function ZelenaEnergijaData(props) {
           label="Cena"
           placeholder="Cena"
           variant="outlined"
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
           type="number"
           onChange={(e)=>{setCena(e.target.value)}}
+          
         /><br/>
         <TextField
           id="kamata"
@@ -121,6 +143,12 @@ export default function ZelenaEnergijaData(props) {
           variant="outlined"
           type="number"
           onChange={(e)=>{setKamata(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
         /><br/>
         <TextField
           id="organizacija"
@@ -129,16 +157,28 @@ export default function ZelenaEnergijaData(props) {
           variant="outlined"
           type="number"
           onChange={(e)=>{setOrganizacija(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
         /><br/>
         <TextField
           id="DDV"
-          label="NDDV Procent"
+          label="DDV Procent"
           placeholder="DDVProcent"  
           variant="outlined"
           type="number"
           onChange={(e)=>{setDDVProcent(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
         /><br/>
-        <button variant="outlined" color="primary" type="submit">Submit</button>
+        <button variant="outlined" color="primary" type="submit"  style={{fontSize:"15px"}}>Submit</button>
       </div>
     </form>
     </center>
