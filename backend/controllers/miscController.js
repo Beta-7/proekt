@@ -1,5 +1,8 @@
 const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const BroiloController=require("../controllers/broiloController")
+const Nagradi = require("../models/nagradi")
+
+
 //TODO: kamatna stapka
 const updateZelenaEnergija = (req, res) => {
     req.body.mesec=parseInt(req.body.mesec)
@@ -52,4 +55,27 @@ const updateZelenaEnergija = (req, res) => {
 
 }
 
-module.exports={updateZelenaEnergija}
+const getNagradi = async (req, res)=>{
+    const nagradi = await Nagradi.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id", "agent", "suma","mesec","godina","firma","pomireno"],raw : true})
+    return res.json(nagradi)
+}
+
+const updateNagradi = (req, res) => {
+
+    const id = req.body.id
+    const pomireno = req.body.pomireno
+    if(id===undefined){
+        return res.json({"error":"missing id","details":"supply id parameter"})
+    }
+
+    if(pomireno===undefined){
+        return res.json({"error":"missing pomireno","details":"supply pomireno parameter"})
+    }
+
+    Nagradi.findOne({where:{id}}).then((nagrada)=>{
+        nagrada.update({pomireno})
+    })
+    return res.json({"error":"none","details":"updated nagrada"})
+}
+
+module.exports={updateZelenaEnergija,updateNagradi,getNagradi}

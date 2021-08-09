@@ -14,8 +14,8 @@ const stornoRoutes = require("./routes/stornoRoutes.js")
 
 const session=require("express-session")
 const fileUpload = require('express-fileupload');
-app.use(cors({credentials: true, origin: true}));
 
+app.use(cors({credentials: true, origin: true}));
 app.use((req, res, next) => {
     res.append('Access-Control-Allow-Methods', '*');
     res.append('Access-Control-Allow-Headers', 'Content-Type');
