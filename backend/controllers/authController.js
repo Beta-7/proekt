@@ -1,6 +1,7 @@
 const User = require("../models/users.js")
 const bcrypt = require("bcryptjs")
 const session=require("express-session")
+const generateLog = require("../logs")
 
 const login = async function(req,res){
     const username=req.body.username;
@@ -14,6 +15,7 @@ const login = async function(req,res){
     if(passwordresult){
         req.session.isLoggedIn=true;
         req.session.username=username;
+        generateLog("se najavi", username)
         return res.json({"message":"Logged in"})
     }
     else{
@@ -30,6 +32,7 @@ const getUsers= async function(req,res){
 const logout = async function(req,res){
     req.session.isLoggedIn=false;
     req.session.username='';
+    generateLog("se odjavi", req.session.username)
     return res.json({"message":"Logged out"})
 }
 
@@ -58,6 +61,7 @@ const changePassword = async function(req,res){
         req.session.isLoggedIn=null;
         req.session.username=null;
         user.update({"password":hashed})
+        generateLog("ja promeni lozinkata", req.session.username)
         return res.send("Se smeni")
     }
     else{
@@ -80,7 +84,9 @@ const register = async function(req,res){
         ime,
         prezime,
         isAdmin
-    }).then(()=>{return res.send("Successfully registered")}).catch(err=>{
+    }).then(()=>{
+        generateLog("se kreirase smetka smetka", req.body.username)
+        return res.send("Successfully registered")}).catch(err=>{
       
         console.error( 'Captured validation error: ', err.errors[0]);
         

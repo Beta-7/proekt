@@ -3,7 +3,7 @@ const BroiloStatus = require("../models/broiloStatus")
 const Firma = require("../models/firma")
 const MernaTocka = require("../models/mernaTocka")
 const BroiloController = require("./broiloController")
-
+const generateLog = require("../logs")
 const dodadiMernaTocka = (req, res) => {
     //tockaID
     //cena
@@ -23,6 +23,7 @@ const dodadiMernaTocka = (req, res) => {
                 cena,
                 "firmaId":firma.id
             }).then(()=>{
+                generateLog("asocira merna tocka so kompanija",req.session.username)
                 return res.send({"message":"success","detail":"Successfully added company"})})    
         })
 
@@ -49,6 +50,7 @@ async function promeniMernaTocka(req,res){
     MernaTocka.update({firmaId:req.body.firmaId,cena:req.body.cena}, {
         where:{id:req.body.id}
     }).then(()=>{
+        generateLog("asocira merna tocka so kompanija",req.session.username)
         return res.json({message:"Success",detail:"Updated Merna Tocka"})
     })
 
@@ -59,6 +61,7 @@ const izbrisiMernaTocka = (req, res) =>{
             id:req.body.id
         }
     }).then(()=>{
+        generateLog("izbrisa merna tocka",req.session.username)
         return res.json({message:"Success",detail:"Deleted Merna Tocka"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete Merna Tocka"})

@@ -4,6 +4,7 @@ const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const csv=require("csvtojson");
 const _ = require('lodash');
 const { isNull } = require("lodash");
+const generateLog = require("../logs")
 
 const getBroilos= async function(req,res){
     const broilos = await BroiloStatus.findAll({attributes:["id","brojMernaTocka","mesec", "tarifa", "datumPocetok", "datumKraj", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojMernoMesto", "brojBroilo", "datumOdEvn"],raw : true})
@@ -11,6 +12,7 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
+    generateLog("prikaci fajl so sostojbi na broila",req.session.username)
    new Promise((reject, success)=>{
 
     var vkupnoPotrosena=0

@@ -5,7 +5,7 @@ const Faktura = require("../models/faktura");
 const Firma = require("../models/firma")
 const Broilos = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
-
+const generateLog = require("../logs")
 const updateID = async (created)=>{
     MernaTocka.findOne({where:{
         tockaID:created.brojNaMernaTocka
@@ -55,7 +55,7 @@ const uploadStornoFile = async (req,res)=>{
         }
     })
     
-    
+    generateLog("prikaci storno fajl",req.session.username)
     return res.json({"message":"success","detail":"uploaded storno file"})
 })     
     }

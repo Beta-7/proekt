@@ -3,7 +3,7 @@ const express = require("express")
 const Firma = require("../models/firma.js")
 const User = require("../models/users.js")
 const BroiloStatus = require("../models/broiloStatus")
-
+const generateLog = require("../logs")
 const csv=require("csvtojson");
 
 const _ = require('lodash');
@@ -26,7 +26,9 @@ const dodadiUser = (req, res) => {
             ime,
             prezime,
             isAdmin
-        }).then(()=>{return res.send({"message":"success","detail":"Successfully added user"})}).catch(err=>{
+        }).then(()=>{
+            generateLog("dodade nov korisnik",req.session.username)
+            return res.send({"message":"success","detail":"Successfully added user"})}).catch(err=>{
           
             console.error( 'Captured validation error: ', err.errors[0]);
             
@@ -50,7 +52,7 @@ const promeniUser = (req,res) =>{
     User.update(user, {
         where:{id:req.body.id}
     }).then(()=>{
-        
+        generateLog("promeni veke postoecki korisnik",req.session.username)
         return res.json({message:"Success",detail:"Updated firma"})
         
     })
@@ -64,6 +66,7 @@ const izbrisiUser = (req,res) =>{
             id:req.body.id
         }
     }).then(()=>{
+        generateLog("izbrisa korisnik",req.session.username)
         return res.json({message:"Success",detail:"Deleted User"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete User"})

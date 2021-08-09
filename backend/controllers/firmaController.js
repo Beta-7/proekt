@@ -1,11 +1,10 @@
-const express = require("express")
 
 const Firma = require("../models/firma.js")
 const User = require("../models/users")
 const BroiloStatus = require("../models/broiloStatus")
 
 const csv=require("csvtojson");
-
+const generateLog = require("../logs")
 const _ = require('lodash');
 const { forEach } = require("lodash");
 
@@ -24,7 +23,9 @@ const dodadiFirma = (req, res) => {
             broj,
             agent,
             nagrada
-        }).then(()=>{return res.send({"message":"success","detail":"Successfully added company"})}).catch(err=>{
+        }).then(()=>{
+            generateLog("dodade nova kompanija", req.session.username)
+            return res.send({"message":"success","detail":"Successfully added company"})}).catch(err=>{
           
             console.error( 'Captured validation error: ', err.errors[0]);
             
@@ -49,6 +50,7 @@ const promeniFirma = (req,res) =>{
     Firma.update(firma, {
         where:{id:req.body.id}
     }).then(()=>{
+        generateLog("promeni podatoci za kompanija", req.session.username)
         return res.json({message:"Success",detail:"Updated firma"})
     })
     })
@@ -61,6 +63,7 @@ const izbrisiFirma = (req,res) =>{
             id:req.body.id
         }
     }).then(()=>{
+        generateLog("izbrisa kompanija", req.session.username)
         return res.json({message:"Success",detail:"Deleted company"})
     }).catch(()=>{
         return res.json({message:"Error",detail:"Failed to delete company"})

@@ -1,7 +1,7 @@
 const VkupnoPotrosena = require("../models/vkupnoPotrosena")
 const BroiloController=require("../controllers/broiloController")
 const Nagradi = require("../models/nagradi")
-
+const generateLog = require("../logs")
 
 //TODO: kamatna stapka
 const updateZelenaEnergija = (req, res) => {
@@ -46,6 +46,7 @@ const updateZelenaEnergija = (req, res) => {
         BroiloController.presmetajProcent(req.body.mesec,req.body.godina, vkupnoPotrosena, req.body.vkupno)
 
     })
+    generateLog("azurira podatoci za mesecot",req.session.username)
     return res.json({"message":"success","detail":"updated"})
     }
     catch{
@@ -75,6 +76,7 @@ const updateNagradi = (req, res) => {
     Nagradi.findOne({where:{id}}).then((nagrada)=>{
         nagrada.update({pomireno})
     })
+    generateLog("azurira nagrada za agent",req.session.username)
     return res.json({"error":"none","details":"updated nagrada"})
 }
 
