@@ -10,12 +10,12 @@ const updateID = async (created)=>{
     MernaTocka.findOne({where:{
         tockaID:created.brojNaMernaTocka
     }}).then((res)=>{
-        Faktura.findOne({order: [ [ 'id', 'DESC' ]],
+        Firma.findOne({order: [ [ 'id', 'DESC' ]],
         where:{
-            firmaId:res.dataValues.firmaId
+            id:res.dataValues.firmaId
         }}).then((resu)=>{
             created.update({
-                fakturaId:resu.dataValues.id
+                firmaId:resu.dataValues.id
             })
         })
     })

@@ -122,7 +122,7 @@ POST http://localhost:5000/faktura/generirajFakturi HTTP/1.1
 Content-Type: application/json
 
 {
-    "id":"5",
+    "id":"1",
     "mesec":"2021.03-03"
 }
 
@@ -151,3 +151,6 @@ Content-Type: application/json
     "den":40
 
 }
+###
+POST http://localhost:5000/stornoDisplay/test HTTP/1.1
+Content-Type: application/json

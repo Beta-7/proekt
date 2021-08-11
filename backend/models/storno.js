@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require("../db.js");
-const Faktura = require('./faktura.js');
+const Firma = require('./firma.js');
 
 
 const Storno = db.define('storno',{
@@ -71,7 +71,7 @@ const Storno = db.define('storno',{
         defaultValue: false
     }
 })
-Faktura.hasMany(Storno, {as: "storni"})
-Storno.belongsTo(Faktura)
+Firma.hasMany(Storno, {as: "storni"})
+Storno.belongsTo(Firma)
 
 module.exports = Storno;
