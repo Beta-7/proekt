@@ -90,29 +90,40 @@ const generirajFakturi = async function(req, res){
                                             }).then((stornoFirma) => {
                                                 stornoFirma.map((stornoData)=>{
                                                     
-                                                if(stornoData.vkupnoKolicina != 0){
-                                                    if(stornoData.vkupnoKolicina >= promeni.elektricnaEnergija){
-                                                        Storno.update({vkupnaKolicina: parseFloat(parseFloat(promeni.elektricnaEnergija)-parseFloat(stornoData.vkupnoKolicina))}, {where: {id: stornoData.firmaId}})
-                                                    }
+                                                    
                                                     if(stornoData.vkupnoKolicina < promeni.elektricnaEnergija){
-                                                        
                                                         StornoDisplay.create({
                                                             tarifa: stornoData.tarifa,
                                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
                                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                                                            vkupnoKolicina: parseFloat(parseFloat(promeni.elektricnaEnergija)-parseFloat(stornoData.vkupnoKolicina)),
+                                                            vkupnoKolicina: stornoData.vkupnoKolicina,
                                                             brojNaBroilo: stornoData.brojNaBroilo,
                                                             fakturaId: faktura.id
                                                         })
-                                                        
-                                                        Storno.update({vkupnaKolicina: parseFloat(0), pomireno: true}, {where: {firmaId: stornoData.firmaId, pomireno: false, tarifa: stornoData.tarifa, brojNaBroilo: stornoData.brojNaBroilo}})
+                                                        Faktura.update({elektricnaEnergija:promeni.elektricnaEnergija-stornoData.vkupnoKolicina},{where:{
+                                                            id:faktura.id
+                                                        }})
+                                                        Storno.destroy({where:{id:stornoData.id}})
+                                                    }
+                                                    if(stornoData.vkupnoKolicina >= promeni.elektricnaEnergija){
+                                                        Faktura.update({elektricnaEnergija:0},{where:{
+                                                            id:faktura.id
+                                                        }})
+                                                        StornoDisplay.create({
+                                                            tarifa: stornoData.tarifa,
+                                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                                            vkupnoKolicina: promeni.elektricnaEnergija,
+                                                            brojNaBroilo: stornoData.brojNaBroilo,
+                                                            fakturaId: faktura.id
+                                                        })
+                                                        Storno.update({
+                                                            vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(promeni.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
+                                                            kolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(promeni.elektricnaEnergija))
+                                                        },{where:{id:stornoData.id}})
                                                     }
                                                     
-                                                }
-                                                else{
-                                                    
-                                                    Storno.update({pomireno: true}, {where: {firmaId: stornoData.firmaId, pomireno: false, tarifa: stornoData.tarifa, brojNaBroilo: stornoData.brojNaBroilo}})
-                                                }
+                                                
                                             })
                                         })
                                         })

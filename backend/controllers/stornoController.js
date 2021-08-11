@@ -31,7 +31,7 @@ const uploadStornoFile = async (req,res)=>{
     .then((jsonObj)=>{
 
         for( var red in jsonObj){
-            
+            if(parseFloat(jsonObj[red].kolicina.replace(",","."))!=0){
             Storno.create({
                 brojNaMernaTocka: jsonObj[red].brojNaMernaTocka,
                 mesecNaFakturiranje: jsonObj[red].mesecNaFakturiranje,
@@ -42,7 +42,7 @@ const uploadStornoFile = async (req,res)=>{
                 krajnaSostojba: parseFloat(jsonObj[red].krajnaSostojba.replace(",",".")),
                 kolicina: parseFloat(jsonObj[red].kolicina.replace(",",".")),
                 multiplikator: parseFloat(jsonObj[red].multiplikator.replace(",",".")),
-                vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina.replace(",",".")),
+                vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina.replace(",","."))*-1.0,
                 nebitno: jsonObj[red].nebitno,
                 brojNaMernoMesto: jsonObj[red].brojNaMernoMesto,
                 brojNaBroilo: jsonObj[red].brojNaBroilo,
@@ -51,7 +51,7 @@ const uploadStornoFile = async (req,res)=>{
              }).then((created)=>{
                 updateID(created)
              })
-                
+            }
         }
     })
     
