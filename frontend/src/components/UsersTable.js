@@ -134,7 +134,6 @@ export default function FirmiTable () {
                     prezime:updatedRow.prezime,
                     isAdmin:updatedRow.isAdmin
                   },{withCredentials:true}).then(()=>{
-                    console.log("asdasddsa")
                     getData()
                     resolve()
                   })

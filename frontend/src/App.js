@@ -11,6 +11,7 @@ import WizardRoot from './components/wizard/WizardRoot'
 import Nagradi from './components/Nagradi'
 import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
+import StornoDataTable from './components/StornoTable'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -81,6 +82,10 @@ export default function App () {
 
           <Route path="/UploadStornoData">
             <UploadStornoData/>
+          </Route>
+
+          <Route path="/StornoDataTable">
+            <StornoDataTable/>
           </Route>
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
