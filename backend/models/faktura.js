@@ -5,7 +5,7 @@ const Firma = require("./firma")
 const BroiloStatus = require("./broiloStatus")
 
 const Faktura = db.define('faktura',{
-    brojNaFaktura:{
+    arhivskiBroj:{
         type:Sequelize.STRING,
         allowNull: false
     },
@@ -24,9 +24,6 @@ const Faktura = db.define('faktura',{
     platenaNaDatum:{
         type:Sequelize.STRING,
     },
-    dolg:{
-        type:Sequelize.FLOAT
-    },
     rokZaNaplata:{
         type:Sequelize.STRING
     },
@@ -43,6 +40,9 @@ const Faktura = db.define('faktura',{
         type:Sequelize.STRING
     },
     elektricnaEnergija:{
+        type:Sequelize.FLOAT
+    },
+    elektricnaEnergijaBezStorno:{
         type:Sequelize.FLOAT
     },
     cenaKwhBezDDV:{
@@ -70,9 +70,6 @@ const Faktura = db.define('faktura',{
         type:Sequelize.FLOAT
     },
     vkupnaNaplata:{
-        type:Sequelize.FLOAT
-    },
-    kamataOdPredhodno:{
         type:Sequelize.FLOAT
     }
 })

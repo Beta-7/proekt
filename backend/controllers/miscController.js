@@ -4,10 +4,10 @@ const Nagradi = require("../models/nagradi")
 const generateLog = require("../logs")
 const Log = require("../models/log")
 
-//TODO: kamatna stapka
+
 const updateZelenaEnergija = (req, res) => {
     req.body.mesec=parseInt(req.body.mesec)
-    
+    req.body.godina=parseInt(req.body.godina)
     if(req.body.mesec < 1 && req.body.mesec > 12 || isNaN(req.body.mesec)){
         return res.json({"message":"error","detail":"bad format"})        
     }
@@ -19,11 +19,7 @@ const updateZelenaEnergija = (req, res) => {
     try{
     var vkupnoPotrosena=0
 
-    if(req.body.mesec<10){
-        req.body.mesec="0"+req.body.mesec
-    }
     
-    console.log(req.body.mesec)
     VkupnoPotrosena.findOne({
         where:
         {
@@ -34,8 +30,6 @@ const updateZelenaEnergija = (req, res) => {
         row.zelenaKolicina=req.body.vkupno
         row.zelenaCena=req.body.cena
         vkupnoPotrosena = row.vkupnoPotrosena
-        console.log(req.body)
-        // console.log(vkupnoPotrosena)
         row.update({
             zelenaKolicina:req.body.vkupno,
             zelenaCena:req.body.cena,

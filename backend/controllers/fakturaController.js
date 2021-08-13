@@ -6,6 +6,7 @@ const MernaTocka = require("../models/mernaTocka.js")
 const Nagradi = require("../models/nagradi.js")
 const StornoDisplay = require("../models/stornoDisplay.js")
 const Storno = require("../models/storno.js")
+const Kamata = require("../models/kamata")
 
 function formatDate(date){
     var newDate = new Date(date)
@@ -19,8 +20,8 @@ const generirajFakturi = async function(req, res){
     // 3. Ako ima spoj gi i kreiraj red vo tabelata
     var godina = req.body.godina
     var mesec = req.body.mesec
-    godina="2021"
-    mesec="03"
+    godina=2021
+    mesec=3
     Firma.findAll({
         //TODO: da raboti
     }).then((result)=>{
@@ -33,27 +34,30 @@ const generirajFakturi = async function(req, res){
                 godina:2021,
                 firmaId:firma.id
             }}).then((postoeckafaktura)=>{
-                if((postoeckafaktura===null)){
+                if((postoeckafaktura===null||true)){
                     
                     Faktura.create({
-                        brojNaFaktura:"05-2021",
-                        mesec:03,
+                        arhivskiBroj:"05-2021",
+                        mesec:3,
                         godina:2021,
                         datumNaIzdavanje: formatDate(date),
                         rokZaNaplata: formatDate(rok),
                         firmaId:firma.id
                     }).then((faktura)=>{
-                        
+                        if(mesec<10){
+                           var tempmesec="0"+mesec
+                        }
                         firma.getBroilo({
                             where:{
-                                mesec:godina+"."+mesec+"-"+mesec
+                                mesec:godina+"."+tempmesec+"-"+tempmesec
                             }
                         }).then((result)=>{
                             var kolicinaOdSiteBroila=0
                             var kolicinaZelenaEnergija=0
                             var promeni = {}
                             result.map((broilo)=>{
-                                //TODO: Da se presmetaat vrednostite vo Faktura polinjata i da se popolnat tuka
+                                
+                                BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                                 MernaTocka.findOne({where:{
                                     tockaID:broilo.brojMernaTocka,
                                     tarifa:broilo.tarifa
@@ -63,11 +67,13 @@ const generirajFakturi = async function(req, res){
                                         godina
                                     }}).then((vkupnoPotrosena)=>{
                                         kolicinaOdSiteBroila=parseFloat(kolicinaOdSiteBroila)+parseFloat(broilo.vkupnoKolicina)
+                                        console.log(broilo.vkupnoKolicina)
                                         kolicinaZelenaEnergija=parseFloat(kolicinaZelenaEnergija) + parseFloat(broilo.potrosenaZelenaEnergija)
                                         faktura.addBroilo(broilo)
                                         
                                         promeni={
                                             elektricnaEnergija:parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija).toFixed(2),
+                                            elektricnaEnergijaBezStorno:parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija).toFixed(2),
                                             obnovlivaEnergija:parseFloat(kolicinaZelenaEnergija).toFixed(2),
                                             dataOd:broilo.datumPocetok,
                                             dataDo:broilo.datumKraj,
@@ -127,13 +133,7 @@ const generirajFakturi = async function(req, res){
                                             })
                                         })
                                         })
-                                        Nagradi.create({
-                                            agent:firma.agent,
-                                            mesec,
-                                            godina,
-                                            suma:parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija).toFixed(2)*firma.nagrada,
-                                            firma:firma.name
-                                        })
+                                        
                                         
                                     })
                                     
@@ -148,11 +148,32 @@ const generirajFakturi = async function(req, res){
             
             })
     })
-
-
+    console.log("asd")
+    dodeliNagradi(mesec, godina)
     return 
 }
 
+const dodeliNagradi = function(mesec, godina){
+    Faktura.findAll({
+        where:{
+            mesec, godina
+        }
+    }).then((fakturi)=>{
+        fakturi.map((faktura)=>{
+            Firma.findOne({where:{id:faktura.firmaId}}).then((firma)=>{
+                Nagradi.create({
+                    agent:firma.agent,
+                    mesec,
+                    godina,
+                    suma:parseInt(parseFloat(faktura.elektricnaEnergijaBezStorno).toFixed(2)*parseFloat(firma.nagrada)),
+                    firma:firma.name
+                })
+            })
+            
+        })
+    })
+    
+}
 
 const zemiFaktura = async function(req, res){
     // Zemi red od tabelata i generiraj pdf/excel fajl
@@ -214,24 +235,61 @@ const platiFaktura = async function(req, res){
     const faktura = await Faktura.findOne({where:{
         id: fakturaid
     }})
-    if (faktura.platena){
-        return res.json({"error":"already paid","details":"this invoice has been paid already"})
-    }
     
-    const fakturaDen = faktura.rokZaNaplata.split("-")[0]
-    const fakturaMesec = faktura.rokZaNaplata.split("-")[1]
-    const fakturaGodina = faktura.rokZaNaplata.split("-")[2]
+    if(faktura===null){
+        return res.json({"error":"wrong id","details":"faktura doesn't exist"})
+    }
 
+    const vkupnoPotrosena = await VkupnoPotrosena.findOne({where:{
+        mesec:toString(faktura.mesec),
+        godina:toString(faktura.godina)
+    }})
+    if(vkupnoPotrosena===null){
+        return res.json({"error":"no monthly data","details":"can't find fee values"})
+    }
 
-    // 20-1-2020
-    // 3-2-2020
+    var [denFaktura,mesecFaktura,godinaFaktura] = faktura.rokZaNaplata.split("-")
 
-    //proveri dali mesecot i godinata se isti
-    //ako ne se
+    var fakturaDate = new Date(Date.UTC(godinaFaktura,mesecFaktura-1,denFaktura))
+    var platenaDate = new Date(Date.UTC(godina, mesec-1, den))
+    
+    
+    //Fakturata se plaka
+    if(platena && !faktura.platena){
+    //Fakturata e platena odkako istekol rokot
+    if(fakturaDate <= platenaDate)
+    {
+        var denoviZakasneto = (platenaDate.getTime()-fakturaDate.getTime()) / (1000 * 3600 * 24)
 
-    // for(let den1 = fakturaDen; den<getDaysInMonth(mesec, godina); den++){
-    //     for(let mesec1 = fakturaMesec; mesec1 < )
-    // }
+        Kamata.create({
+            firmaid:faktura.firmaId,
+            fakturaid:faktura.id,
+            suma:(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
+            rok:faktura.rokZaNaplata,
+            platenoData:den+"-"+mesec+"-"+godina
+        })
+    }
+    Faktura.update({
+        platena:true,
+        platenaNaDatum:den+"-"+mesec+"-"+godina
+    },{where:{
+        id:faktura.id
+    }})
+    }
+
+    //Greska, fakturata ne bila platena. Vragi go platena statusot na false i izbrisi ja kamatata.
+    // Sleden pat koga ke se plati ke bide generirana
+    if(!platena && faktura.platena){
+        Kamata.destroy({where:{
+            fakturaid:faktura.id
+        }})
+        Faktura.update({
+            platena:false,
+            platenaNaDatum:null
+        },{where:{
+            id:faktura.id
+        }})
+    }
 
 }
 

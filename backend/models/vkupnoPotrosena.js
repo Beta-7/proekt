@@ -5,11 +5,11 @@ const db = require("../db.js");
 
 const VkupnoPotrosena = db.define('vkupnopotrosena',{
     mesec:{
-        type:Sequelize.STRING,
+        type:Sequelize.INTEGER,
         
     },
     godina:{
-        type:Sequelize.STRING,
+        type:Sequelize.INTEGER,
         
     },
     vkupnoPotrosena:{
