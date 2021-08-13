@@ -6,6 +6,114 @@ const Firma = require("../models/firma")
 const Broilos = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
 const generateLog = require("../logs")
+
+
+
+const dodadiStorno = (req, res) => {
+    const brojNaMernaTocka=req.body.brojNaMernaTocka;
+    const mesecNaFakturiranje=req.body.mesecNaFakturiranje;
+    const tarifa=req.body.tarifa;
+    const datumNaPocetokNaMerenje=req.body.datumNaPocetokNaMerenje;
+    const datumNaZavrshuvanjeNaMerenje=req.body.datumNaZavrshuvanjeNaMerenje;
+    const pocetnaSostojba=parseFloat(req.body.pocetnaSostojba);
+    const krajnaSostojba=parseFloat(req.body.krajnaSostojba);
+    const kolicina=parseFloat(req.body.kolicina);
+    const multiplikator=parseFloat(req.body.multiplikator);
+    const vkupnoKolicina=parseFloat(req.body.vkupnoKolicina);
+    const nebitno=req.body.nebitno;
+    const brojNaMernoMesto=req.body.brojNaMernoMesto;
+    const brojNaBroilo=req.body.brojNaBroilo;
+    const nebitno2=req.body.nebitno2;
+    const datumNaIzrabotkaEVN=req.body.datumNaIzrabotkaEVN;
+    const pomireno=req.body.pomireno;
+
+
+
+    Storno.create({
+        brojNaMernaTocka,
+        mesecNaFakturiranje,
+        tarifa,
+        datumNaPocetokNaMerenje,
+        datumNaZavrshuvanjeNaMerenje,
+        pocetnaSostojba,
+        krajnaSostojba,
+        kolicina,
+        multiplikator,
+        vkupnoKolicina,
+        nebitno,
+        brojNaMernoMesto,
+        brojNaBroilo,
+        nebitno2,
+        datumNaIzrabotkaEVN,
+        pomireno,
+        }).then(()=>{
+            generateLog("Додаде нов сторно",req.session.username, req.body.username)
+            return res.send({"message":"success","detail":"Successfully added storno"})}).catch(err=>{
+          
+            console.error( 'Captured validation error: ', err.errors[0]);
+            
+            return res.json({"code":err.code,"message":err.errors[0].message,"detail":err.errors[0].message});
+        })
+    
+
+}
+const promeniStorno = (req,res) =>{
+    
+    var storno = Storno.findOne({where:{id:req.body.id}});
+    Storno.findOne({where:{id:req.body.id}}).then((id)=>{
+        if(id===null){
+           return res.json({message:"No Storno",detail:"No Storno with that id"})
+        }
+        storno.brojNaMernaTocka=req.body.brojNaMernaTocka;
+        storno.mesecNaFakturiranje=req.body.mesecNaFakturiranje;
+        storno.tarifa=req.body.tarifa;
+        storno.datumNaPocetokNaMerenje=req.body.datumNaPocetokNaMerenje;
+        storno.datumNaZavrshuvanjeNaMerenje=req.body.datumNaZavrshuvanjeNaMerenje;
+        storno.pocetnaSostojba=req.body.pocetnaSostojba;
+        storno.krajnaSostojba=req.body.krajnaSostojba;
+        storno.kolicina=req.body.kolicina;
+        storno.multiplikator=req.body.multiplikator;
+        storno.vkupnoKolicina=req.body.vkupnoKolicina;
+        storno.nebitno=req.body.nebitno;
+        storno.brojNaMernoMesto=req.body.brojNaMernoMesto;
+        storno.brojNaBroilo=req.body.brojNaBroilo;
+        storno.nebitno2=req.body.nebitno2;
+        storno.datumNaIzrabotkaEVN=req.body.datumNaIzrabotkaEVN;
+        storno.pomireno=req.body.pomireno;
+    Storno.update(storno, {
+        where:{id:req.body.id}
+    }).then(()=>{
+        generateLog("Промени веќе постоечко сторно",req.session.username, req.body.username)
+        return res.json({message:"Success",detail:"Updated Storno"})
+        
+    })
+    })
+    
+
+}
+const izbrisiStorno = async (req,res) =>{
+    const storno = await Storno.findOne({where:{id:req.body.id}})
+    Storno.destroy({
+        where: {
+            id:req.body.id
+        }
+    }).then(()=>{
+        generateLog("Избриша сторно",req.session.username, user.username)
+        return res.json({message:"Success",detail:"Deleted Storno"})
+    }).catch(()=>{
+        return res.json({message:"Error",detail:"Failed to delete Storno"})
+    })
+}
+
+
+
+
+const getStornos= async function(req,res){
+    const stornos = await Storno.findAll({attributes:["id","brojNaMernaTocka", "mesecNaFakturiranje", "tarifa", "datumNaPocetokNaMerenje", "datumNaZavrshuvanjeNaMerenje", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojNaMernoMesto", "brojNaBroilo", "nebitno2", "datumNaIzrabotkaEVN", "pomireno"],raw : true})
+    return res.json(stornos)
+}
+
+
 const updateID = async (created)=>{
     MernaTocka.findOne({where:{
         tockaID:created.brojNaMernaTocka
@@ -70,4 +178,4 @@ const uploadStornoFile = async (req,res)=>{
 
 
 
-module.exports={uploadStornoFile}
+module.exports={uploadStornoFile, getStornos, dodadiStorno, promeniStorno, izbrisiStorno}

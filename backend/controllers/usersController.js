@@ -52,7 +52,7 @@ const promeniUser = (req,res) =>{
         where:{id:req.body.id}
     }).then(()=>{
         generateLog("Промени веќе постоечки корисник",req.session.username, req.body.username)
-        return res.json({message:"Success",detail:"Updated firma"})
+        return res.json({message:"Success",detail:"Updated User"})
         
     })
     })
