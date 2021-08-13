@@ -92,25 +92,38 @@ const uploadFile = async (req,res)=>{
             }
             )
             
-    
-            BroiloStatus.create({
-               brojMernaTocka: niza[red].brojMernaTocka,
-               mesec: niza[red].mesec,
-               tarifa: niza[red].tarifa,
-               datumPocetok: niza[red].datumPocetok,
-               datumKraj: niza[red].datumKraj,
-               pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
-               krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
-               kolicina: niza[red].kolicina.replace(",","."),
-               multiplikator: niza[red].multiplikator,
-               vkupnoKolicina: niza[red].vkupnoKolicina,
-               nebitno: niza[red].nebitno,
-               brojMernoMesto: niza[red].brojMernoMesto,
-               brojBroilo: niza[red].brojBroilo,
-               datumOdEvn: niza[red].datumOdEvn
-            }).then(()=>{
-               
+            BroiloStatus.findOne({where:{
+                brojMernaTocka: niza[red].brojMernaTocka,
+                mesec: niza[red].mesec,
+                tarifa: niza[red].tarifa,
+                datumPocetok: niza[red].datumPocetok,
+                datumKraj: niza[red].datumKraj,
+                pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
+                krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
+                brojMernoMesto: niza[red].brojMernoMesto,
+                brojBroilo: niza[red].brojBroilo,
+                datumOdEvn: niza[red].datumOdEvn
+            }}).then((broilo)=>{
+                if(broilo===null){
+                    BroiloStatus.create({
+                        brojMernaTocka: niza[red].brojMernaTocka,
+                        mesec: niza[red].mesec,
+                        tarifa: niza[red].tarifa,
+                        datumPocetok: niza[red].datumPocetok,
+                        datumKraj: niza[red].datumKraj,
+                        pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
+                        krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
+                        kolicina: niza[red].kolicina.replace(",","."),
+                        multiplikator: niza[red].multiplikator,
+                        vkupnoKolicina: niza[red].vkupnoKolicina,
+                        nebitno: niza[red].nebitno,
+                        brojMernoMesto: niza[red].brojMernoMesto,
+                        brojBroilo: niza[red].brojBroilo,
+                        datumOdEvn: niza[red].datumOdEvn
+                     })
+                }
             })
+            
 
         }
         VkupnoPotrosena.findOne({where:{
@@ -141,8 +154,12 @@ const uploadFile = async (req,res)=>{
     }
 
 function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
+    if(mesec<10){
+        var tempmesec="0"+mesec
+    }
+    
     BroiloStatus.findAll({where:{
-        mesec:godina+"."+mesec+"-"+mesec
+        mesec:godina+"."+tempmesec+"-"+tempmesec
     }}).then((results)=>{
         results.map((row)=>{
             const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100).toFixed(2)

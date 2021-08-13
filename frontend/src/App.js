@@ -11,12 +11,12 @@ import WizardRoot from './components/wizard/WizardRoot'
 import Nagradi from './components/Nagradi'
 import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
-import StornoDataTable from './components/StornoTable'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
 
 import axios from 'axios';
+import ZelenaEnergijaData from './components/wizard/ZelenaEnergijaData';
 axios.defaults.baseURL = 'http://localhost:5000';
 
 
@@ -68,6 +68,10 @@ export default function App () {
             <MernaTocka/>
           </Route>
 
+          <Route path="/zelena">
+            <ZelenaEnergijaData step={3} stepState={()=>{}} editStep={()=>{}}/>
+          </Route>
+
           <Route path="/wizard">
             <WizardRoot/>
           </Route>
@@ -82,10 +86,6 @@ export default function App () {
 
           <Route path="/UploadStornoData">
             <UploadStornoData/>
-          </Route>
-
-          <Route path="/StornoDataTable">
-            <StornoDataTable/>
           </Route>
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>

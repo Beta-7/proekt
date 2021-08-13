@@ -11,7 +11,6 @@ const mernaTockaRoutes = require("./routes/mernaTockaRoutes.js")
 const fakturaRoutes = require("./routes/fakturaRoutes.js")
 const miscRoutes = require("./routes/miscRoutes.js")
 const stornoRoutes = require("./routes/stornoRoutes.js")
-const stornoDisplayRoutes = require("./routes/stornoDisplayRoutes.js")
 
 const session=require("express-session")
 const fileUpload = require('express-fileupload');
@@ -56,4 +55,3 @@ app.use("/mernaTocka",mernaTockaRoutes)
 app.use("/faktura",fakturaRoutes)
 app.use("/misc",miscRoutes)
 app.use("/storno",stornoRoutes)
-app.use("/stornoDisplay",stornoDisplayRoutes)

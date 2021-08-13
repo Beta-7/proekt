@@ -3,7 +3,7 @@ const db = require("../db.js");
 const Faktura = require('./faktura.js');
 
 
-const stornoDisplay = db.define('stornoDisplay',{
+const StornoDisplay = db.define('stornoDisplay',{
     tarifa:{
         type:Sequelize.STRING,
         allowNull: false
@@ -23,9 +23,12 @@ const stornoDisplay = db.define('stornoDisplay',{
     brojNaBroilo:{
         type:Sequelize.STRING,
         allowNull: false
+    },
+    firmaid:{
+        type:Sequelize.INTEGER
     }
 })
-Faktura.hasMany(stornoDisplay, {as: "stornoDisplay"})
-stornoDisplay.belongsTo(Faktura)
+Faktura.hasMany(StornoDisplay, {as: "StornoDisplay"})
+StornoDisplay.belongsTo(Faktura)
 
-module.exports = stornoDisplay;
+module.exports = StornoDisplay;

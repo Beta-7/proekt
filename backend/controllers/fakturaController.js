@@ -14,6 +14,9 @@ function formatDate(date){
     return newDate.getDate() + "-" + parseInt(newDate.getMonth()+1) + "-" + newDate.getFullYear()
 }
 
+
+
+
 const generirajFakturi = async function(req, res){
     // 1. Pomini gi site firmi
     // 2. Proveri dali firmata ima broiloStatus za ovoj mesec
@@ -87,10 +90,11 @@ const generirajFakturi = async function(req, res){
                                             vkupnaNaplata:parseFloat(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))+parseFloat(parseFloat(vkupnoPotrosena.DDVProcent)/100.0*(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))))).toFixed(2)
                                             
                                         }
-                                        
+                                        console.log(kolicinaOdSiteBroila, kolicinaZelenaEnergija)
                                         Faktura.update(promeni,{where:{
                                             id:faktura.id
                                         }}).then(()=>{
+                                            
                                             Storno.findAll(
                                                 {where: {firmaId:firma.id, tarifa: broilo.tarifa}
                                             }).then((stornoFirma) => {
@@ -161,13 +165,23 @@ const dodeliNagradi = function(mesec, godina){
     }).then((fakturi)=>{
         fakturi.map((faktura)=>{
             Firma.findOne({where:{id:faktura.firmaId}}).then((firma)=>{
-                Nagradi.create({
+                Nagradi.findOne({where:{
                     agent:firma.agent,
                     mesec,
                     godina,
-                    suma:parseInt(parseFloat(faktura.elektricnaEnergijaBezStorno).toFixed(2)*parseFloat(firma.nagrada)),
                     firma:firma.name
+                }}).then((postoecka)=>{
+                    if(postoecka===null){
+                        Nagradi.create({
+                            agent:firma.agent,
+                            mesec,
+                            godina,
+                            suma:parseInt(parseFloat(faktura.elektricnaEnergijaBezStorno).toFixed(2)*parseFloat(firma.nagrada)),
+                            firma:firma.name
+                        })
+                    }
                 })
+
             })
             
         })
@@ -188,14 +202,25 @@ const zemiFaktura = async function(req, res){
         mesec:req.body.mesec,
         godina:req.body.godina
     },
-    include: {
+    include: 
+    {
         model: BroiloStatus,
         as: "Broilo"
     }
+    
     }).then((result)=>{
-        console.log("Fakturata so id "+result.id + " za kompanijata "+result.firmaId+" ima broila so id")
+        console.log("Faktura so id "+result.id + " za kompanijata "+result.firmaId)
         result.Broilo.map((broilo)=>{
-            console.log(broilo.id)
+            console.log("Broilo " + broilo.id)
+        })
+        StornoDisplay.findAll({where:{
+            
+        }})
+        result.Storno.map((storno)=>{
+            console.log("Storno " + storno.id)
+        })
+        result.Storno.map((kamata)=>{
+            console.log("Kamata " + kamata.id)
         })
     })
 
@@ -214,7 +239,6 @@ const platiFaktura = async function(req, res){
     var den = req.body.den;
     var mesec = req.body.mesec;
     var godina = req.body.godina;
-
     if(fakturaid===undefined){
         return res.json({"error":"missing fakturaid","details":"supply fakturaid parameter"})
     }
@@ -226,7 +250,7 @@ const platiFaktura = async function(req, res){
     mesec = (mesec<1 || mesec>12) ? undefined : mesec
     godina = (godina<2020 || godina>2100) ? undefined : godina
     
-    if((den===undefined || mesec===undefined || godina===undefined) && platena){
+    if((den===undefined || mesec===undefined || godina===undefined) && platena!==undefined){
         den = new Date().getDate()
         mesec = new Date().getMonth()+1
         godina = new Date().getFullYear()
@@ -241,8 +265,8 @@ const platiFaktura = async function(req, res){
     }
 
     const vkupnoPotrosena = await VkupnoPotrosena.findOne({where:{
-        mesec:toString(faktura.mesec),
-        godina:toString(faktura.godina)
+        mesec:faktura.mesec,
+        godina:faktura.godina
     }})
     if(vkupnoPotrosena===null){
         return res.json({"error":"no monthly data","details":"can't find fee values"})

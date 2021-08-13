@@ -2,8 +2,8 @@ POST http://localhost:5000/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "username":"notadmin",
-    "password":"notadmin",
+    "username":"asd",
+    "password":"asd",
     "ime":"david",
     "prezime":"david",
     "isAdmin":true
@@ -122,7 +122,7 @@ POST http://localhost:5000/faktura/generirajFakturi HTTP/1.1
 Content-Type: application/json
 
 {
-    "id":"1",
+    "id":"5",
     "mesec":"2021.03-03"
 }
 
@@ -133,7 +133,7 @@ Content-Type: application/json
 
 {
 
-    "firmaId":"2",
+    "firmaId":"1",
     "mesec":"3",
     "godina":"2021"
 }
@@ -146,11 +146,8 @@ Content-Type: application/json
 
 {
 
-    "fakturaid":"4",
-    "platena":true,
-    "den":40
+    "fakturaid":"2",
+    "platena":true
+   
 
 }
-###
-POST http://localhost:5000/stornoDisplay/test HTTP/1.1
-Content-Type: application/json
