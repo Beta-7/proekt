@@ -108,7 +108,8 @@ const generirajFakturi = async function(req, res){
                                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
                                                             vkupnoKolicina: stornoData.vkupnoKolicina,
                                                             brojNaBroilo: stornoData.brojNaBroilo,
-                                                            fakturaId: faktura.id
+                                                            fakturaId: faktura.id,
+                                                            firmaId:faktura.firmaId
                                                         })
                                                         Faktura.update({elektricnaEnergija:promeni.elektricnaEnergija-stornoData.vkupnoKolicina},{where:{
                                                             id:faktura.id
@@ -125,7 +126,8 @@ const generirajFakturi = async function(req, res){
                                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
                                                             vkupnoKolicina: promeni.elektricnaEnergija,
                                                             brojNaBroilo: stornoData.brojNaBroilo,
-                                                            fakturaId: faktura.id
+                                                            fakturaId: faktura.id,
+                                                            firmaId:faktura.firmaId
                                                         })
                                                         Storno.update({
                                                             vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(promeni.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
@@ -151,13 +153,15 @@ const generirajFakturi = async function(req, res){
             })
             
             })
+    }).then(()=>{
+        console.log("asd")
+        dodeliNagradi(mesec, godina)
     })
-    console.log("asd")
-    dodeliNagradi(mesec, godina)
     return 
 }
 
 const dodeliNagradi = function(mesec, godina){
+    console.log("dodeluvam nagradi")
     Faktura.findAll({
         where:{
             mesec, godina
@@ -171,6 +175,7 @@ const dodeliNagradi = function(mesec, godina){
                     godina,
                     firma:firma.name
                 }}).then((postoecka)=>{
+                    console.log(postoecka   )
                     if(postoecka===null){
                         Nagradi.create({
                             agent:firma.agent,

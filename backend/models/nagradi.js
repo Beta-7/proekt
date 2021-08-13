@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require("../db.js");
-const Faktura = require("./faktura")
-const User  = require("./users")
+
 
 const Nagradi = db.define('nagradi',{
     agent:{
@@ -12,10 +11,10 @@ const Nagradi = db.define('nagradi',{
         type:Sequelize.DOUBLE,
     },
     mesec:{
-        type:Sequelize.STRING
+        type:Sequelize.INTEGER
     },
     godina:{
-        type:Sequelize.STRING
+        type:Sequelize.INTEGER
     },
     firma:{
         type:Sequelize.STRING

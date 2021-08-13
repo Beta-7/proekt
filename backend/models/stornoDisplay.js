@@ -24,7 +24,7 @@ const StornoDisplay = db.define('stornoDisplay',{
         type:Sequelize.STRING,
         allowNull: false
     },
-    firmaid:{
+    firmaId:{
         type:Sequelize.INTEGER
     }
 })
