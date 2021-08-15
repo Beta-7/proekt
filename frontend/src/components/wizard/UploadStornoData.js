@@ -1,15 +1,25 @@
 import axios from 'axios';
  
 import React,{Component} from 'react';
- 
+import StornoTable from './StornoTable'
+
+
 class UploadStornoData extends Component {
     constructor(props){
       super(props)
       this.handleChange = this.handleChange.bind(this);
+      this.data = null
     }
     state = {
-      selectedFile: null
+      selectedFile: null,
     };
+
+    getData(){
+       axios.post("/storno/getStornos",{},{withCredentials:true}).then((response)=>{
+        this.data(response.data)
+       })
+     }
+
     onFileChange = event => {
       this.setState({ selectedFile: event.target.files[0] });
     
@@ -35,6 +45,8 @@ class UploadStornoData extends Component {
         }
       });
       }
+      console.log(this.state.data)
+
     };
     
     fileData = () => {
@@ -71,6 +83,7 @@ class UploadStornoData extends Component {
             </div>
           {this.fileData()}
           </center>
+          <StornoTable data={this.state.data}></StornoTable>
         </div>
       );
     }

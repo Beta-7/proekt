@@ -40,11 +40,14 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 
 
-export default function FirmiTable () {
+export default function StornoTable(props) {
     const [data, setData] = useState([])
 
 
     useEffect(() => {
+      console.log(props.data)
+      setData(props.data)
+      console.log(data)
       getData()
       }, [])
 
@@ -52,15 +55,10 @@ export default function FirmiTable () {
 
       
        function getData(){
-         var users = {}
-         var usersid = {}
           axios.post("/storno/getStornos",{},{withCredentials:true}).then((response)=>{
-              setData(response.data)
-              console.log(response.data)
+              //setData(response.data)
+              //console.log(response.data)
           })
-
-
-
         }
 
     
