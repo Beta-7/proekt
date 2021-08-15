@@ -12,7 +12,6 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
-    console.log(req.session)
     generateLog("Прикачи фајл со состојба на броилата",req.session.username)
    new Promise((reject, success)=>{
 
@@ -42,6 +41,8 @@ const uploadFile = async (req,res)=>{
             
             grupirani[key] = _.chain(skroteni[key]).groupBy("tarifa").value();
         }
+
+        
     
         var niza=[]
         var brojac=-1
@@ -91,8 +92,9 @@ const uploadFile = async (req,res)=>{
                 }
             }
             )
-            
-            BroiloStatus.findOne({where:{
+
+
+            BroiloStatus.findOrCreate({ where: {
                 brojMernaTocka: niza[red].brojMernaTocka,
                 mesec: niza[red].mesec,
                 tarifa: niza[red].tarifa,
@@ -103,26 +105,25 @@ const uploadFile = async (req,res)=>{
                 brojMernoMesto: niza[red].brojMernoMesto,
                 brojBroilo: niza[red].brojBroilo,
                 datumOdEvn: niza[red].datumOdEvn
-            }}).then((broilo)=>{
-                if(broilo===null){
-                    BroiloStatus.create({
-                        brojMernaTocka: niza[red].brojMernaTocka,
-                        mesec: niza[red].mesec,
-                        tarifa: niza[red].tarifa,
-                        datumPocetok: niza[red].datumPocetok,
-                        datumKraj: niza[red].datumKraj,
-                        pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
-                        krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
-                        kolicina: niza[red].kolicina.replace(",","."),
-                        multiplikator: niza[red].multiplikator,
-                        vkupnoKolicina: niza[red].vkupnoKolicina,
-                        nebitno: niza[red].nebitno,
-                        brojMernoMesto: niza[red].brojMernoMesto,
-                        brojBroilo: niza[red].brojBroilo,
-                        datumOdEvn: niza[red].datumOdEvn
-                     })
+            },
+                defaults: {
+                    brojMernaTocka: niza[red].brojMernaTocka,
+                    mesec: niza[red].mesec,
+                    tarifa: niza[red].tarifa,
+                    datumPocetok: niza[red].datumPocetok,
+                    datumKraj: niza[red].datumKraj,
+                    pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
+                    krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
+                    kolicina: niza[red].kolicina.replace(",","."),
+                    multiplikator: niza[red].multiplikator,
+                    vkupnoKolicina: niza[red].vkupnoKolicina,
+                    nebitno: niza[red].nebitno,
+                    brojMernoMesto: niza[red].brojMernoMesto,
+                    brojBroilo: niza[red].brojBroilo,
+                    datumOdEvn: niza[red].datumOdEvn
                 }
-            })
+            }
+            )
             
 
         }
