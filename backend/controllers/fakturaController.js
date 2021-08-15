@@ -7,6 +7,7 @@ const Nagradi = require("../models/nagradi.js")
 const StornoDisplay = require("../models/stornoDisplay.js")
 const Storno = require("../models/storno.js")
 const Kamata = require("../models/kamata")
+const generateLog = require("../logs.js")
 
 function formatDate(date){
     var newDate = new Date(date)
@@ -24,7 +25,7 @@ const generirajFakturi = async function(req, res){
     var godina = req.body.godina
     var mesec = req.body.mesec
     godina=2021
-    mesec=3
+    mesec=4
     Firma.findAll({
         //TODO: da raboti
     }).then((result)=>{
@@ -33,20 +34,33 @@ const generirajFakturi = async function(req, res){
             var rok = new Date()
             rok.setDate(date.getDate()+10)
             Faktura.findOne({where:{
-                mesec:03,
-                godina:2021,
+                mesec,
+                godina,
                 firmaId:firma.id
             }}).then((postoeckafaktura)=>{
                 if((postoeckafaktura===null||true)){
                     
                     Faktura.create({
                         arhivskiBroj:"05-2021",
-                        mesec:3,
-                        godina:2021,
+                        mesec,
+                        godina,
                         datumNaIzdavanje: formatDate(date),
                         rokZaNaplata: formatDate(rok),
                         firmaId:firma.id
                     }).then((faktura)=>{
+
+                        Kamata.findAll({where:{
+                            firmaid:firma.id
+                        }}).then((kamataRes)=>{
+                            if(kamataRes!==null){
+                                kamataRes.map((kamata)=>{
+                                    Kamata.update({
+                                        fakturaDisplayId:faktura.id
+                                    },{where:{id:kamata.id}})
+                                })
+                        }
+                        })
+
                         if(mesec<10){
                            var tempmesec="0"+mesec
                         }
@@ -137,6 +151,7 @@ const generirajFakturi = async function(req, res){
                                                     
                                                 
                                             })
+
                                         })
                                         })
                                         
@@ -155,13 +170,13 @@ const generirajFakturi = async function(req, res){
             })
     }).then(()=>{
         console.log("asd")
-        dodeliNagradi(mesec, godina)
+        return res.status(200)
     })
-    return 
 }
-
-const dodeliNagradi = function(mesec, godina){
-    console.log("dodeluvam nagradi")
+const dodeliNagradi = async function(req, res){
+    var mesec=req.body.mesec
+    var godina=req.body.godina
+    generateLog("Доделува награди",req.session.username,mesec+"-"+godina)
     Faktura.findAll({
         where:{
             mesec, godina
@@ -175,7 +190,6 @@ const dodeliNagradi = function(mesec, godina){
                     godina,
                     firma:firma.name
                 }}).then((postoecka)=>{
-                    console.log(postoecka   )
                     if(postoecka===null){
                         Nagradi.create({
                             agent:firma.agent,
@@ -219,13 +233,19 @@ const zemiFaktura = async function(req, res){
             console.log("Broilo " + broilo.id)
         })
         StornoDisplay.findAll({where:{
-            
-        }})
-        result.Storno.map((storno)=>{
-            console.log("Storno " + storno.id)
+            fakturaId:result.id
+        }}).then((stornores)=>{
+            stornores.map((storno)=>{
+                console.log("Storno" + storno.id)
+            })
         })
-        result.Storno.map((kamata)=>{
-            console.log("Kamata " + kamata.id)
+
+        Kamata.findAll({where:{
+            fakturaDisplayId:result.id
+        }}).then((kamatares)=>{
+            kamatares.map((kamata)=>{
+                console.log("Kamata " + kamata.id)
+            })
         })
     })
 
@@ -292,7 +312,8 @@ const platiFaktura = async function(req, res){
 
         Kamata.create({
             firmaid:faktura.firmaId,
-            fakturaid:faktura.id,
+            fakturaStoKasniId:faktura.id,
+            fakturaDisplayId:null,
             suma:(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
             rok:faktura.rokZaNaplata,
             platenoData:den+"-"+mesec+"-"+godina
@@ -310,7 +331,7 @@ const platiFaktura = async function(req, res){
     // Sleden pat koga ke se plati ke bide generirana
     if(!platena && faktura.platena){
         Kamata.destroy({where:{
-            fakturaid:faktura.id
+            fakturaStoKasniId:faktura.id
         }})
         Faktura.update({
             platena:false,
@@ -323,4 +344,4 @@ const platiFaktura = async function(req, res){
 }
 
 
-module.exports={generirajFakturi, zemiFaktura, platiFaktura}
+module.exports={generirajFakturi, zemiFaktura, platiFaktura, dodeliNagradi}

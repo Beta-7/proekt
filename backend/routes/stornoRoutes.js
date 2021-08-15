@@ -10,5 +10,6 @@ app.post("/getStornos",storno.getStornos)
 app.post("/dodadiStorno", storno.dodadiStorno)
 app.post("/promeniStorno", storno.promeniStorno)
 app.post("/izbrisiStorno", storno.izbrisiStorno)
+app.post("/reasociraj", storno.reasociate)
 
 module.exports = app;

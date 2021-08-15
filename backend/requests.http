@@ -123,7 +123,18 @@ Content-Type: application/json
 
 {
     "id":"5",
-    "mesec":"2021.03-03"
+    "mesec":3,
+    "godina":2021
+}
+
+###
+POST http://localhost:5000/faktura/dodeliNagradi HTTP/1.1
+Content-Type: application/json
+
+{
+    "id":"5",
+    "mesec":3,
+    "godina":2021
 }
 
 
@@ -138,7 +149,8 @@ Content-Type: application/json
     "godina":"2021"
 }
 
-
+###
+POST http://localhost:5000/storno/reasociraj HTTP/1.1
 
 ###
 POST http://localhost:5000/faktura/platiFaktura HTTP/1.1

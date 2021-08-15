@@ -5,7 +5,8 @@ const Faktura = require("../models/faktura");
 const Firma = require("../models/firma")
 const Broilos = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
-const generateLog = require("../logs")
+const generateLog = require("../logs");
+const { removeListener } = require("../routes/fakturaRoutes");
 
 
 
@@ -47,12 +48,11 @@ const dodadiStorno = (req, res) => {
         datumNaIzrabotkaEVN,
         pomireno,
         }).then(()=>{
-            generateLog("Додаде нов сторно",req.session.username, req.body.username)
+            generateLog("Додаде нов сторно ред",req.session.username, req.body.username)
+            updateID(created)
             return res.send({"message":"success","detail":"Successfully added storno"})}).catch(err=>{
-          
-            console.error( 'Captured validation error: ', err.errors[0]);
-            
-            return res.json({"code":err.code,"message":err.errors[0].message,"detail":err.errors[0].message});
+              console.error( 'Captured validation error: ', err.errors[0]);
+              return res.json({"code":err.code,"message":err.errors[0].message,"detail":err.errors[0].message});
         })
     
 
@@ -107,25 +107,53 @@ const izbrisiStorno = async (req,res) =>{
 
 
 
-
 const getStornos= async function(req,res){
     const stornos = await Storno.findAll({attributes:["id","brojNaMernaTocka", "mesecNaFakturiranje", "tarifa", "datumNaPocetokNaMerenje", "datumNaZavrshuvanjeNaMerenje", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojNaMernoMesto", "brojNaBroilo", "nebitno2", "datumNaIzrabotkaEVN", "pomireno"],raw : true})
     return res.json(stornos)
 }
 
+const reasociate = async(req,res)=>{
+    Storno.findAll().then((res)=>{
+        res.map((storno)=>{
+            MernaTocka.findOne({where:{tockaID:storno.brojNaMernaTocka}}).then((mernatocka)=>{
+                if(mernatocka!==null){
+                    Storno.update({firmaId:mernatocka.firmaId},{where:{id:storno.id}})
+                }
+            })
+
+        })
+    })
+}
 
 const updateID = async (created)=>{
     MernaTocka.findOne({where:{
         tockaID:created.brojNaMernaTocka
     }}).then((res)=>{
-        Firma.findOne({order: [ [ 'id', 'DESC' ]],
-        where:{
-            id:res.dataValues.firmaId
-        }}).then((resu)=>{
-            created.update({
-                firmaId:resu.dataValues.id
+        console.log(res)
+        if(res===null){
+            MernaTocka.create({
+                tockaID:created.brojNaMernaTocka,
+                tarifa:created.tarifa,
+                cena:1
+            }).then(()=>{
+                generateLog("Генерирана мерна точка од сторно фајл",actedon=created.brojNaMernaTocka)
+                return
             })
-        })
+        }
+        else{        
+            if(res.dataValues.firmaId!==null){
+
+                
+            Firma.findOne({order: [ [ 'id', 'DESC' ]],
+            where:{
+                id:res.dataValues.firmaId
+            }}).then((resu)=>{
+                created.update({
+                    firmaId:resu.dataValues.id
+                })
+            })
+        }
+    }
     })
 }
 const uploadStornoFile = async (req,res)=>{
@@ -178,4 +206,4 @@ const uploadStornoFile = async (req,res)=>{
 
 
 
-module.exports={uploadStornoFile, getStornos, dodadiStorno, promeniStorno, izbrisiStorno}
+module.exports={uploadStornoFile, getStornos, dodadiStorno, promeniStorno, izbrisiStorno, reasociate}
