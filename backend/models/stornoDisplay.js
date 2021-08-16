@@ -16,9 +16,24 @@ const StornoDisplay = db.define('stornoDisplay',{
         type:Sequelize.STRING,
         allowNull: false
     },
-    vkupnoKolicina:{
+    pocetnaSostojba:{
         type:Sequelize.FLOAT,
         allowNull: false
+    },
+    krajnaSostojba:{
+        type:Sequelize.FLOAT,
+        allowNull: false
+    },
+    kolicina:{
+        type:Sequelize.FLOAT,
+        allowNull: false
+    },
+    multiplikator:{
+        type:Sequelize.FLOAT,
+        allowNull: false
+    },
+    vkupnoKolicina:{
+        type:Sequelize.FLOAT
     },
     brojNaBroilo:{
         type:Sequelize.STRING,

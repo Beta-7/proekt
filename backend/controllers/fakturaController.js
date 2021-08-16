@@ -103,6 +103,10 @@ const generirajFakturi = async function(req, res){
                                     if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
                                         StornoDisplay.create({
                                             tarifa: stornoData.tarifa,
+                                            pocetnaSostojba:stornoData.pocetnaSostojba,
+                                            krajnaSostojba:stornoData.krajnaSostojba,
+                                            kolicina:stornoData.kolicina,
+                                            multiplikator:stornoData.multiplikator,
                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
                                             vkupnoKolicina: stornoData.vkupnoKolicina,
@@ -124,6 +128,10 @@ const generirajFakturi = async function(req, res){
                                         }})
                                         StornoDisplay.create({
                                             tarifa: stornoData.tarifa,
+                                            pocetnaSostojba:stornoData.pocetnaSostojba,
+                                            krajnaSostojba:stornoData.krajnaSostojba,
+                                            kolicina:stornoData.kolicina,
+                                            multiplikator:stornoData.multiplikator,
                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
                                             vkupnoKolicina: faktura.elektricnaEnergija,
@@ -200,6 +208,8 @@ const dodeliNagradi = async function(req, res){
                             suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
                             firma:firma.name
                         })
+                    }else{
+                        Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoecka.id}})
                     }
                 })
 

@@ -79,7 +79,7 @@ const uploadFile = async (req,res)=>{
             
             
         }
-        for( var red in niza){
+        for( let red in niza){
             vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(2)
             mesec=niza[red].mesec.slice(5,7)
             godina=niza[red].mesec.slice(0,4)
