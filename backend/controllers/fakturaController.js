@@ -25,7 +25,8 @@ const generirajFakturi = async function(req, res){
     var godina = req.body.godina
     var mesec = req.body.mesec
     godina=2021
-    mesec=4
+    mesec=3
+    var vkupnoPotrosenaEnergija =0
     Firma.findAll({
         //TODO: da raboti
     }).then((result)=>{
@@ -48,7 +49,7 @@ const generirajFakturi = async function(req, res){
                         rokZaNaplata: formatDate(rok),
                         firmaId:firma.id
                     }).then((faktura)=>{
-
+                        //dodeli kamata za kasnenje
                         Kamata.findAll({where:{
                             firmaid:firma.id
                         }}).then((kamataRes)=>{
@@ -57,121 +58,122 @@ const generirajFakturi = async function(req, res){
                                     Kamata.update({
                                         fakturaDisplayId:faktura.id
                                     },{where:{id:kamata.id}})
+                                    Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
                                 })
                         }
                         })
 
-                        if(mesec<10){
-                           var tempmesec="0"+mesec
-                        }
+                        if(mesec<10){var tempmesec="0"+mesec}
                         firma.getBroilo({
                             where:{
                                 mesec:godina+"."+tempmesec+"-"+tempmesec
                             }
                         }).then((result)=>{
+                        //dodadi broila
                             var kolicinaOdSiteBroila=0
-                            var kolicinaZelenaEnergija=0
-                            var promeni = {}
                             result.map((broilo)=>{
                                 
                                 BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
+                                
+                                kolicinaOdSiteBroila=parseFloat(kolicinaOdSiteBroila)+parseFloat(broilo.vkupnoKolicina)
+                        
+                                faktura.addBroilo(broilo)
                                 MernaTocka.findOne({where:{
-                                    tockaID:broilo.brojMernaTocka,
-                                    tarifa:broilo.tarifa
-                                }}).then((mernaTocka)=>{
-                                    VkupnoPotrosena.findOne({where:{
-                                        mesec,
-                                        godina
-                                    }}).then((vkupnoPotrosena)=>{
-                                        kolicinaOdSiteBroila=parseFloat(kolicinaOdSiteBroila)+parseFloat(broilo.vkupnoKolicina)
-                                        console.log(broilo.vkupnoKolicina)
-                                        kolicinaZelenaEnergija=parseFloat(kolicinaZelenaEnergija) + parseFloat(broilo.potrosenaZelenaEnergija)
-                                        faktura.addBroilo(broilo)
-                                        
-                                        promeni={
-                                            elektricnaEnergija:parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija).toFixed(2),
-                                            elektricnaEnergijaBezStorno:parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija).toFixed(2),
-                                            obnovlivaEnergija:parseFloat(kolicinaZelenaEnergija).toFixed(2),
-                                            dataOd:broilo.datumPocetok,
-                                            dataDo:broilo.datumKraj,
-                                            cenaKwhBezDDV:parseFloat(mernaTocka.cena).toFixed(2),
-                                            vkupenIznosBezDDV:parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena)).toFixed(2),
-                                            cenaObnovlivaEnergija:parseFloat(vkupnoPotrosena.zelenaCena).toFixed(2),
-                                            vkupnaObnovlivaEnergijaBezDDV:parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija)).toFixed(2),
-                                            nadomestZaOrganizacija:parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija)).toFixed(2),
-                                            vkupenIznosNaFakturaBezDDV:parseFloat(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))).toFixed(2),
-                                            DDV:parseFloat(parseFloat(vkupnoPotrosena.DDVProcent)/100.0*(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija)))).toFixed(2),
-                                            vkupnaNaplata:parseFloat(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))+parseFloat(parseFloat(vkupnoPotrosena.DDVProcent)/100.0*(parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija) * parseFloat(mernaTocka.cena))+parseFloat(parseFloat(vkupnoPotrosena.zelenaCena)*parseFloat(kolicinaZelenaEnergija))+parseFloat(parseFloat(kolicinaOdSiteBroila-kolicinaZelenaEnergija)*parseFloat(vkupnoPotrosena.nadomestZaOrganizacija))))).toFixed(2)
-                                            
-                                        }
-                                        console.log(kolicinaOdSiteBroila, kolicinaZelenaEnergija)
-                                        Faktura.update(promeni,{where:{
-                                            id:faktura.id
-                                        }}).then(()=>{
-                                            
-                                            Storno.findAll(
-                                                {where: {firmaId:firma.id, tarifa: broilo.tarifa}
-                                            }).then((stornoFirma) => {
-                                                stornoFirma.map((stornoData)=>{
-                                                    
-                                                    
-                                                    if(stornoData.vkupnoKolicina < promeni.elektricnaEnergija){
-                                                        StornoDisplay.create({
-                                                            tarifa: stornoData.tarifa,
-                                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
-                                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                                                            vkupnoKolicina: stornoData.vkupnoKolicina,
-                                                            brojNaBroilo: stornoData.brojNaBroilo,
-                                                            fakturaId: faktura.id,
-                                                            firmaId:faktura.firmaId
-                                                        })
-                                                        Faktura.update({elektricnaEnergija:promeni.elektricnaEnergija-stornoData.vkupnoKolicina},{where:{
-                                                            id:faktura.id
-                                                        }})
-                                                        Storno.destroy({where:{id:stornoData.id}})
-                                                    }
-                                                    if(stornoData.vkupnoKolicina >= promeni.elektricnaEnergija){
-                                                        Faktura.update({elektricnaEnergija:0},{where:{
-                                                            id:faktura.id
-                                                        }})
-                                                        StornoDisplay.create({
-                                                            tarifa: stornoData.tarifa,
-                                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
-                                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                                                            vkupnoKolicina: promeni.elektricnaEnergija,
-                                                            brojNaBroilo: stornoData.brojNaBroilo,
-                                                            fakturaId: faktura.id,
-                                                            firmaId:faktura.firmaId
-                                                        })
-                                                        Storno.update({
-                                                            vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(promeni.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
-                                                            kolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(promeni.elektricnaEnergija))
-                                                        },{where:{id:stornoData.id}})
-                                                    }
-                                                    
-                                                
-                                            })
-
-                                        })
-                                        })
-                                        
-                                        
-                                    })
-                                    
+                                    tockaID:broilo.brojMernaTocka
+                                }}).then((MT)=>{
+                                    Faktura.update({
+                                        elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+                                        elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+                                        cenaKwhBezDDV:MT.cena,
+                                        dataOd:broilo.datumPocetok,
+                                        dataDo:broilo.datumKraj
+                                    },{where:{
+                                        id:faktura.id
+                                    }})
                                 })
                                 
+                            })
+                        }).then(()=>{
+                        //dodadi storno               
+                            Storno.findAll(
+                                {where: {firmaId:firma.id}
+                            }).then((stornoFirma) => {
+                                stornoFirma.map((stornoData)=>{
+
+                                    if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
+                                        StornoDisplay.create({
+                                            tarifa: stornoData.tarifa,
+                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                            vkupnoKolicina: stornoData.vkupnoKolicina,
+                                            brojNaBroilo: stornoData.brojNaBroilo,
+                                            fakturaId: faktura.id,
+                                            firmaId:faktura.firmaId
+                                        })
+                                        Faktura.update({
+                                            elektricnaEnergija:faktura.elektricnaEnergija-stornoData.vkupnoKolicina,
+                                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-stornoData.vkupnoKolicina
+                                        },{where:{
+                                            id:faktura.id
+                                        }})
+                                        Storno.destroy({where:{id:stornoData.id}})
+                                    }
+                                    if(stornoData.vkupnoKolicina >= faktura.elektricnaEnergija){
+                                        Faktura.update({elektricnaEnergija:0, elektricnaEnergijaBezZelena:0},{where:{
+                                            id:faktura.id
+                                        }})
+                                        StornoDisplay.create({
+                                            tarifa: stornoData.tarifa,
+                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                            vkupnoKolicina: faktura.elektricnaEnergija,
+                                            brojNaBroilo: stornoData.brojNaBroilo,
+                                            fakturaId: faktura.id,
+                                            firmaId:faktura.firmaId
+                                        })
+                                        Storno.update({
+                                            vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(faktura.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
+                                            kolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(faktura.elektricnaEnergija))
+                                        },{where:{id:stornoData.id}})
+                                    }
+                                    
                                 
+                            })
+
+                        })
+                        }).then(()=>{
+                            //presmetaj zelena
+                            VkupnoPotrosena.findOne({where:{
+                                mesec,
+                                godina
+                            }}).then((vkupnopotrosena)=>{
+                                
+                                Faktura.findOne({where:{mesec, godina, firmaId:firma.id}}).then((rezultatFaktura)=>{
+                                    vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
+                                    // console.log("asd", vkupnopotrosena.vkupnoPotrosena,rezultatFaktura.elektricnaEnergija )
+                                    VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+                                })
+
                             })
                         })
                     })
                 }
             })
             
-            })
-    }).then(()=>{
-        console.log("asd")
-        return res.status(200)
+            
+    
+        
     })
+    }).then(()=>{
+        //dodeli zelena i popolni gi site vrednosti
+        console.log("asd")
+        
+
+ 
+
+    })
+
+    return res.status(200)  
 }
 const dodeliNagradi = async function(req, res){
     var mesec=req.body.mesec
@@ -195,11 +197,38 @@ const dodeliNagradi = async function(req, res){
                             agent:firma.agent,
                             mesec,
                             godina,
-                            suma:parseInt(parseFloat(faktura.elektricnaEnergijaBezStorno).toFixed(2)*parseFloat(firma.nagrada)),
+                            suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
                             firma:firma.name
                         })
                     }
                 })
+
+            }).then(()=>{
+                VkupnoPotrosena.findOne({where:{mesec, godina}}).then((vkupnoPotrosena)=>{
+                    
+                    var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
+                    var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
+                    console.log(faktura.elektricnaEnergijaBezZelena+" "+vkupnoPotrosena.vkupnoPotrosena+" "+vkupnoPotrosena.zelenaKolicina)
+                    var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
+                    var vkupenIznosBezDDV = (faktura.cenaKwhBezDDV*elektricnaEnergija).toFixed(2)
+                    var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
+                   
+                    // console.log(parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))) 
+                    Faktura.update({
+                        elektricnaEnergija,
+                        obnovlivaEnergija,
+                        cenaObnovlivaEnergija:vkupnoPotrosena.zelenaCena,
+                        vkupnaObnovlivaEnergijaBezDDV,
+                        vkupenIznosBezDDV,
+                        nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
+                        nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija),
+                        vkupenIznosNaFakturaBezDDV,
+                        DDV:vkupnoPotrosena.DDVProcent,
+                        vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
+
+                    },{where:{id:faktura.id}})
+                
+            })
 
             })
             

@@ -27,6 +27,10 @@ const Faktura = db.define('faktura',{
     rokZaNaplata:{
         type:Sequelize.STRING
     },
+    kamataOdPrethodniFakturi:{
+        type:Sequelize.STRING,
+        defaultValue:0
+    },
     datumNaIzdavanje:{
         type:Sequelize.STRING
     },
@@ -42,7 +46,7 @@ const Faktura = db.define('faktura',{
     elektricnaEnergija:{
         type:Sequelize.FLOAT
     },
-    elektricnaEnergijaBezStorno:{
+    elektricnaEnergijaBezZelena:{
         type:Sequelize.FLOAT
     },
     cenaKwhBezDDV:{
@@ -61,6 +65,9 @@ const Faktura = db.define('faktura',{
         type:Sequelize.FLOAT
     },
     nadomestZaOrganizacija:{
+        type:Sequelize.FLOAT
+    },
+    nadomestZaOrganizacijaOdKwh:{
         type:Sequelize.FLOAT
     },
     vkupenIznosNaFakturaBezDDV:{
