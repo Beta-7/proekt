@@ -10,6 +10,7 @@ import MerniTockiTable from './MerniTockiTable';
 import FirmiTable from './FirmiTable';
 import ZelenaEnergijaData from './ZelenaEnergijaData';
 import UploadStornoData from './UploadStornoData';
+import FakturiTable from './FakturiTable';
 import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 const theme = createMuiTheme({
@@ -48,7 +49,7 @@ export default function HorizontalNonLinearStepperWithError() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
-  const [errors, setErrors] = React.useState([1,0,0,1,1,1,0]);
+  const [errors, setErrors] = React.useState([1,0,0,1,1,0,0]);
   const steps = getSteps();
   var errorMessages="Незавршен чекор"  
   
@@ -100,8 +101,8 @@ export default function HorizontalNonLinearStepperWithError() {
           
           case 5:
             return <div>
-                <Typography variant="h3">
-                provera na plakjanje
+                <Typography variant="h5">
+                <FakturiTable/>
                 </Typography>
                 </div>;
           case 6:
