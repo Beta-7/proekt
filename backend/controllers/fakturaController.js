@@ -174,7 +174,6 @@ const generirajFakturi = async function(req, res){
     })
     }).then(()=>{
         //dodeli zelena i popolni gi site vrednosti
-        console.log("asd")
         
 
  
@@ -247,6 +246,11 @@ const dodeliNagradi = async function(req, res){
     
 }
 
+const getFakturi = async function(req, res){
+    const fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    return res.json(fakturi)
+}
+
 const zemiFaktura = async function(req, res){
     // Zemi red od tabelata i generiraj pdf/excel fajl
     // const izbor = req.body.izbor;
@@ -298,11 +302,23 @@ function getDaysInMonth(m, y) {
 }
 
 const platiFaktura = async function(req, res){
-    const fakturaid=req.body.fakturaid;
+    const fakturaid=req.body.id;
     const platena = req.body.platena;
-    var den = req.body.den;
-    var mesec = req.body.mesec;
-    var godina = req.body.godina;
+    var datum = req.body.platenaNaDatum
+    var den
+    var mesec
+    var godina
+    if(!(datum === null) && datum.length > 11){
+        den = datum[8]+datum[9]
+        mesec = datum[5]+datum[6]
+        godina = datum[0]+datum[1]+datum[2]+datum[3]
+    }
+    if(!(datum === null) && datum.length < 11){
+        den = datum[0]+datum[1]
+        mesec = datum[3]+datum[4]
+        godina = datum[6]+datum[7]+datum[8]+datum[9]
+    }
+    
     if(fakturaid===undefined){
         return res.json({"error":"missing fakturaid","details":"supply fakturaid parameter"})
     }
@@ -310,16 +326,20 @@ const platiFaktura = async function(req, res){
         return res.json({"error":"missing platena","details":"supply platena parameter"})
     }
 
+
     den = (den<1 || den>31) ? undefined : den
     mesec = (mesec<1 || mesec>12) ? undefined : mesec
     godina = (godina<2020 || godina>2100) ? undefined : godina
     
-    if((den===undefined || mesec===undefined || godina===undefined) && platena!==undefined){
+    if(datum === null && platena!==undefined){
         den = new Date().getDate()
+        den = den > 9 ? "" + den: "0" + den;
         mesec = new Date().getMonth()+1
+        mesec = mesec > 9 ? "" + mesec: "0" + mesec;
         godina = new Date().getFullYear()
+        godina = godina > 9 ? "" + godina: "0" + godina;
     }
-    
+
     const faktura = await Faktura.findOne({where:{
         id: fakturaid
     }})
@@ -366,6 +386,8 @@ const platiFaktura = async function(req, res){
     }})
     }
 
+    
+
     //Greska, fakturata ne bila platena. Vragi go platena statusot na false i izbrisi ja kamatata.
     // Sleden pat koga ke se plati ke bide generirana
     if(!platena && faktura.platena){
@@ -380,7 +402,21 @@ const platiFaktura = async function(req, res){
         }})
     }
 
+    if(platena && faktura.platena){
+
+
+            Faktura.update({
+                platenaNaDatum:den+"-"+mesec+"-"+godina
+            },{where:{
+                id:faktura.id
+            }})
+        
+    }
+
+
+    return res.json({message:"Success",detail:"Updated data"})
 }
 
 
-module.exports={generirajFakturi, zemiFaktura, platiFaktura, dodeliNagradi}
+
+module.exports={generirajFakturi, zemiFaktura, platiFaktura, dodeliNagradi, getFakturi}
