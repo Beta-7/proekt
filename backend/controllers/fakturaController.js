@@ -113,6 +113,7 @@ const generirajFakturi = async function(req,res){
                         firmaId:faktura.firmaId
                     })
                     console.log(faktura.elektricnaEnergija+stornoData.vkupnoKolicina,faktura.id)
+                    
                     await Faktura.update({
                         elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
                         elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina
@@ -377,15 +378,13 @@ const dodeliNagradi = async function(req, res){
 
             }).then(()=>{
                 VkupnoPotrosena.findOne({where:{mesec, godina}}).then((vkupnoPotrosena)=>{
-                    
+                    if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
                     var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
                     var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
-                    console.log(faktura.elektricnaEnergijaBezZelena+" "+vkupnoPotrosena.vkupnoPotrosena+" "+vkupnoPotrosena.zelenaKolicina)
                     var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
                     var vkupenIznosBezDDV = (faktura.cenaKwhBezDDV*elektricnaEnergija).toFixed(2)
                     var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
                    
-                    // console.log(parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))) 
                     Faktura.update({
                         elektricnaEnergija,
                         obnovlivaEnergija,
@@ -399,7 +398,7 @@ const dodeliNagradi = async function(req, res){
                         vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
 
                     },{where:{id:faktura.id}})
-                
+                    }
             })
 
             })
@@ -412,7 +411,7 @@ const dodeliNagradi = async function(req, res){
 
 const getFakturi = async function(req, res){
     let fakturi=null
-    if(req.body.mesec===null || req.body.godina===null)
+    if(req.body.mesec===undefined || req.body.godina===undefined)
     fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
     else{
     fakturi = await Faktura.findAll({where:{
