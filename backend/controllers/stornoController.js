@@ -178,7 +178,7 @@ const uploadStornoFile = async (req,res)=>{
                 krajnaSostojba: parseFloat(jsonObj[red].krajnaSostojba.replace(",",".")),
                 kolicina: parseFloat(jsonObj[red].kolicina.replace(",",".")),
                 multiplikator: parseFloat(jsonObj[red].multiplikator.replace(",",".")),
-                vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina.replace(",","."))*-1.0,
+                vkupnoKolicina: parseFloat(jsonObj[red].vkupnoKolicina.replace(",",".")),
                 nebitno: jsonObj[red].nebitno,
                 brojNaMernoMesto: jsonObj[red].brojNaMernoMesto,
                 brojNaBroilo: jsonObj[red].brojNaBroilo,

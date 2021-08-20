@@ -41,27 +41,8 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 
 export default function StornoTable(props) {
-    const [data, setData] = useState([])
 
 
-    useEffect(() => {
-      console.log(props.data)
-      setData(props.data)
-      console.log(data)
-      getData()
-      }, [])
-
-
-
-      
-       function getData(){
-          axios.post("/storno/getStornos",{},{withCredentials:true}).then((response)=>{
-              //setData(response.data)
-              //console.log(response.data)
-          })
-        }
-
-    
 
     
 
@@ -71,72 +52,62 @@ export default function StornoTable(props) {
          defaultSort:"desc"
          },
         {
-          title: "brojNaMernaTocka", field: "brojNaMernaTocka",
+          title: "Број на мерна точка", field: "brojNaMernaTocka",
           validate: rowData => rowData.brojNaMernaTocka === undefined || rowData.brojNaMernaTocka === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "mesecNaFakturiranje", field: "mesecNaFakturiranje",
+          title: "Месец на фактурирање", field: "mesecNaFakturiranje",
           validate: rowData => rowData.mesecNaFakturiranje === undefined || rowData.mesecNaFakturiranje === "" ? "Required" : true,
           filtering:false
         },
         {
-          title: "tarifa", field: 'tarifa',
+          title: "Тарифа", field: 'tarifa',
           validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
         },
         {
-            title: "datumNaPocetokNaMerenje", field: 'datumNaPocetokNaMerenje',
+            title: "Почеток на мерење", field: 'datumNaPocetokNaMerenje',
             validate: rowData => rowData.datumNaPocetokNaMerenje === undefined || rowData.datumNaPocetokNaMerenje === "" ? "Required" : true,
           },
           {
-            title: "datumNaZavrshuvanjeNaMerenje", field: 'datumNaZavrshuvanjeNaMerenje',
+            title: "Крај на мерење", field: 'datumNaZavrshuvanjeNaMerenje',
             validate: rowData => rowData.datumNaZavrshuvanjeNaMerenje === undefined || rowData.datumNaZavrshuvanjeNaMerenje === "" ? "Required" : true,
           },
           {
-            title: "pocetnaSostojba", field: 'pocetnaSostojba',
+            title: "Почетна состојба", field: 'pocetnaSostojba',
             validate: rowData => rowData.pocetnaSostojba === undefined || rowData.pocetnaSostojba === "" ? "Required" : true,
           },
           {
-            title: "krajnaSostojba", field: 'krajnaSostojba',
+            title: "Крајна состојба", field: 'krajnaSostojba',
             validate: rowData => rowData.krajnaSostojba === undefined || rowData.krajnaSostojba === "" ? "Required" : true,
           },
           {
-            title: "kolicina", field: 'kolicina',
+            title: "Количина", field: 'kolicina',
             validate: rowData => rowData.kolicina === undefined || rowData.kolicina === "" ? "Required" : true,
           },
           {
-            title: "multiplikator", field: 'multiplikator',
+            title: "Мулти", field: 'multiplikator',
             validate: rowData => rowData.multiplikator === undefined || rowData.multiplikator === "" ? "Required" : true,
           },
           {
-            title: "vkupnoKolicina", field: 'vkupnoKolicina',
+            title: "Вкупно количина", field: 'vkupnoKolicina',
             validate: rowData => rowData.vkupnoKolicina === undefined || rowData.vkupnoKolicina === "" ? "Required" : true,
           },
+
           {
-            title: "nebitno", field: 'nebitno',
-            validate: rowData => rowData.nebitno === undefined || rowData.nebitno === "" ? "Required" : true,
-          },
-          {
-            title: "brojNaMernoMesto", field: 'brojNaMernoMesto',
+            title: "Број мерно место", field: 'brojNaMernoMesto',
             validate: rowData => rowData.brojNaMernoMesto === undefined || rowData.brojNaMernoMesto === "" ? "Required" : true,
           },
           {
-            title: "brojNaBroilo", field: 'brojNaBroilo',
+            title: "Број броило", field: 'brojNaBroilo',
             validate: rowData => rowData.brojNaBroilo === undefined || rowData.brojNaBroilo === "" ? "Required" : true,
           },
+        
           {
-            title: "nebitno2", field: 'nebitno2',
-            validate: rowData => rowData.nebitno2 === undefined || rowData.nebitno2 === "" ? "Required" : true,
-          },
-          {
-            title: "datumNaIzrabotkaEVN", field: 'datumNaIzrabotkaEVN',
+            title: "Датум од ЕВН", field: 'datumNaIzrabotkaEVN',
             validate: rowData => rowData.datumNaIzrabotkaEVN === undefined || rowData.datumNaIzrabotkaEVN === "" ? "Required" : true,
           },
-          {
-            title: "pomireno", field: 'pomireno',
-            validate: rowData => rowData.pomireno === undefined || rowData.pomireno === "" ? "Required" : true,
-            type: 'boolean'
-          },
+
     ]
     
     
@@ -144,7 +115,7 @@ export default function StornoTable(props) {
             <MaterialTable
               title="Кориснички сметки"
               columns={columns}
-              data={data}
+              data={props.dataa}
               components={{
                 Pagination: PatchedPagination,
               }}
@@ -161,14 +132,11 @@ export default function StornoTable(props) {
                     kolicina:newRow.kolicina,
                     multiplikator:newRow.multiplikator,
                     vkupnoKolicina:newRow.vkupnoKolicina,
-                    nebitno:newRow.nebitno,
                     brojNaMernoMesto:newRow.brojNaMernoMesto,
                     brojNaBroilo:newRow.brojNaBroilo,
-                    nebitno2:newRow.nebitno2,
                     datumNaIzrabotkaEVN:newRow.datumNaIzrabotkaEVN,
-                    pomireno:newRow.pomireno
                   },{withCredentials:true}).then(()=>{
-                    getData()
+                    props.getData()
                     resolve()
                   })
                   
@@ -178,7 +146,7 @@ export default function StornoTable(props) {
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
-                    getData()
+                    props.getData()
                     resolve()
                   })
                   resolve()
@@ -196,14 +164,11 @@ export default function StornoTable(props) {
                     kolicina:updatedRow.kolicina,
                     multiplikator:updatedRow.multiplikator,
                     vkupnoKolicina:updatedRow.vkupnoKolicina,
-                    nebitno:updatedRow.nebitno,
                     brojNaMernoMesto:updatedRow.brojNaMernoMesto,
                     brojNaBroilo:updatedRow.brojNaBroilo,
-                    nebitno2:updatedRow.nebitno2,
-                    datumNaIzrabotkaEVN:updatedRow.datumNaIzrabotkaEVN,
-                    pomireno:updatedRow.pomireno
+                    datumNaIzrabotkaEVN:updatedRow.datumNaIzrabotkaEVN
                   },{withCredentials:true}).then(()=>{
-                    getData()
+                    props.getData()
                     resolve()
                   })
                 })

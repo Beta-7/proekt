@@ -164,6 +164,42 @@ export default function HorizontalNonLinearStepperWithError() {
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.test}>
+
+      <div>
+        {activeStep === steps.length ? (
+          <div>
+            <Typography className={classes.instructions} variant="h3">
+              All steps completed - you&apos;re finished
+            </Typography>
+            <Button onClick={handleReset} className={classes.button} style={{fontSize:"15px"}}>
+              ResetsetActiveStep
+            </Button>
+          </div>
+        ) : (
+          <div>
+            
+            <div>
+              <div className="nav navbar-nav navbar-left" style={{"padding-left": "10px"}}>
+              <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                Back
+              </Button>
+              </div>
+                <div className="nav navbar-nav navbar-right" style={{"padding-right": "10px"}}>
+                <Button
+                variant="contained"
+                color="primary"
+                onClick={handleNext}
+                className={classes.button}
+                disabled={errors[activeStep]===1}
+              >
+                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              </Button>
+               </div>
+              
+            </div>
+          </div>
+        )}
+      </div>
         
       <Stepper activeStep={activeStep}
       >
@@ -193,50 +229,8 @@ export default function HorizontalNonLinearStepperWithError() {
           );
         })}
       </Stepper>
-      <div>
-        {activeStep === steps.length ? (
-          <div>
-            <Typography className={classes.instructions} variant="h3">
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Button onClick={handleReset} className={classes.button} style={{fontSize:"15px"}}>
-              ResetsetActiveStep
-            </Button>
-          </div>
-        ) : (
-          <div>
-            <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-            <div>
-              <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                Back
-              </Button>
-              {isStepOptional(activeStep) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSkip}
-                  className={classes.button}
-                  disabled={errors[activeStep]===1}
-                >
-                  Skip
-                </Button>
-              )}
-                
-                <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                className={classes.button}
-                disabled={errors[activeStep]===1}
-              >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
-               
-              
-            </div>
-          </div>
-        )}
-      </div>
+      
+      <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
     </div>
     </ThemeProvider>
   );

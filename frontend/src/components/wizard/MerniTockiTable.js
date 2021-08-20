@@ -48,15 +48,19 @@ export default function FirmiTable (props) {
       
       getData()
       }, [])
+    
+      const reasociraj =()=>{
+        axios.post("/storno/reasociraj",{},{withCredentials:true})
+      }
 
-
-      const test = (asd) =>{
-        console.log(props.stepState)
+      const EnableButton = (asd) =>{
         props.editStep(props.step,asd)
       }
       
        function getData(){
-        test(0) 
+        reasociraj()
+        EnableButton(0) 
+        setNemaAsocirani(true)
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
              firmi.data.rows.map((firma)=>{
@@ -67,12 +71,12 @@ export default function FirmiTable (props) {
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
                 response.data.map((tocka)=>{
                     if(tocka.firmaId === null){
-                      console.log("asd")
                       setNemaAsocirani(false)
-                      test(1)
+                      EnableButton(1)
                       
                     }
                 })  
+                
             setData(response.data)
             })
 

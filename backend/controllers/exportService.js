@@ -27,7 +27,7 @@ const generirajBroiloTabela = async function(brojmernomesto,datumpocetok,datumkr
     try{
         for(let row=0;row<4;row++){
             worksheet.mergeCells('A'+(red+row)+':D'+(red+row));
-            worksheet.mergeCells('E'+(red+row)+':K'+(red+row));
+            worksheet.mergeCells('E'+(red+row)+':G'+(red+row));
         }
     }catch(err){
 
@@ -35,12 +35,14 @@ const generirajBroiloTabela = async function(brojmernomesto,datumpocetok,datumkr
 
 
     cell= worksheet.getCell('E'+(red+0))
+    console.log(brojmernomesto)
     cell.value=brojmernomesto
 
     cell= worksheet.getCell('E'+(red+1))
     cell.value=""
 
     cell= worksheet.getCell('E'+(red+2))
+    console.log(datumpocetok)
     cell.value=datumpocetok.replace("-",".").replace("-",".")+" - "+datumkraj.replace("-",".").replace("-",".")
 
 
@@ -78,18 +80,20 @@ const generirajBroiloTabela = async function(brojmernomesto,datumpocetok,datumkr
     cell= worksheet.getCell('F'+(red+6))
     cell.value=ntkolicina
 
+    cell= worksheet.getCell('F'+(red+7))
+    cell.value=vtkolicina+ntkolicina
 
 
-
+return worksheet
 
 }
 
 const toExcel = async function(req,res){
     const mesec = 3
     const godina = 2021
-    const workbook = new ExcelJS.Workbook();
+    let workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile("../test_data/510-2021 Komitent.xlsx");
-    const worksheet = workbook.getWorksheet('Sheet1');
+    let worksheet = workbook.getWorksheet('Sheet1');
     
     
     const vkupno = await VkupnoPotrosena.findOne({where:{
@@ -97,7 +101,7 @@ const toExcel = async function(req,res){
     }})
     const faktura = await Faktura.findOne({where:
         {
-            firmaId:1,
+            firmaId:2,
             mesec,
             godina
         },
@@ -147,14 +151,21 @@ const toExcel = async function(req,res){
     cell.value = "Надомест за организирање на пазарот на ел. енергија ("+faktura.nadomestZaOrganizacijaOdKwh + " мкд по kWh):"
 
     cell = worksheet.getCell("J30");
-    cell.value = faktura.vkupenIznosBezDDV.toFixed(2)
-    
+    cell.value = faktura.vkupenIznosNaFakturaBezDDV.toFixed(2)
+    console.log(faktura.id)
+    console.log(faktura.vkupenIznosNaFakturaBezDDV.toFixed(2))
+        
+
     cell = worksheet.getCell("B32");
     cell.value = "ДДВ ("+vkupno.DDVProcent+"%):"
+
+    cell = worksheet.getCell("J32");
+    cell.value = (faktura.vkupenIznosNaFakturaBezDDV * (vkupno.DDVProcent/100.0)).toFixed(2)
 
 
     cell = worksheet.getCell("J34");
     cell.value = faktura.vkupnaNaplata.toFixed(2)
+
 
     cell = worksheet.getCell("J36");
     cell.value = faktura.rokZaNaplata.replace("-",".").replace("-",".")
@@ -164,8 +175,7 @@ const toExcel = async function(req,res){
         for(broilo of broila){
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
-            let vkupno
-            
+            console.log('broilo')
             const istiBroila = await BroiloStatus.findAll({where:{fakturaId:faktura.id,brojBroilo:broilo.brojBroilo}})
             if(istiBroila!==null){
                
@@ -183,7 +193,6 @@ const toExcel = async function(req,res){
                         ntmulti=istoBroilo.multiplikator
                         ntkolicina=istoBroilo.vkupnoKolicina
                     }
-                    vkupno=parseFloat(vtkolicina)+parseFloat(ntkolicina)
                     generirajBroiloTabela(broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
@@ -200,25 +209,25 @@ const toExcel = async function(req,res){
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
             let vkupno
             
-            const istiBroila = await BroiloStatus.findAll({where:{fakturaId:faktura.id,brojBroilo:broilo.brojBroilo}})
-            if(istiBroila!==null){
+            console.log('storno')
+            const istiStorni = await StornoDisplay.findAll({where:{fakturaId:faktura.id,brojNaBroilo:storno.brojNaBroilo}})
+            if(istiStorni!==null){
                
-               for(istoBroilo of istiBroila){
-                    if(istoBroilo.tarifa==="1.1.1.8.1.255"){
-                        vtpocetna=istoBroilo.pocetnaSostojba
-                        vtkrajna=istoBroilo.krajnaSostojba
+               for(istoStorno of istiStorni){
+                    if(istoStorno.tarifa==="1.1.1.8.1.255"){
+                        vtpocetna=istoStorno.pocetnaSostojba
+                        vtkrajna=istoStorno.krajnaSostojba
                         vtrazlika=(parseFloat(vtkrajna)-parseFloat(vtpocetna)).toFixed(1)
-                        vtmulti=istoBroilo.multiplikator
-                        vtkolicina=istoBroilo.vkupnoKolicina
-                    }else if(istoBroilo.tarifa==="1.1.1.8.2.255"){
-                        ntpocetna=istoBroilo.pocetnaSostojba
-                        ntkrajna=istoBroilo.krajnaSostojba
+                        vtmulti=istoStorno.multiplikator
+                        vtkolicina=istoStorno.vkupnoKolicina
+                    }else if(istoStorno.tarifa==="1.1.1.8.2.255"){
+                        ntpocetna=istoStorno.pocetnaSostojba
+                        ntkrajna=istoStorno.krajnaSostojba
                         ntrazlika=(parseFloat(ntkrajna)-parseFloat(ntpocetna)).toFixed(1)
-                        ntmulti=istoBroilo.multiplikator
-                        ntkolicina=istoBroilo.vkupnoKolicina
+                        ntmulti=istoStorno.multiplikator
+                        ntkolicina=istoStorno.vkupnoKolicina
                     }
-                    vkupno=parseFloat(vtkolicina)+parseFloat(ntkolicina)
-                    generirajBroiloTabela(broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    generirajBroiloTabela(istoStorno.brojNaMernoMesto,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }

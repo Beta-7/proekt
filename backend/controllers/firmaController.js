@@ -11,6 +11,7 @@ const { forEach } = require("lodash");
 const dodadiFirma = (req, res) => {
     const name=req.body.name;
     const broj=req.body.broj;
+    const adresa=req.body.adresaNaFirma;
     const agent=req.body.agent;
     const nagrada=req.body.nagrada;
     User.findOne({where:{username: agent}}).then((user)=>{
@@ -20,6 +21,7 @@ const dodadiFirma = (req, res) => {
 
         Firma.create({
             name,
+            adresaNaFirma:adresa,
             broj,
             agent,
             nagrada
@@ -46,6 +48,8 @@ const promeniFirma = (req,res) =>{
     firma.name=req.body.name==="undefined"?firma.name : req.body.name;
     firma.broj=req.body.broj==="undefined"?firma.broj:req.body.broj;
     firma.agent=req.body.agent==="undefined"?firma.agent:req.body.agent;
+    firma.adresaNaFirma=req.body.adresaNaFirma==="undefined"?firma.adresaNaFirma:req.body.adresaNaFirma
+    ;
     firma.nagrada=req.body.nagrada==="undefined"?firma.nagrada:req.body.nagrada;
     Firma.update(firma, {
         where:{id:req.body.id}
@@ -73,7 +77,7 @@ const izbrisiFirma = async (req,res) =>{
 
 const zemiFirmi = async (req,res) =>{
     
-    const firmi = await Firma.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id", "name", "broj","agent","nagrada"],raw : true})
+    const firmi = await Firma.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id", "name","adresaNaFirma", "broj","agent","nagrada"],raw : true})
     return res.json(firmi)
 }
 

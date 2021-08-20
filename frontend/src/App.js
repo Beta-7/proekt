@@ -12,6 +12,7 @@ import Nagradi from './components/Nagradi'
 import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
 import FakturiTable from './components/wizard/FakturiTable'
+import GenerirajFakturi from './components/wizard/GenerirajFakturi'
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -91,6 +92,10 @@ export default function App () {
 
           <Route path="/UploadStornoData">
             <UploadStornoData/>
+          </Route>
+
+          <Route path="/GenerirajFakturi">
+            <GenerirajFakturi/>
           </Route>
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>

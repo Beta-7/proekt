@@ -87,11 +87,17 @@ export default function FirmiTable () {
          hidden:true,
          defaultSort:"desc"
          },
-        {
+         {
           title: "Назив на фирма", field: "name",
           validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true,
           filtering:false
         },
+        {
+          title: "Адреса на фирма", field: "adresaNaFirma",
+          validate: rowData => rowData.adresaNaFirma === undefined || rowData.adresaNaFirma === "" ? "Required" : true,
+          filtering:false
+        },
+        
         {
           title: "Број", field: "broj",
           validate: rowData => rowData.broj === undefined || rowData.broj === "" ? "Required" : true,
@@ -122,6 +128,7 @@ export default function FirmiTable () {
                   axios.post("/firmi/dodadiFirma",{
                     name:newRow.name,
                     broj:newRow.broj,
+                    adresaNaFirma:newRow.adresaNaFirma,
                     agent:vraboteni[newRow.agent],
                     nagrada:newRow.nagrada
                   },{withCredentials:true}).then(()=>{
@@ -144,6 +151,7 @@ export default function FirmiTable () {
                   axios.post("/firmi/promeniFirma",{
                     id:oldRow.id,
                     name:updatedRow.name,
+                    adresaNaFirma:updatedRow.adresaNaFirma,
                     broj:updatedRow.broj,
                     agent:vraboteni[updatedRow.agent],
                     nagrada:updatedRow.nagrada

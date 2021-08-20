@@ -8,15 +8,25 @@ class UploadStornoData extends Component {
     constructor(props){
       super(props)
       this.handleChange = this.handleChange.bind(this);
-      this.data = null
+    
+      this.state = {
+        selectedFile: null,
+        data:[]
+      };
+      
+      
     }
-    state = {
-      selectedFile: null,
-    };
 
+    componentDidMount() {
+      this.getData()
+    }
+  
+    
     getData(){
        axios.post("/storno/getStornos",{},{withCredentials:true}).then((response)=>{
-        this.data(response.data)
+        this.setState({data: response.data});
+        // console.log("yeet")
+        // console.log(this.state.data)
        })
      }
 
@@ -42,10 +52,12 @@ class UploadStornoData extends Component {
       axios.post("/storno/uploadStornoFile", formData,{withCredentials:true}).then((res)=>{
         if(res.data.message==="success"){
           this.test()
+          this.getData()
+          // console.log(this.state.data)
         }
       });
       }
-      console.log(this.state.data)
+      
 
     };
     
@@ -83,7 +95,7 @@ class UploadStornoData extends Component {
             </div>
           {this.fileData()}
           </center>
-          <StornoTable data={this.state.data}></StornoTable>
+          <StornoTable   dataa={this.state.data} getData={this.getData}></StornoTable>
         </div>
       );
     }

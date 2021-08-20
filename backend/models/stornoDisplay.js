@@ -24,6 +24,9 @@ const StornoDisplay = db.define('stornoDisplay',{
         type:Sequelize.FLOAT,
         allowNull: false
     },
+    brojNaMernoMesto:{
+        type:Sequelize.STRING
+    },
     kolicina:{
         type:Sequelize.FLOAT,
         allowNull: false

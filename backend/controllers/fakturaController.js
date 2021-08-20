@@ -16,172 +16,335 @@ function formatDate(date){
 }
 
 
+const generirajFakturi = async function(req,res){
+    let godina = req.body.godina
+    let mesec = req.body.mesec
+    let vkupnoPotrosenaEnergija =0
+    let date = new Date()
+    let rok = new Date()
+    rok.setDate(date.getDate()+10)
 
-
-const generirajFakturi = async function(req, res){
-    // 1. Pomini gi site firmi
-    // 2. Proveri dali firmata ima broiloStatus za ovoj mesec
-    // 3. Ako ima spoj gi i kreiraj red vo tabelata
-    var godina = req.body.godina
-    var mesec = req.body.mesec
-    godina=2021
-    mesec=3
-    var vkupnoPotrosenaEnergija =0
-    Firma.findAll({
-        //TODO: da raboti
-    }).then((result)=>{
-        result.map((firma)=>{
-            var date = new Date()
-            var rok = new Date()
-            rok.setDate(date.getDate()+10)
-            Faktura.findOne({where:{
+    let firmi = await Firma.findAll({})
+    for(firma of firmi){
+        let postoecka = await Faktura.findOne({where:{
+            mesec,
+            godina,
+            firmaId:firma.id
+        }})
+        if(postoecka===null){
+            
+            let faktura = await Faktura.create({
+                arhivskiBroj:"05-2021",
                 mesec,
                 godina,
+                datumNaIzdavanje: formatDate(date),
+                rokZaNaplata: formatDate(rok),
                 firmaId:firma.id
-            }}).then((postoeckafaktura)=>{
-                if((postoeckafaktura===null||true)){
+            })
+
+
+            let kamati = await Kamata.findAll({where:{
+                firmaid:firma.id,
+                fakturaDisplayId:null
+            }})
+            for(kamata of kamati){
+                await Kamata.update({
+                    fakturaDisplayId:faktura.id
+                },{where:{id:kamata.id}})
+                await Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
+            }
+
+
+            if(mesec<10){var tempmesec="0"+mesec}
+            let broila = await firma.getBroilo({where:{
+                mesec:godina+"."+tempmesec+"-"+tempmesec
+            }})
+            let kolicinaOdSiteBroila=0
+            for(broilo of broila){
+                await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
+                await faktura.addBroilo(broilo)
+                let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
+                kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
+                await Faktura.update({
+                elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+                elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+                cenaKwhBezDDV:MT.cena,
+                dataOd:broilo.datumPocetok,
+                dataDo:broilo.datumKraj    
+            },{where:{
+                id:faktura.id
+                }})
+            }
+            await faktura.reload()
+            let storni = await Storno.findAll({where:{
+             firmaId:firma.id
+            }})
+            for(stornoData of storni){
+                if(stornoData.vkupnoKolicina>0){
+                    await StornoDisplay.create({
+                        tarifa: stornoData.tarifa,
+                        pocetnaSostojba:stornoData.pocetnaSostojba,
+                        krajnaSostojba:stornoData.krajnaSostojba,
+                        brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                        kolicina:stornoData.kolicina,
+                        multiplikator:stornoData.multiplikator,
+                        datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                        datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                        vkupnoKolicina: stornoData.vkupnoKolicina,
+                        brojNaBroilo: stornoData.brojNaBroilo,
+                        fakturaId: faktura.id,
+                        firmaId:faktura.firmaId
+                    })
+                    await Storno.destroy({where:{id:stornoData.id}})
+                }
+                else if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
+                    await StornoDisplay.create({
+                        tarifa: stornoData.tarifa,
+                        pocetnaSostojba:stornoData.pocetnaSostojba,
+                        krajnaSostojba:stornoData.krajnaSostojba,
+                        kolicina:stornoData.kolicina,
+                        multiplikator:stornoData.multiplikator,
+                        brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                        datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                        datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                        vkupnoKolicina: stornoData.vkupnoKolicina,
+                        brojNaBroilo: stornoData.brojNaBroilo,
+                        fakturaId: faktura.id,
+                        firmaId:faktura.firmaId
+                    })
+                    console.log(faktura.elektricnaEnergija+stornoData.vkupnoKolicina,faktura.id)
+                    await Faktura.update({
+                        elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                        elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina
+                    },{where:{
+                        id:faktura.id
+                    }})
+                    await faktura.reload()
+                    await Storno.destroy({where:{id:stornoData.id}})
+                }
+                else if(stornoData.vkupnoKolicina >= faktura.elektricnaEnergija){
+                    await Faktura.update({elektricnaEnergija:0, elektricnaEnergijaBezZelena:0},{where:{
+                        id:faktura.id
+                    }})
+                    await faktura.reload()
+                    await StornoDisplay.create({
+                        tarifa: stornoData.tarifa,
+                        pocetnaSostojba:stornoData.pocetnaSostojba,
+                        krajnaSostojba:stornoData.krajnaSostojba,
+                        kolicina:stornoData.kolicina,
+                        multiplikator:stornoData.multiplikator,
+                        brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                        datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                        datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                        vkupnoKolicina: faktura.elektricnaEnergija,
+                        brojNaBroilo: stornoData.brojNaBroilo,
+                        fakturaId: faktura.id,
+                        firmaId:faktura.firmaId
+                    })
+                    await Storno.update({
+                        vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
+                        kolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))
+                    },{where:{id:stornoData.id}})
+                }
+            }
+
+
+            var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
+                mesec,
+                godina
+            }})
+            var rezultatFaktura = await Faktura.findOne({where:{mesec, godina, firmaId:firma.id}})
+            vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
+            await VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+
+
+
+        }
+        
+    }
+    return res.json({"status":"success"})
+}
+
+// const starogenerirajFakturi = async function(req, res){
+//     // 1. Pomini gi site firmi
+//     // 2. Proveri dali firmata ima broiloStatus za ovoj mesec
+//     // 3. Ako ima spoj gi i kreiraj red vo tabelata
+//     var godina = req.body.godina
+//     var mesec = req.body.mesec
+
+//     var vkupnoPotrosenaEnergija =0
+//     Firma.findAll({
+//         //TODO: da raboti
+//     }).then((result)=>{
+//         for(firma of result){
+//             var date = new Date()
+//             var rok = new Date()
+//             rok.setDate(date.getDate()+10)
+//             Faktura.findOne({where:{
+//                 mesec,
+//                 godina,
+//                 firmaId:firma.id
+//             }}).then((postoeckafaktura)=>{
+//                 if((postoeckafaktura===null)){
                     
-                    Faktura.create({
-                        arhivskiBroj:"05-2021",
-                        mesec,
-                        godina,
-                        datumNaIzdavanje: formatDate(date),
-                        rokZaNaplata: formatDate(rok),
-                        firmaId:firma.id
-                    }).then((faktura)=>{
-                        //dodeli kamata za kasnenje
-                        Kamata.findAll({where:{
-                            firmaid:firma.id
-                        }}).then((kamataRes)=>{
-                            if(kamataRes!==null){
-                                kamataRes.map((kamata)=>{
-                                    Kamata.update({
-                                        fakturaDisplayId:faktura.id
-                                    },{where:{id:kamata.id}})
-                                    Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
-                                })
-                        }
-                        })
+//                     Faktura.create({
+//                         arhivskiBroj:"05-2021",
+//                         mesec,
+//                         godina,
+//                         datumNaIzdavanje: formatDate(date),
+//                         rokZaNaplata: formatDate(rok),
+//                         firmaId:firma.id
+//                     }).then((faktura)=>{
+//                         //dodeli kamata za kasnenje
+//                         Kamata.findAll({where:{
+//                             firmaid:firma.id
+//                         }}).then((kamataRes)=>{
+//                             if(kamataRes!==null){
+//                                 kamataRes.map((kamata)=>{
+//                                     Kamata.update({
+//                                         fakturaDisplayId:faktura.id
+//                                     },{where:{id:kamata.id}})
+//                                     Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
+//                                 })
+//                         }
+//                         })
 
-                        if(mesec<10){var tempmesec="0"+mesec}
-                        firma.getBroilo({
-                            where:{
-                                mesec:godina+"."+tempmesec+"-"+tempmesec
-                            }
-                        }).then((result)=>{
-                        //dodadi broila
-                            var kolicinaOdSiteBroila=0
-                            result.map((broilo)=>{
-                                
-                                BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
-                                
-                                kolicinaOdSiteBroila=parseFloat(kolicinaOdSiteBroila)+parseFloat(broilo.vkupnoKolicina)
                         
-                                faktura.addBroilo(broilo)
-                                MernaTocka.findOne({where:{
-                                    tockaID:broilo.brojMernaTocka
-                                }}).then((MT)=>{
-                                    Faktura.update({
-                                        elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
-                                        elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
-                                        cenaKwhBezDDV:MT.cena,
-                                        dataOd:broilo.datumPocetok,
-                                        dataDo:broilo.datumKraj
-                                    },{where:{
-                                        id:faktura.id
-                                    }})
-                                })
-                                
-                            })
-                        }).then(()=>{
-                        //dodadi storno               
-                            Storno.findAll(
-                                {where: {firmaId:firma.id}
-                            }).then((stornoFirma) => {
-                                stornoFirma.map((stornoData)=>{
+                        
+//                     }).then(()=>{
+//                         //dodadi broila
+//                         if(mesec<10){var tempmesec="0"+mesec}
+//                         firma.getBroilo({
+//                             where:{
+//                                 mesec:godina+"."+tempmesec+"-"+tempmesec
+//                             }
+//                         }).then((result)=>{
 
-                                    if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
-                                        StornoDisplay.create({
-                                            tarifa: stornoData.tarifa,
-                                            pocetnaSostojba:stornoData.pocetnaSostojba,
-                                            krajnaSostojba:stornoData.krajnaSostojba,
-                                            kolicina:stornoData.kolicina,
-                                            multiplikator:stornoData.multiplikator,
-                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
-                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                                            vkupnoKolicina: stornoData.vkupnoKolicina,
-                                            brojNaBroilo: stornoData.brojNaBroilo,
-                                            fakturaId: faktura.id,
-                                            firmaId:faktura.firmaId
-                                        })
-                                        Faktura.update({
-                                            elektricnaEnergija:faktura.elektricnaEnergija-stornoData.vkupnoKolicina,
-                                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-stornoData.vkupnoKolicina
-                                        },{where:{
-                                            id:faktura.id
-                                        }})
-                                        Storno.destroy({where:{id:stornoData.id}})
-                                    }
-                                    if(stornoData.vkupnoKolicina >= faktura.elektricnaEnergija){
-                                        Faktura.update({elektricnaEnergija:0, elektricnaEnergijaBezZelena:0},{where:{
-                                            id:faktura.id
-                                        }})
-                                        StornoDisplay.create({
-                                            tarifa: stornoData.tarifa,
-                                            pocetnaSostojba:stornoData.pocetnaSostojba,
-                                            krajnaSostojba:stornoData.krajnaSostojba,
-                                            kolicina:stornoData.kolicina,
-                                            multiplikator:stornoData.multiplikator,
-                                            datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
-                                            datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                                            vkupnoKolicina: faktura.elektricnaEnergija,
-                                            brojNaBroilo: stornoData.brojNaBroilo,
-                                            fakturaId: faktura.id,
-                                            firmaId:faktura.firmaId
-                                        })
-                                        Storno.update({
-                                            vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(faktura.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
-                                            kolicina:(parseFloat(stornoData.vkupnoKolicina)-parseFloat(faktura.elektricnaEnergija))
-                                        },{where:{id:stornoData.id}})
-                                    }
+                        
+//                             var kolicinaOdSiteBroila=0
+//                             for(broilo of result){
+//                                 BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
+                                
+//                                 kolicinaOdSiteBroila=parseFloat(kolicinaOdSiteBroila)+parseFloat(broilo.vkupnoKolicina)
+                        
+//                                 faktura.addBroilo(broilo)
+//                                 MernaTocka.findOne({where:{
+//                                     tockaID:broilo.brojMernaTocka
+//                                 }}).then((MT)=>{
+//                                     Faktura.update({
+//                                         elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+//                                         elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+//                                         cenaKwhBezDDV:MT.cena,
+//                                         dataOd:broilo.datumPocetok,
+//                                         dataDo:broilo.datumKraj
+//                                     },{where:{
+//                                         id:faktura.id
+//                                     }})
+//                                 })
+                                
+//                             }
+//                         })
+//                         }).then(()=>{
+//                         //dodadi storno               
+//                             Storno.findAll(
+//                                 {where: {firmaId:firma.id}
+//                             }).then((stornoFirma) => {
+//                                 for(stornoData of stornoFirma){
+//                                     if(stornoData.vkupnoKolicina>0){
+//                                         StornoDisplay.create({
+//                                             tarifa: stornoData.tarifa,
+//                                             pocetnaSostojba:stornoData.pocetnaSostojba,
+//                                             krajnaSostojba:stornoData.krajnaSostojba,
+//                                             brojNaMernoMesto:stornoData.brojNaMernoMesto,
+//                                             kolicina:stornoData.kolicina,
+//                                             multiplikator:stornoData.multiplikator,
+//                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+//                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+//                                             vkupnoKolicina: stornoData.vkupnoKolicina,
+//                                             brojNaBroilo: stornoData.brojNaBroilo,
+//                                             fakturaId: faktura.id,
+//                                             firmaId:faktura.firmaId
+//                                         })
+//                                         Storno.destroy({where:{id:stornoData.id}})
+//                                     }
+//                                     else if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
+//                                         StornoDisplay.create({
+//                                             tarifa: stornoData.tarifa,
+//                                             pocetnaSostojba:stornoData.pocetnaSostojba,
+//                                             krajnaSostojba:stornoData.krajnaSostojba,
+//                                             kolicina:stornoData.kolicina,
+//                                             multiplikator:stornoData.multiplikator,
+//                                             brojNaMernoMesto:stornoData.brojNaMernoMesto,
+//                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+//                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+//                                             vkupnoKolicina: stornoData.vkupnoKolicina,
+//                                             brojNaBroilo: stornoData.brojNaBroilo,
+//                                             fakturaId: faktura.id,
+//                                             firmaId:faktura.firmaId
+//                                         })
+//                                         console.log(faktura.elektricnaEnergija-stornoData.vkupnoKolicina,faktura.elektricnaEnergija,stornoData.vkupnoKolicina)
+//                                         Faktura.update({
+                                            
+//                                             elektricnaEnergija:faktura.elektricnaEnergija-stornoData.vkupnoKolicina,
+//                                         },{where:{
+//                                             id:faktura.id
+//                                         }})
+//                                         Storno.destroy({where:{id:stornoData.id}})
+//                                     }
+//                                     else if(stornoData.vkupnoKolicina >= faktura.elektricnaEnergija){
+//                                         Faktura.update({elektricnaEnergija:0},{where:{
+//                                             id:faktura.id
+//                                         }})
+//                                         StornoDisplay.create({
+//                                             tarifa: stornoData.tarifa,
+//                                             pocetnaSostojba:stornoData.pocetnaSostojba,
+//                                             krajnaSostojba:stornoData.krajnaSostojba,
+//                                             kolicina:stornoData.kolicina,
+//                                             multiplikator:stornoData.multiplikator,
+//                                             brojNaMernoMesto:stornoData.brojNaMernoMesto,
+//                                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+//                                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+//                                             vkupnoKolicina: faktura.elektricnaEnergija,
+//                                             brojNaBroilo: stornoData.brojNaBroilo,
+//                                             fakturaId: faktura.id,
+//                                             firmaId:faktura.firmaId
+//                                         })
+//                                         Storno.update({
+//                                             vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
+//                                             kolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))
+//                                         },{where:{id:stornoData.id}})
+//                                     }
                                     
                                 
-                            })
+//                             }
 
-                        })
-                        }).then(()=>{
-                            //presmetaj zelena
-                            VkupnoPotrosena.findOne({where:{
-                                mesec,
-                                godina
-                            }}).then((vkupnopotrosena)=>{
+//                         })
+//                         }).then(()=>{
+//                             //presmetaj zelena
+//                             VkupnoPotrosena.findOne({where:{
+//                                 mesec,
+//                                 godina
+//                             }}).then((vkupnopotrosena)=>{
                                 
-                                Faktura.findOne({where:{mesec, godina, firmaId:firma.id}}).then((rezultatFaktura)=>{
-                                    vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
-                                    // console.log("asd", vkupnopotrosena.vkupnoPotrosena,rezultatFaktura.elektricnaEnergija )
-                                    VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
-                                })
+//                                 Faktura.findOne({where:{mesec, godina, firmaId:firma.id}}).then((rezultatFaktura)=>{
+//                                     vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
+//                                     // console.log("asd", vkupnopotrosena.vkupnoPotrosena,rezultatFaktura.elektricnaEnergija )
+//                                     VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+//                                 })
 
-                            })
-                        })
-                    })
-                }
-            })
+//                             })
+//                         })
+//                 }
+//             })
             
             
     
         
-    })
-    }).then(()=>{
-        //dodeli zelena i popolni gi site vrednosti
-        
+//     }
+//     })
 
- 
-
-    })
-
-    return res.status(200)  
-}
+//     return res.status(200)  
+// }
 const dodeliNagradi = async function(req, res){
     var mesec=req.body.mesec
     var godina=req.body.godina
@@ -243,11 +406,21 @@ const dodeliNagradi = async function(req, res){
             
         })
     })
-    
+    return res.json({"status":"success"})
+
 }
 
 const getFakturi = async function(req, res){
-    const fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    let fakturi=null
+    if(req.body.mesec===null || req.body.godina===null)
+    fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    else{
+    fakturi = await Faktura.findAll({where:{
+        mesec:req.body.mesec,
+        godina:req.body.godina
+    },attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+     
+    }
     return res.json(fakturi)
 }
 

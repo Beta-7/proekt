@@ -12,6 +12,10 @@ const Firma = db.define('firma',{
         allowNull: false,
             
     },
+    adresaNaFirma:{
+        type:Sequelize.STRING,
+        allowNull: false
+    },
     agent:{
         type:Sequelize.STRING,
         allowNull: false
