@@ -162,13 +162,16 @@ export default function FirmiTable () {
                 })
       
               }}
-                options={{
-                  actionsColumnIndex: -1, addRowPosition: "first",
-                  filtering:true,
-                  headerStyle: {
-                    fontSize: 13,
-                  }
-                }}
+              options={{
+                paging:true,
+                pageSize:20,       // make initial page size
+                emptyRowsWhenPaging: true,   //to make page size fix in case of less data rows
+                pageSizeOptions:[5,10,20],
+                actionsColumnIndex: -1, addRowPosition: "first",
+                headerStyle: {
+                  fontSize: 13,
+                }
+              }}
             />
     );
         

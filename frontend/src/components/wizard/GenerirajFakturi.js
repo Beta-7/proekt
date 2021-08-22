@@ -148,7 +148,8 @@ export default function FakturaTable(props) {
           type="number"
           onChange={(e)=>{setMesec(e.target.value)}}
           InputProps={{
-            style: {fontSize: 15}
+            style: {fontSize: 15},
+            inputProps: { min: 0, max: new Date().getMonth()+1 }
           }}
           InputLabelProps={{
             style: {fontSize: 15}
@@ -195,12 +196,16 @@ export default function FakturaTable(props) {
                 })
       
               }}
-                options={{
-                  actionsColumnIndex: -1, addRowPosition: "first",
-                  headerStyle: {
-                    fontSize: 13,
-                  }
-                }}
+              options={{
+                paging:true,
+                pageSize:20,       // make initial page size
+                emptyRowsWhenPaging: true,   //to make page size fix in case of less data rows
+                pageSizeOptions:[5,10,20],
+                actionsColumnIndex: -1, addRowPosition: "first",
+                headerStyle: {
+                  fontSize: 13,
+                }
+              }}
             />
                 </center>
             </div>

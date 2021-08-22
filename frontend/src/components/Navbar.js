@@ -116,7 +116,8 @@ const Navbar = ({loggedStatus,changeStatus, route, setRoute }) => {
                             <a href="/dodadiData" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Додади Податоци</MenuItem></a>
                             <a href="/uploadStornoData" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Сторно</MenuItem></a>
                             <a href="/firmiTable" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Фирми</MenuItem></a>
-                            <a href="/" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Фактури</MenuItem></a>
+                            <a href="/GenerirajFakturi" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Фактури</MenuItem></a>
+                            <a href="/Nagradi" style={{ textDecoration: 'none', color: 'black' }}><MenuItem style={{ fontSize: '13px' }} onClick={handleClose}>Награди</MenuItem></a>
                           </StyledMenu>
                         </div>
       

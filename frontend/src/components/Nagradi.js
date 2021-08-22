@@ -43,7 +43,7 @@ axios.defaults.baseURL = 'http://localhost:5000';
 
 
 
-export default function FirmiTable () {
+export default function NagradiTable () {
     const [data, setData] = useState([])
 
 
@@ -116,14 +116,6 @@ export default function FirmiTable () {
                 Pagination: PatchedPagination,
               }}
               
-                options={{
-                  actionsColumnIndex: -1, addRowPosition: "first",
-                  headerStyle: {
-                    fontSize: 13,
-                  },
-                  filtering:true
-                  
-                }}
                 editable={{onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
                   axios.post("/misc/updateNagrada",{
                     id:oldRow.id,
@@ -134,6 +126,16 @@ export default function FirmiTable () {
                     resolve()
                   })
                 })}}
+                options={{
+                  paging:true,
+                  pageSize:20,       // make initial page size
+                  emptyRowsWhenPaging: true,   //to make page size fix in case of less data rows
+                  pageSizeOptions:[5,10,20],
+                  actionsColumnIndex: -1, addRowPosition: "first",
+                  headerStyle: {
+                    fontSize: 13,
+                  }
+                }}
             />
     );
         

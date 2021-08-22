@@ -11,6 +11,7 @@ import FirmiTable from './FirmiTable';
 import ZelenaEnergijaData from './ZelenaEnergijaData';
 import UploadStornoData from './UploadStornoData';
 import FakturiTable from './FakturiTable';
+import GenerirajFakturi from './GenerirajFakturi'
 import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 const theme = createMuiTheme({
@@ -47,7 +48,7 @@ function getSteps() {
 
 export default function HorizontalNonLinearStepperWithError() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(7);
   const [skipped, setSkipped] = React.useState(new Set());
   const [errors, setErrors] = React.useState([1,0,0,1,1,0,0]);
   const steps = getSteps();
@@ -108,11 +109,11 @@ export default function HorizontalNonLinearStepperWithError() {
           case 6:
             return <div>
                 <Typography variant="h3">
-                generiraj faktura
+                <GenerirajFakturi/>
                 </Typography>
                 </div>;
           default:
-            return 'Unknown step';
+            return 'Крај';
         }
       }
   const isStepOptional = (step) => {
@@ -159,6 +160,7 @@ export default function HorizontalNonLinearStepperWithError() {
 
   const handleReset = () => {
     setActiveStep(0);
+    setErrors([1,0,0,1,1,0,0])
   };
 
   return (
@@ -169,22 +171,22 @@ export default function HorizontalNonLinearStepperWithError() {
         {activeStep === steps.length ? (
           <div>
             <Typography className={classes.instructions} variant="h3">
-              All steps completed - you&apos;re finished
+              Чекорите се завршени, дали сакате да внесете нови податоци?
             </Typography>
-            <Button onClick={handleReset} className={classes.button} style={{fontSize:"15px"}}>
-              ResetsetActiveStep
+            <Button onClick={handleReset}  variant="contained" className={classes.button} style={{fontSize:"15px"}}>
+              Повторно
             </Button>
           </div>
         ) : (
           <div>
             
             <div>
-              <div className="nav navbar-nav navbar-left" style={{"padding-left": "10px"}}>
+              <div className="nav navbar-nav navbar-left" style={{"margin-left": "10px"}}>
               <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                 Back
               </Button>
               </div>
-                <div className="nav navbar-nav navbar-right" style={{"padding-right": "10px"}}>
+                <div className="nav navbar-nav navbar-right" style={{"margin-right": "10px"}}>
                 <Button
                 variant="contained"
                 color="primary"
@@ -195,7 +197,8 @@ export default function HorizontalNonLinearStepperWithError() {
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>
                </div>
-              
+               <br></br><br></br>
+               
             </div>
           </div>
         )}
@@ -212,7 +215,7 @@ export default function HorizontalNonLinearStepperWithError() {
                 {errorMessages}
               </Typography>
             );
-            <StepLabel classes={{label: classes.customLabelStyle}}> // HERE add this
+            <StepLabel classes={{label: classes.customLabelStyle}}>
       {label}
     </StepLabel>
           }
