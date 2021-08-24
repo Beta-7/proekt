@@ -42,18 +42,28 @@ const generirajFakturi = async function(req,res){
                 let fakturaId = await Faktura.findOne({order: [
                     ['id', 'DESC'],
                 ],})
-                let fakId = 1
-                if(!(fakturaId === null)){
-                    fakId = (parseInt(fakturaId.id)+1)
+                
+                let faktura = null;
+                if(fakturaId===null){
+                    faktura = await Faktura.create({
+                        arhivskiBroj:"1-"+godina,
+                        mesec,
+                        godina,
+                        datumNaIzdavanje: formatDate(date),
+                        rokZaNaplata: formatDate(rok),
+                        firmaId:firma.id
+                    })
+                }else{
+                    faktura = await Faktura.create({
+                        arhivskiBroj:(parseInt(fakturaId.id)+1)+"-"+godina,
+                        mesec,
+                        godina,
+                        datumNaIzdavanje: formatDate(date),
+                        rokZaNaplata: formatDate(rok),
+                        firmaId:firma.id
+                    })
                 }
-                let faktura = await Faktura.create({
-                    arhivskiBroj:fakId+"-"+godina,
-                    mesec,
-                    godina,
-                    datumNaIzdavanje: formatDate(date),
-                    rokZaNaplata: formatDate(rok),
-                    firmaId:firma.id
-                })
+                
                 
                 
                 let kamati = await Kamata.findAll({where:{
@@ -275,9 +285,10 @@ const zemiFaktura = async function(req, res){
 
     let filename = firma.name+"-"+faktura.arhivskiBroj+".xlsx"
     if(izbor === "excel"){
-        exportService.toExcel(parseInt(fakturaId))
+        await exportService.toExcel(parseInt(fakturaId))
         res.attachment(filename)
         res.sendFile("/fakturi/"+filename,{"root":".."})
+
     }
         
 

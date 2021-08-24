@@ -5,6 +5,7 @@ const BroiloStatus = require("../models/broiloStatus");
 
 const VkupnoPotrosena = require('../models/vkupnoPotrosena');
 const StornoDisplay = require('../models/stornoDisplay');
+const Kamata = require("../models/kamata")
 const toPdf = async function(req,res){
 
 
@@ -240,7 +241,24 @@ const toExcel = async function(fakturaId){
         }
 
     }
+    const kamati =await  Kamata.findAll({where:{fakturaDisplayId:faktura.id}})
+    let kamatarow=30
+    for(kamata of kamati){
+        worksheet.insertRow(kamatarow);
+        
+        let fakturastokasni = await Faktura.findOne({where:{id:kamata.fakturaStoKasniId}})
+        try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
+        cell = worksheet.getCell("B"+kamatarow);
+        cell.value = "Казнена камата за фактура " + fakturastokasni.arhivskiBroj
+        console.log(fakturastokasni.arhivskiBroj)
+        cell = worksheet.getCell("J"+kamatarow);
+        cell.value = kamata.suma
+        cell = worksheet.getCell("K"+kamatarow)
+        cell.value = "ден."
+        
+        kamatarow=kamatarow+1
 
+    }
 
         await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     
