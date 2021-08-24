@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import FakturiTable from './FakturiTable';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import { TablePagination, TablePaginationProps } from '@material-ui/core';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -183,6 +184,31 @@ export default function FakturaTable(props) {
               components={{
                 Pagination: PatchedPagination,
               }}
+              actions={[
+                {
+                  icon: () => <GetAppIcon/>,
+                  tooltip: 'Edit User',
+                  onClick: (event, rowData) => new Promise((resolve,reject) => {
+                    axios.get('/faktura/ZemiFaktura', {
+                      responseType: 'blob',
+                      params: {
+                        fakturaid:rowData.id,
+                        izbor:"excel"
+                      }
+                    },{withCredentials:true}).then((response) => {
+                      console.log(response)
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      const filename = response.headers['content-disposition'].split('filename=')[1];
+                      console.log(filename)
+                      link.setAttribute('download', filename.substring(1).slice(0,-1));
+                      document.body.appendChild(link);
+                      link.click();
+                    });
+                  })
+                },
+              ]}
               editable={{
                 onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
                   axios.post("/faktura/platiFaktura",{
