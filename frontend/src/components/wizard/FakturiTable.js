@@ -141,7 +141,7 @@ export default function FakturaTable(props) {
                       link.href = url;
                       const filename = response.headers['content-disposition'].split('filename=')[1];
                       console.log(filename)
-                      link.setAttribute('download', filename);
+                      link.setAttribute('download', filename.substring(1).slice(0,-1));
                       document.body.appendChild(link);
                       link.click();
                     });
