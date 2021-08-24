@@ -6,7 +6,7 @@ const exportService = require("../controllers/exportService")
 
 
 app.post("/generirajFakturi",faktura.generirajFakturi)
-app.post("/zemiFaktura",faktura.zemiFaktura)
+app.get("/zemiFaktura",faktura.zemiFaktura)
 app.post("/platiFaktura",faktura.platiFaktura)
 app.post("/dodeliNagradi",faktura.dodeliNagradi)
 app.post("/toExcel", exportService.toExcel)

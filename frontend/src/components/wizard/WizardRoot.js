@@ -48,7 +48,7 @@ function getSteps() {
 
 export default function HorizontalNonLinearStepperWithError() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(7);
+  const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const [errors, setErrors] = React.useState([1,0,0,1,1,0,0]);
   const steps = getSteps();

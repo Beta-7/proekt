@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-
+import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import { TablePagination, TablePaginationProps } from '@material-ui/core';
 
@@ -121,7 +121,33 @@ export default function FakturaTable(props) {
               data={data}
               components={{
                 Pagination: PatchedPagination,
+
               }}
+              actions={[
+                {
+                  icon: () => <GetAppIcon/>,
+                  tooltip: 'Edit User',
+                  onClick: (event, rowData) => new Promise((resolve,reject) => {
+                    axios.get('/faktura/ZemiFaktura', {
+                      responseType: 'blob',
+                      params: {
+                        fakturaid:rowData.id,
+                        izbor:"excel"
+                      }
+                    },{withCredentials:true}).then((response) => {
+                      console.log(response)
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      const filename = response.headers['content-disposition'].split('filename=')[1];
+                      console.log(filename)
+                      link.setAttribute('download', filename);
+                      document.body.appendChild(link);
+                      link.click();
+                    });
+                  })
+                },
+              ]}
               editable={{
                 onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
                   axios.post("/faktura/platiFaktura",{
@@ -145,6 +171,7 @@ export default function FakturaTable(props) {
                     fontSize: 13,
                   }
                 }}
+                
             />
     );
         

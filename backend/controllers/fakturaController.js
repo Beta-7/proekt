@@ -33,17 +33,21 @@ const generirajFakturi = async function(req,res){
         }})
         if(mesec<10){var tempmesec="0"+mesec}
         if(postoecka===null){
-            
+        let temp = godina+"."+tempmesec+"-"+tempmesec
         let broilo = await BroiloStatus.findOne({where:{
-            mesec: parseString(godina)+"."+parseString(tempmesec)+"-"+parseString(tempmesec) 
+            mesec: temp
         }})    
             if(broilo!==null){
 
                 let fakturaId = await Faktura.findOne({order: [
                     ['id', 'DESC'],
                 ],})
+                let fakId = 1
+                if(!(fakturaId === null)){
+                    fakId = (parseInt(fakturaId.id)+1)
+                }
                 let faktura = await Faktura.create({
-                    arhivskiBroj:(parseInt(fakturaId.id)+1)+"-"+godina,
+                    arhivskiBroj:fakId+"-"+godina,
                     mesec,
                     godina,
                     datumNaIzdavanje: formatDate(date),
@@ -254,9 +258,8 @@ const getFakturi = async function(req, res){
 
 const zemiFaktura = async function(req, res){
     // Zemi red od tabelata i generiraj pdf/excel fajl
-    console.log("asd")
-    const izbor = req.body.izbor;
-    const fakturaId = req.body.fakturaid;
+    const izbor = req.query.izbor;
+    const fakturaId = req.query.fakturaid;
     const faktura = await Faktura.findOne({where:{
         id:fakturaId
     }})
@@ -270,14 +273,13 @@ const zemiFaktura = async function(req, res){
         return res.json({"message":"Invalid input","detail":"izbor must be pdf or excel"})
     }
 
-
+    let filename = firma.name+"-"+faktura.arhivskiBroj+".xlsx"
     if(izbor === "excel"){
         exportService.toExcel(parseInt(fakturaId))
-        res.sendFile("/fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx",{"root":".."})
+        res.attachment(filename)
+        res.sendFile("/fakturi/"+filename,{"root":".."})
     }
         
-    
-
 
 }
 
