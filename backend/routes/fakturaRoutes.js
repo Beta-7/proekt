@@ -6,9 +6,11 @@ const exportService = require("../controllers/exportService")
 
 
 app.post("/generirajFakturi",faktura.generirajFakturi)
-app.post("/zemiFaktura",faktura.zemiFaktura)
 app.post("/platiFaktura",faktura.platiFaktura)
 app.post("/dodeliNagradi",faktura.dodeliNagradi)
 app.post("/toExcel", exportService.toExcel)
 app.post('/getFakturi', faktura.getFakturi)
+
+
+app.get("/zemiFaktura",faktura.zemiFaktura)
 module.exports = app;

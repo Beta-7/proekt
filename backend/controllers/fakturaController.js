@@ -268,8 +268,8 @@ const getFakturi = async function(req, res){
 const zemiFaktura = async function(req, res){
     // Zemi red od tabelata i generiraj pdf/excel fajl
     console.log("asd")
-    const izbor = req.body.izbor;
-    const fakturaId = req.body.fakturaid;
+    const izbor = req.query.izbor;
+    const fakturaId = req.query.fakturaid;
     const faktura = await Faktura.findOne({where:{
         id:fakturaId
     }})
