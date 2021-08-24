@@ -2,7 +2,7 @@ const ExcelJS = require('exceljs');
 const Firma = require('../models/firma');
 const Faktura = require("../models/faktura");
 const BroiloStatus = require("../models/broiloStatus");
-const MernaTocka = require('../models/mernaTocka');
+
 const VkupnoPotrosena = require('../models/vkupnoPotrosena');
 const StornoDisplay = require('../models/stornoDisplay');
 const toPdf = async function(req,res){
@@ -88,22 +88,19 @@ return worksheet
 
 }
 
-const toExcel = async function(req,res){
-    const mesec = 3
-    const godina = 2021
+const toExcel = async function(fakturaId){
     let workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile("../test_data/510-2021 Komitent.xlsx");
+    try{
+        await workbook.xlsx.readFile("../template.xlsx");
+    } catch(e){
+        console.log(e)
+        return
+    }
     let worksheet = workbook.getWorksheet('Sheet1');
     
-    
-    const vkupno = await VkupnoPotrosena.findOne({where:{
-        mesec, godina
-    }})
     const faktura = await Faktura.findOne({where:
         {
-            firmaId:2,
-            mesec,
-            godina
+            id:fakturaId
         },
         include: 
         {
@@ -111,7 +108,15 @@ const toExcel = async function(req,res){
             as: "Broilo"
         }
         
-        })
+    })
+    if(faktura===null){
+        console.log("Nepostoecka faktura")
+        return 
+    }
+    const vkupno = await VkupnoPotrosena.findOne({where:{
+        mesec:faktura.mesec,
+        godina:faktura.godina
+    }})
     const firma = await Firma.findOne({where:{id:faktura.firmaId}})
     
     let cell = worksheet.getCell('B11');
@@ -237,8 +242,7 @@ const toExcel = async function(req,res){
     }
 
 
-        await workbook.xlsx.writeFile("../test_data/test.xlsx");
-   
+        await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     
         
 
