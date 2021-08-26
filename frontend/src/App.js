@@ -13,6 +13,7 @@ import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
 import FakturiTable from './components/wizard/FakturiTable'
 import GenerirajFakturi from './components/wizard/GenerirajFakturi'
+import KamatiTable from "./components/KamatiTable"
 import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
@@ -97,6 +98,12 @@ export default function App () {
           <Route path="/GenerirajFakturi">
             <GenerirajFakturi/>
           </Route>
+
+          <Route path="/kamatiTable">
+            <KamatiTable/>
+          </Route>
+
+
 
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
           <LoggedInRoute exact path="/dodadiData" loggedStatus={loggedIn} component={AddData}></LoggedInRoute>

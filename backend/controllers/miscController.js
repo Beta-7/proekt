@@ -3,7 +3,8 @@ const BroiloController=require("../controllers/broiloController")
 const Nagradi = require("../models/nagradi")
 const generateLog = require("../logs")
 const Log = require("../models/log")
-
+const Kamata = require("../models/kamata")
+const Firma = require("../models/firma.js")
 
 const updateZelenaEnergija = (req, res) => {
     req.body.mesec=parseInt(req.body.mesec)
@@ -84,4 +85,13 @@ const getLogs = async (req, res)=>{
 }
 
 
-module.exports={updateZelenaEnergija,updateNagradi,getNagradi,getLogs}
+const getKamati= async function(req,res){
+    const kamati = await Kamata.findAll({attributes:["id","firmaid", "fakturaStoKasniId", "fakturaDisplayId", "suma", "rok", "platenoData"],raw : true})
+    for(let i in kamati){
+        let ime = await Firma.findOne({where: {id:kamati[i]["id"]}, attributes:["name"]}) 
+        kamati[i]["firmaid"] = ime.dataValues.name
+    }
+    return res.json(kamati)
+}
+
+module.exports={updateZelenaEnergija,updateNagradi,getNagradi,getLogs,getKamati}
