@@ -51,41 +51,41 @@ export default function ZelenaEnergijaData(props) {
   const onSubmitForm = (e) => {
     e.preventDefault();
     var failed = false
-    if(mesec === ''){
+    if(mesec === '' || mesec === "NaN"){
       setMesecError(true)
       failed = true
     }
 
-    if(godina === ''){
+    if(godina === '' || godina === "NaN"){
       setGodinaError(true)
       failed = true
     }
 
-    if(vkupno === ''){
+    if(vkupno === '' || vkupno === "NaN"){
       setVkupnoError(true)
       failed = true
     }
 
-    if(cena === ''){
+    if(cena === '' || cena === "NaN"){
       setCenaError(true)
       failed = true
     }
 
-    if(kamata === ''){
+    if(kamata === '' || kamata === "NaN"){
       setKamataError(true)
       failed = true
     }
 
-    if(organizacija === ''){
+    if(organizacija === '' || organizacija === "NaN"){
       setOrganizacijaError(true)
       failed = true
     }
 
-    if(DDVProcent === ''){
+    if(DDVProcent === '' || DDVProcent === "NaN"){
       setDDVProcentError(true)
       failed = true
     }
-
+    console.log(DDVProcent)
     if(failed === true){
       return
     }
@@ -163,14 +163,19 @@ export default function ZelenaEnergijaData(props) {
           label="Вкупно количество зелена енергија*"
           placeholder="Вкупно количество зелена енергија*"
           variant="outlined"
+          type="number"
+          onChange={(e) => {setVkupno(parseFloat(e.target.value).toFixed(2))
+                            setVkupnoError(false)
+          }}
           InputProps={{
             style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.01"
           }}
           InputLabelProps={{
             style: {fontSize: 15}
           }}
-          type="number"
-          onChange={(e)=>{setVkupno(e.target.value)}}
         /><br/>
         <TextField
           error={cenaError}
@@ -178,14 +183,19 @@ export default function ZelenaEnergijaData(props) {
           label="Цена*"
           placeholder="Цена*"
           variant="outlined"
+          type="number"
+          onChange={(e) => {setCena(parseFloat(e.target.value).toFixed(3))
+                            setCenaError(false)
+          }}
           InputProps={{
             style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.001"
           }}
           InputLabelProps={{
             style: {fontSize: 15}
           }}
-          type="number"
-          onChange={(e)=>{setCena(e.target.value)}}
           
         /><br/>
         <TextField
@@ -195,9 +205,14 @@ export default function ZelenaEnergijaData(props) {
           placeholder="Каматна стапка за каснење*"
           variant="outlined"
           type="number"
-          onChange={(e)=>{setKamata(e.target.value)}}
+          onChange={(e) => {setKamata(parseFloat(e.target.value).toFixed(3))
+                            setKamataError(false)
+          }}
           InputProps={{
             style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.001"
           }}
           InputLabelProps={{
             style: {fontSize: 15}
@@ -210,9 +225,14 @@ export default function ZelenaEnergijaData(props) {
           placeholder="Надомест за организација*"
           variant="outlined"
           type="number"
-          onChange={(e)=>{setOrganizacija(e.target.value)}}
+          onChange={(e) => {setOrganizacija(parseFloat(e.target.value).toFixed(6))
+                            setOrganizacijaError(false)
+          }}
           InputProps={{
             style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.000001"
           }}
           InputLabelProps={{
             style: {fontSize: 15}
@@ -225,13 +245,19 @@ export default function ZelenaEnergijaData(props) {
           placeholder="ДДВ Процент*"  
           variant="outlined"
           type="number"
-          onChange={(e)=>{setDDVProcent(e.target.value)}}
+          onChange={(e) => {setDDVProcent(parseFloat(e.target.value).toFixed(2))
+                            setDDVProcentError(false)
+          }}
           InputProps={{
             style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.01"
           }}
           InputLabelProps={{
             style: {fontSize: 15}
           }}
+          
         /><br/>
         <button variant="outlined" color="primary" type="submit"  style={{fontSize:"15px"}}>Submit</button>
       </div>

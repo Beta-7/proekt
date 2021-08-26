@@ -142,6 +142,7 @@ export default function FirmiTable (props) {
                     firmaId:updatedRow.firmaId,
                     cena:updatedRow.cena
                   },{withCredentials:true}).then(()=>{
+                    axios.post("/storno/reasociraj")
                     getData()
                     resolve()
                   })
