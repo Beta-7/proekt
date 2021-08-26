@@ -29,6 +29,13 @@ export default function ZelenaEnergijaData(props) {
   const [kamata, setKamata] = React.useState('');
   const [organizacija, setOrganizacija] = React.useState('');
   const [DDVProcent, setDDVProcent] = React.useState('');
+  const [mesecError, setMesecError] = React.useState(false);
+  const [godinaError, setGodinaError] = React.useState(false);
+  const [vkupnoError, setVkupnoError] = React.useState(false);
+  const [cenaError, setCenaError] = React.useState(false);
+  const [kamataError, setKamataError] = React.useState(false);
+  const [organizacijaError, setOrganizacijaError] = React.useState(false);
+  const [DDVProcentError, setDDVProcentError] = React.useState(false);
   
 
   const handleChange = (event) => {
@@ -43,7 +50,46 @@ export default function ZelenaEnergijaData(props) {
 
   const onSubmitForm = (e) => {
     e.preventDefault();
-    test(0)
+    var failed = false
+    if(mesec === ''){
+      setMesecError(true)
+      failed = true
+    }
+
+    if(godina === ''){
+      setGodinaError(true)
+      failed = true
+    }
+
+    if(vkupno === ''){
+      setVkupnoError(true)
+      failed = true
+    }
+
+    if(cena === ''){
+      setCenaError(true)
+      failed = true
+    }
+
+    if(kamata === ''){
+      setKamataError(true)
+      failed = true
+    }
+
+    if(organizacija === ''){
+      setOrganizacijaError(true)
+      failed = true
+    }
+
+    if(DDVProcent === ''){
+      setDDVProcentError(true)
+      failed = true
+    }
+
+    if(failed === true){
+      return
+    }
+
     axios.post("/misc/AddZelenaData", {
         mesec,
         godina,
@@ -70,9 +116,11 @@ export default function ZelenaEnergijaData(props) {
     <form className={classes.root} autoComplete="off" onSubmit={onSubmitForm}>
       <div>
         <TextField
+          error={mesecError}
+          oninput="setCustomValidity('')"
           id="mesec"
           type="number"
-          label="Mesec"
+          label="Месец*"
           InputProps={{
             inputProps: { 
                 max: 12, min: 1 
@@ -82,7 +130,7 @@ export default function ZelenaEnergijaData(props) {
           InputLabelProps={{
             style: {fontSize: 15}
           }}
-          placeholder="Mesec"
+          placeholder="Месец*"
           variant="outlined"
           onChange={(e)=>{
             if(e.target.value<10){
@@ -92,9 +140,10 @@ export default function ZelenaEnergijaData(props) {
             }}
         /><br/>
         <TextField
+          error={godinaError}
           id="godina"
-          label="Godina"
-          placeholder="Godina"
+          label="Година*"
+          placeholder="Година*"
           variant="outlined"
           InputProps={{
             inputProps: { 
@@ -109,9 +158,10 @@ export default function ZelenaEnergijaData(props) {
           onChange={(e)=>{setGodina(e.target.value)}}
         /><br/>
         <TextField
+          error={vkupnoError}
           id="Vkupno"
-          label="Vkupno kolicestvo zelena energija"
-          placeholder="Vkupno kolicestvo zelena energija"
+          label="Вкупно количество зелена енергија*"
+          placeholder="Вкупно количество зелена енергија*"
           variant="outlined"
           InputProps={{
             style: {fontSize: 15}
@@ -123,9 +173,10 @@ export default function ZelenaEnergijaData(props) {
           onChange={(e)=>{setVkupno(e.target.value)}}
         /><br/>
         <TextField
+          error={cenaError}
           id="cena"
-          label="Cena"
-          placeholder="Cena"
+          label="Цена*"
+          placeholder="Цена*"
           variant="outlined"
           InputProps={{
             style: {fontSize: 15}
@@ -138,9 +189,10 @@ export default function ZelenaEnergijaData(props) {
           
         /><br/>
         <TextField
+          error={kamataError}
           id="kamata"
-          label="Kamatna stapka za kasnenje"
-          placeholder="Kamata"
+          label="Каматна стапка за каснење*"
+          placeholder="Каматна стапка за каснење*"
           variant="outlined"
           type="number"
           onChange={(e)=>{setKamata(e.target.value)}}
@@ -152,9 +204,10 @@ export default function ZelenaEnergijaData(props) {
           }}
         /><br/>
         <TextField
+          error={organizacijaError}
           id="organizacija"
-          label="Nadomest za organizacija"
-          placeholder="Nadomest"
+          label="Надомест за организација*"
+          placeholder="Надомест за организација*"
           variant="outlined"
           type="number"
           onChange={(e)=>{setOrganizacija(e.target.value)}}
@@ -166,9 +219,10 @@ export default function ZelenaEnergijaData(props) {
           }}
         /><br/>
         <TextField
+          error={DDVProcentError}
           id="DDV"
-          label="DDV Procent"
-          placeholder="DDVProcent"  
+          label="ДДВ Процент*"
+          placeholder="ДДВ Процент*"  
           variant="outlined"
           type="number"
           onChange={(e)=>{setDDVProcent(e.target.value)}}

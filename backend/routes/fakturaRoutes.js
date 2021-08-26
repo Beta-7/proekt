@@ -5,12 +5,12 @@ const auth = require("../controllers/authController.js")
 const exportService = require("../controllers/exportService")
 
 
-app.post("/generirajFakturi",faktura.generirajFakturi)
-app.get("/zemiFaktura",faktura.zemiFaktura)
-app.post("/platiFaktura",faktura.platiFaktura)
-app.post("/dodeliNagradi",faktura.dodeliNagradi)
-app.post("/toExcel", exportService.toExcel)
-app.post('/getFakturi', faktura.getFakturi)
+app.post("/generirajFakturi", auth.authMiddleware, faktura.generirajFakturi)
+app.get("/zemiFaktura", auth.authMiddleware, faktura.zemiFaktura)
+app.post("/platiFaktura", auth.authMiddleware, faktura.platiFaktura)
+app.post("/dodeliNagradi", auth.authMiddleware, faktura.dodeliNagradi)
+app.post("/toExcel", auth.authMiddleware, exportService.toExcel)
+app.post('/getFakturi', auth.authMiddleware,  faktura.getFakturi)
 
 
 app.get("/zemiFaktura",faktura.zemiFaktura)

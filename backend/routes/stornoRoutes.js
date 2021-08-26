@@ -5,11 +5,11 @@ const auth = require("../controllers/authController.js")
 
 // localhost:5000/broilo/*
 //TODO: authentication
-app.post("/uploadStornoFile",storno.uploadStornoFile)
-app.post("/getStornos",storno.getStornos)
-app.post("/dodadiStorno", storno.dodadiStorno)
-app.post("/promeniStorno", storno.promeniStorno)
-app.post("/izbrisiStorno", storno.izbrisiStorno)
-app.post("/reasociraj", storno.reasociate)
+app.post("/uploadStornoFile", auth.authMiddleware, storno.uploadStornoFile)
+app.post("/getStornos", auth.authMiddleware, storno.getStornos)
+app.post("/dodadiStorno", auth.authMiddleware, storno.dodadiStorno)
+app.post("/promeniStorno", auth.authMiddleware, storno.promeniStorno)
+app.post("/izbrisiStorno", auth.authMiddleware, storno.izbrisiStorno)
+app.post("/reasociraj", auth.authMiddleware, storno.reasociate)
 
 module.exports = app;

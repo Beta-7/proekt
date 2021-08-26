@@ -15,7 +15,7 @@ import FakturiTable from './components/wizard/FakturiTable'
 import GenerirajFakturi from './components/wizard/GenerirajFakturi'
 import KamatiTable from "./components/KamatiTable"
 import React, { useState, useEffect } from 'react';
-import {BrowserRouter, Route, Switch} from "react-router-dom";
+import {Redirect, BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
 
 import axios from 'axios';
@@ -51,62 +51,28 @@ export default function App () {
           <div>
             <Navbar loggedStatus={loggedIn} changeStatus={setLoggedIn} route={route} setRoute={setRoute}/>
           <BrowserRouter>
+          <Switch>
           <Route
           path='/login'
           component={() => <Login loggedStatus={loggedIn} changeStatus={changeStatus} />}
           />
-          <Route path="/Firmitable">
-            <FirmiTable/>
-          </Route>
 
-          <Route path="/Userstable">
-            <UsersTable/>
-          </Route>
-
-          <Route path="/broilosTable">
-            <BroilosTable/>
-          </Route>
-
-          <Route path="/MerniTockiTable">
-            <MernaTocka/>
-          </Route>
-
-          <Route path="/zelena">
-            <ZelenaEnergijaData step={3} stepState={()=>{}} editStep={()=>{}}/>
-          </Route>
-
-          <Route path="/wizard">
-            <WizardRoot/>
-          </Route>
-
-          <Route path="/nagradi">
-            <Nagradi/>
-          </Route>
-
-          <Route path="/logs">
-            <Logs/>
-          </Route>
-
-          <Route path="/FakturiTable">
-            <FakturiTable/>
-          </Route>
-
-          <Route path="/UploadStornoData">
-            <UploadStornoData/>
-          </Route>
-
-          <Route path="/GenerirajFakturi">
-            <GenerirajFakturi/>
-          </Route>
-
-          <Route path="/kamatiTable">
-            <KamatiTable/>
-          </Route>
-
-
-
+          <LoggedInRoute exact path="/Firmitable" loggedStatus={loggedIn} component={FirmiTable}></LoggedInRoute>
+          <LoggedInRoute exact path="/Userstable" loggedStatus={loggedIn} component={UsersTable}></LoggedInRoute>
+          <LoggedInRoute exact path="/broilosTable" loggedStatus={loggedIn} component={BroilosTable}></LoggedInRoute>
+          <LoggedInRoute exact path="/MerniTockiTable" loggedStatus={loggedIn} component={MernaTocka}></LoggedInRoute>
+          <LoggedInRoute exact path="/zelena" step={4} stepState={()=>{}} editStep={()=>{}} loggedStatus={loggedIn} component={ZelenaEnergijaData}></LoggedInRoute>
+          <LoggedInRoute exact path="/wizard" loggedStatus={loggedIn} component={WizardRoot}></LoggedInRoute>
+          <LoggedInRoute exact path="/nagradi" loggedStatus={loggedIn} component={Nagradi}></LoggedInRoute>
+          <LoggedInRoute exact path="/logs" loggedStatus={loggedIn} component={Logs}></LoggedInRoute>
+          <LoggedInRoute exact path="/FakturiTable" loggedStatus={loggedIn} component={FakturiTable}></LoggedInRoute>
+          <LoggedInRoute exact path="/UploadStornoData" loggedStatus={loggedIn} component={UploadStornoData}></LoggedInRoute>
+          <LoggedInRoute exact path="/GenerirajFakturi" loggedStatus={loggedIn} component={GenerirajFakturi}></LoggedInRoute>
+          <LoggedInRoute exact path="/kamatiTable" loggedStatus={loggedIn} component={KamatiTable}></LoggedInRoute>
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
           <LoggedInRoute exact path="/dodadiData" loggedStatus={loggedIn} component={AddData}></LoggedInRoute>
+          <Redirect to="/" />
+          </Switch>
           </BrowserRouter >
           
           </div>

@@ -6,8 +6,8 @@ const auth = require("../controllers/authController.js")
 // localhost:5000/mernaTocka/*
 
 //TODO: remove route - will be used internally. currently added for testing
-app.post("/dodadiMernaTocka",mernaTocka.dodadiMernaTocka)
-app.post("/PromeniMernaTocka",mernaTocka.promeniMernaTocka)
-app.post("/getMerniTocki",mernaTocka.getMerniTocki)
-app.post("/izbrisiMernaTocka",mernaTocka.izbrisiMernaTocka)
+app.post("/dodadiMernaTocka", auth.authMiddleware, mernaTocka.dodadiMernaTocka)
+app.post("/PromeniMernaTocka", auth.authMiddleware, mernaTocka.promeniMernaTocka)
+app.post("/getMerniTocki", auth.authMiddleware, mernaTocka.getMerniTocki)
+app.post("/izbrisiMernaTocka", auth.authMiddleware, mernaTocka.izbrisiMernaTocka)
 module.exports = app;

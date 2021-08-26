@@ -9,6 +9,6 @@ const auth = require("../controllers/authController.js")
 //TODO: authentication
 
 app.post("/dodadiUser",auth.authMiddleware,user.dodadiUser)
-app.post("/promeniUser", user.promeniUser)
-app.post("/izbrisiUser", user.izbrisiUser)
+app.post("/promeniUser", auth.authMiddleware, user.promeniUser)
+app.post("/izbrisiUser", auth.authMiddleware, user.izbrisiUser)
 module.exports = app;

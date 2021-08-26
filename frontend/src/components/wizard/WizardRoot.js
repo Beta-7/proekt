@@ -18,7 +18,7 @@ const theme = createMuiTheme({
   overrides: {
     MuiTypography: {
       body2: {
-        fontSize: [16, "!important"]
+        fontSize: [15, "!important"]
       }
     }
   }
@@ -108,7 +108,7 @@ export default function HorizontalNonLinearStepperWithError() {
                 </div>;
           case 6:
             return <div>
-                <Typography variant="h3">
+                <Typography variant="h5">
                 <GenerirajFakturi/>
                 </Typography>
                 </div>;
@@ -181,12 +181,12 @@ export default function HorizontalNonLinearStepperWithError() {
           <div>
             
             <div>
-              <div className="nav navbar-nav navbar-left" style={{"margin-left": "10px"}}>
+              <div className="nav navbar-nav navbar-left" style={{"margin-left": "5px"}}>
               <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                 Back
               </Button>
               </div>
-                <div className="nav navbar-nav navbar-right" style={{"margin-right": "10px"}}>
+                <div className="nav navbar-nav navbar-right" style={{"margin-right": "5px"}}>
                 <Button
                 variant="contained"
                 color="primary"
@@ -211,7 +211,7 @@ export default function HorizontalNonLinearStepperWithError() {
           const labelProps = {};
           if (isStepOptional(index)) {
             labelProps.optional = (
-              <Typography variant="h6" color="error">
+              <Typography variant="subtitle1" color="error">
                 {errorMessages}
               </Typography>
             );

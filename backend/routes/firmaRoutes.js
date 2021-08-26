@@ -7,8 +7,8 @@ const auth = require("../controllers/authController.js")
 
 //TODO: authentication
 app.post("/dodadiFirma",auth.authMiddleware,firma.dodadiFirma)
-app.post("/promeniFirma", firma.promeniFirma)
-app.post("/zemiFirmi",firma.zemiFirmi)
-app.post("/izbrisiFirma",firma.izbrisiFirma)
-app.post("/zemiBroilaNaFirma",firma.zemiBroilaNaFirma)
+app.post("/promeniFirma", auth.authMiddleware, firma.promeniFirma)
+app.post("/zemiFirmi", auth.authMiddleware, firma.zemiFirmi)
+app.post("/izbrisiFirma", auth.authMiddleware, firma.izbrisiFirma)
+app.post("/zemiBroilaNaFirma", auth.authMiddleware, firma.zemiBroilaNaFirma)
 module.exports = app;

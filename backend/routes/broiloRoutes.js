@@ -7,6 +7,6 @@ const auth = require("../controllers/authController.js")
 //TODO: authentication
 
 app.post("/getBroilos",auth.authMiddleware,broilo.getBroilos)
-app.post("/uploadFile",broilo.uploadFile)
-app.post("/asocirajBroilo",broilo.asocirajBroiloSoKompanija)
+app.post("/uploadFile", auth.authMiddleware, broilo.uploadFile)
+app.post("/asocirajBroilo", auth.authMiddleware, broilo.asocirajBroiloSoKompanija)
 module.exports = app;
