@@ -137,7 +137,8 @@ export default function ZelenaEnergijaData(props) {
                 setMesec("0"+e.target.value)
             }else
             setMesec(e.target.value)
-            }}
+            setMesecError(false)  
+          }}
         /><br/>
         <TextField
           error={godinaError}
@@ -155,7 +156,8 @@ export default function ZelenaEnergijaData(props) {
             style: {fontSize: 15}
           }}
           type="number"
-          onChange={(e)=>{setGodina(e.target.value)}}
+          onChange={(e)=>{setGodina(e.target.value)
+                          setGodinaError(false)}}
         /><br/>
         <TextField
           error={vkupnoError}
