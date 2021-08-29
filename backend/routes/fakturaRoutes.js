@@ -6,7 +6,7 @@ const exportService = require("../controllers/exportService")
 
 
 app.post("/generirajFakturi", auth.authMiddleware, faktura.generirajFakturi)
-app.get("/zemiFaktura", auth.authMiddleware, faktura.zemiFaktura)
+app.get("/zemiFaktura", faktura.zemiFaktura)
 app.post("/platiFaktura", auth.authMiddleware, faktura.platiFaktura)
 app.post("/dodeliNagradi", auth.authMiddleware, faktura.dodeliNagradi)
 app.post("/toExcel", auth.authMiddleware, exportService.toExcel)
