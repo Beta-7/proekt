@@ -11,7 +11,7 @@ const toPdf = async function(req,res){
 
 }
 
-const generirajBroiloTabela = async function(brojmernomesto,datumpocetok,datumkraj,brojbroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet, red){
+const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,datumkraj,brojbroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet, red){
     // broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo
     let cell
     let cell2
@@ -39,8 +39,9 @@ const generirajBroiloTabela = async function(brojmernomesto,datumpocetok,datumkr
     console.log(brojmernomesto)
     cell.value=brojmernomesto
 
+
     cell= worksheet.getCell('E'+(red+1))
-    cell.value=""
+    cell.value=adresa
 
     cell= worksheet.getCell('E'+(red+2))
     console.log(datumpocetok)
@@ -123,11 +124,22 @@ const toExcel = async function(fakturaId){
     let cell = worksheet.getCell('B11');
     cell.value = firma.name;
     
+    cell = worksheet.getCell("B13")
+    cell.value = firma.adresaNaFirma
+
     cell = worksheet.getCell("J16");
     cell.value = faktura.datumNaIzdavanje
    
     cell = worksheet.getCell("E16");
     cell.value = faktura.arhivskiBroj
+
+    cell = worksheet.getCell("H17");
+    cell.value = "Рок за плаќање"
+   
+    cell = worksheet.getCell("K17");
+    cell.value = faktura.rokZaNaplata
+
+
 
     cell = worksheet.getCell("H20");
     cell.value = faktura.dataOd + " - " + faktura.dataDo
@@ -199,7 +211,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoBroilo.multiplikator
                         ntkolicina=istoBroilo.vkupnoKolicina
                     }
-                    generirajBroiloTabela(broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    generirajBroiloTabela(firma.adresaNaFirma,broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }
@@ -233,7 +245,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoStorno.multiplikator
                         ntkolicina=istoStorno.vkupnoKolicina
                     }
-                    generirajBroiloTabela(istoStorno.brojNaMernoMesto,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    generirajBroiloTabela(firma.adresaNaFirma,istoStorno.brojNaMernoMesto,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }
