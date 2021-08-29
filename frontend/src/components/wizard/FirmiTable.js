@@ -35,7 +35,7 @@ function PatchedPagination(props) {
 }
 
 
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseUrl = 'http://10.30.91.51:5000';
 
 
 
