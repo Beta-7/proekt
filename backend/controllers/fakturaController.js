@@ -206,7 +206,10 @@ const dodeliNagradi = async function(req, res){
                     godina,
                     firma:firma.name
                 }}).then((postoecka)=>{
-                    if(postoecka===null){
+                    if(faktura.elektricnaEnergija>0 && faktura.agent!==null){
+                        if(postoecka===null){
+
+                        
                         Nagradi.create({
                             agent:firma.agent,
                             mesec,
@@ -217,6 +220,7 @@ const dodeliNagradi = async function(req, res){
                     }else{
                         Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoecka.id}})
                     }
+                }
                 })
 
             }).then(()=>{
