@@ -13,6 +13,7 @@ import Logs from './components/Logs'
 import UploadStornoData from './components/wizard/UploadStornoData'
 import FakturiTable from './components/wizard/FakturiTable'
 import GenerirajFakturi from './components/wizard/GenerirajFakturi'
+import DodadiMerniTocki from './components/DodadiMerniTocki'
 import KamatiTable from "./components/KamatiTable"
 import React, { useState, useEffect } from 'react';
 import {Redirect, BrowserRouter, Route, Switch} from "react-router-dom";
@@ -20,7 +21,7 @@ import './App.css';
 
 import axios from 'axios';
 import ZelenaEnergijaData from './components/wizard/ZelenaEnergijaData';
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
+axios.defaults.baseUrl = 'http://10.30.91.51';
 
 
 export default function App () {
@@ -71,6 +72,7 @@ export default function App () {
           <LoggedInRoute exact path="/kamatiTable" loggedStatus={loggedIn} component={KamatiTable}></LoggedInRoute>
           <LoggedInRoute exact path="/" loggedStatus={loggedIn} component={Home}></LoggedInRoute>
           <LoggedInRoute exact path="/dodadiData" loggedStatus={loggedIn} component={AddData}></LoggedInRoute>
+          <LoggedInRoute exact path="/merniTocki" loggedStatus={loggedIn} component={DodadiMerniTocki}></LoggedInRoute>
           <Redirect to="/" />
           </Switch>
           </BrowserRouter >

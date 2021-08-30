@@ -49,7 +49,7 @@ const theme = createTheme({
 
 
 
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
+axios.defaults.baseUrl = 'http://10.30.91.51';
 
     
 

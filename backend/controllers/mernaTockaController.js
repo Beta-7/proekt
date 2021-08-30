@@ -8,11 +8,20 @@ const dodadiMernaTocka = (req, res) => {
     //tockaID
     //cena
     //firma
+    //tarifa
     const tockaID=req.body.tockaID
     const cena=parseFloat(req.body.cena)
     const firmaID=req.body.firmaID
+    let tarifa=req.body.tarifa
+    if(tarifa == 0){
+        tarifa="1.1.1.8.1.255"
+    }
+    if(tarifa == 1){
+        tarifa="1.1.1.8.2.255"
+    }
+    
 
-    MernaTocka.findOne({where:{tockaID: req.body.tockaID}}).then((user)=>{
+    MernaTocka.findOne({where:{tockaID: req.body.tockaID, tarifa}}).then((user)=>{
         if(user!==null){
             return res.json({"message":"Error","detail":"Merna tocka already exists"})
         }
@@ -21,7 +30,8 @@ const dodadiMernaTocka = (req, res) => {
             MernaTocka.create({
                 tockaID,
                 cena,
-                "firmaId":firma.id
+                "firmaId":firma.id,
+                tarifa
             }).then(()=>{
                 generateLog("Асоцира мерна точка со компанија",req.session.username, tockaID)
                 return res.send({"message":"success","detail":"Successfully added company"})})    
@@ -37,6 +47,7 @@ async function promeniMernaTocka(req,res){
         //id
         //firmaID
         //cena
+        //tarifa
     const MT = await MernaTocka.findOne({where:{
         id:req.body.id
     }})

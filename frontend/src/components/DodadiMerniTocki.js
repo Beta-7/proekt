@@ -39,11 +39,14 @@ axios.defaults.baseUrl = 'http://10.30.91.51';
 
 
 
-export default function FirmiTable (props) {
+export default function FirmiTable () {
     const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
     const [nemaNeasocirani, setNemaAsocirani] = useState(true)
-
+    const tarifi = [
+        "1.1.1.8.1.255",
+        "1.1.1.8.2.255"
+    ]
     useEffect(() => {
       
       getData()
@@ -53,13 +56,9 @@ export default function FirmiTable (props) {
         axios.post("/storno/reasociraj",{},{withCredentials:true})
       }
 
-      const EnableButton = (asd) =>{
-        props.editStep(props.step,asd)
-      }
       
        function getData(){
         reasociraj()
-        EnableButton(0) 
         setNemaAsocirani(true)
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
@@ -70,9 +69,11 @@ export default function FirmiTable (props) {
               setFirmi(firmiNiza)
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
                 response.data.map((tocka)=>{
+                    if(tocka.tarifa==="1.1.1.8.1.255") tocka.tarifa=0
+                    else if(tocka.tarifa==="1.1.1.8.2.255") tocka.tarifa=1
+                    
                     if(tocka.firmaId === null){
                       setNemaAsocirani(false)
-                      EnableButton(1)
                       
                     }
                 })  
@@ -93,7 +94,6 @@ export default function FirmiTable (props) {
         { title: "Мерна точка ИД", field: "tockaID",
          filtering:false,
          defaultSort:"desc",
-         editable: false
          },
         {
           title: "Цена", field: "cena",
@@ -105,7 +105,8 @@ export default function FirmiTable (props) {
             title: "Тарифа", field: "tarifa",
             validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
             filtering:false,
-            editable: false
+            editable:'onAdd',
+            lookup: {...tarifi}
           },
         {
           title: "Фирма", field: "firmaId",
@@ -127,6 +128,18 @@ export default function FirmiTable (props) {
                 Pagination: PatchedPagination,
               }}
               editable={{
+                onRowAdd: (newRow) => new Promise((resolve, reject) => {
+                axios.post("/mernaTocka/dodadiMernaTocka",{
+                  tockaID:newRow.tockaID,
+                  cena:newRow.cena,
+                  tarifa:newRow.tarifa,
+                  firmaID:newRow.firmaId,
+                },{withCredentials:true}).then(()=>{
+                  getData()
+                  resolve()
+                })
+                
+              }),
                 onRowDelete: selectedRow => new Promise((resolve, reject) => {
                   axios.post("/mernaTocka/izbrisiMernaTocka",{
                     id:selectedRow.id
