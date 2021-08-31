@@ -60,7 +60,7 @@ class UploadSensorData extends Component {
           
           <center>
             <h1> 
-              Прикачи документ (сензор дата)<br/><br/>
+              Прикачи документ (Состојба на потрошена енeргија)<br/><br/>
 
             </h1>
             <div>

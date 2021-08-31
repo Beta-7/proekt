@@ -2,8 +2,10 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
-
+import { TablePagination, TablePaginationProps, Button } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
+import TextField from '@material-ui/core/TextField';
 
 //Fix to the broken pagination
 function PatchedPagination(props) {
@@ -35,14 +37,14 @@ function PatchedPagination(props) {
 }
 
 
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
-
+axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
 export default function FakturaTable(props) {
     const [data, setData] = useState([])
-
+    const [godina, setGodina] = useState("")
+    const [mesec, setMesec] = useState("")
 
     useEffect(() => {
       setData(props.data)
@@ -50,7 +52,25 @@ export default function FakturaTable(props) {
       }, [])
 
 
-
+      function hangleClick(){
+        new Promise((resolve,reject) => {
+          axios.get('/faktura/zemiFakturiMesec', {
+            responseType: 'blob',
+            params: {
+              mesec,
+              godina
+            }
+          },{withCredentials:true}).then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const filename = response.headers['content-disposition'].split('filename=')[1];
+            link.setAttribute('download', filename.substring(1).slice(0,-1));
+            document.body.appendChild(link);
+            link.click();
+          });
+        })
+      }
       
        function getData(){
           axios.post("/faktura/getFakturi",{},{withCredentials:true}).then((response)=>{
@@ -115,6 +135,46 @@ export default function FakturaTable(props) {
     
     
         return (
+          <div>
+            <TextField
+          id="mesec"
+          label="Месец"
+          placeholder="Месец"
+          value={mesec}
+          size="small"
+          variant="outlined"
+          type="number"
+          onChange={(e)=>{setMesec(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15},
+            inputProps: { min: 0, max: new Date().getMonth()+1 }
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
+        />
+                <TextField
+          id="godina"
+          label="Година"
+          placeholder="Година"
+          value={godina}  
+          size="small"
+          variant="outlined"
+          type="Number"
+          onChange={(e)=>{setGodina(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
+        />
+                <IconButton onClick={hangleClick} style={{marginTop: "-12px", marginLeft: "10px"}} variant="contained">
+                    <SystemUpdateAltIcon style={{height: "40px", width: "40px"}} fontSize="large"/>
+                </IconButton>
+
+                <br></br>
+        <br></br> 
             <MaterialTable
               title="Кориснички сметки"
               columns={columns}
@@ -173,6 +233,8 @@ export default function FakturaTable(props) {
                 }}
                 
             />
+            
+            </div>
     );
         
 

@@ -8,6 +8,8 @@ import { TablePagination, TablePaginationProps } from '@material-ui/core';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { createTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
+import IconButton from '@material-ui/core/IconButton';
 //Fix to the broken pagination
 function PatchedPagination(props) {
     const {
@@ -49,8 +51,7 @@ const theme = createTheme({
 
 
 
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
-
+axios.defaults.baseUrl = 'http://localhost:5000';
     
 
 
@@ -64,6 +65,26 @@ export default function FakturaTable(props) {
         setMesec(new Date().getMonth()+1)
         setGodina( new Date().getFullYear())
     },[])
+
+    function hangleClick(){
+      new Promise((resolve,reject) => {
+        axios.get('/faktura/zemiFakturiMesec', {
+          responseType: 'blob',
+          params: {
+            mesec,
+            godina
+          }
+        },{withCredentials:true}).then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          const filename = response.headers['content-disposition'].split('filename=')[1];
+          link.setAttribute('download', filename.substring(1).slice(0,-1));
+          document.body.appendChild(link);
+          link.click();
+        });
+      })
+    }
     
     const getData=()=>{
             console.log("asd")
@@ -140,6 +161,7 @@ export default function FakturaTable(props) {
             <MuiThemeProvider theme={theme}>
             <div>
                 <center>
+                <hr></hr>
                 <TextField
           id="mesec"
           label="Месец"
@@ -176,7 +198,50 @@ export default function FakturaTable(props) {
                 <Button onClick={generiraj} style={{fontSize:"15px"}} variant="contained" color="secondary">
                     Генерирај фактури
                 </Button>
-                
+
+        <br></br>
+        <hr></hr>
+        <br></br>
+
+                <TextField
+          id="mesec"
+          label="Месец"
+          placeholder="Месец"
+          value={mesec}
+          size="small"
+          variant="outlined"
+          type="number"
+          onChange={(e)=>{setMesec(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15},
+            inputProps: { min: 0, max: new Date().getMonth()+1 }
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
+        />
+                <TextField
+          id="godina"
+          label="Година"
+          placeholder="Година"
+          value={godina}  
+          size="small"
+          variant="outlined"
+          type="Number"
+          onChange={(e)=>{setGodina(e.target.value)}}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
+        />
+                <IconButton onClick={hangleClick} style={{marginTop: "-12px", marginLeft: "10px"}} variant="contained">
+                    <SystemUpdateAltIcon style={{height: "40px", width: "40px"}} fontSize="large"/>
+                </IconButton>
+
+                      <br></br>
+                      <br></br>
                 <MaterialTable
               title="Кориснички сметки"
               columns={columns}

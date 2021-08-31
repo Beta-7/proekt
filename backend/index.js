@@ -11,7 +11,6 @@ const mernaTockaRoutes = require("./routes/mernaTockaRoutes.js")
 const fakturaRoutes = require("./routes/fakturaRoutes.js")
 const miscRoutes = require("./routes/miscRoutes.js")
 const stornoRoutes = require("./routes/stornoRoutes.js")
-
 const session=require("express-session")
 const fileUpload = require('express-fileupload');
 
@@ -25,7 +24,6 @@ app.use((req, res, next) => {
     res.append('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });
-
 
 app.use(express.json());
 //TODO: podobar session secret

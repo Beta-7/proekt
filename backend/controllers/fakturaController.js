@@ -9,6 +9,12 @@ const Storno = require("../models/storno.js")
 const Kamata = require("../models/kamata")
 const generateLog = require("../logs.js")
 const exportService = require("./exportService")
+
+var zip = new require('node-zip')();
+var fs = require("fs")
+var path=require("path")
+
+
 function formatDate(date){
     var newDate = new Date(date)
     
@@ -297,10 +303,34 @@ const zemiFaktura = async function(req, res){
         
 
 }
+const zemiFakturiMesec = async function(req,res){
+    const mesec=parseInt(req.query.mesec)
+    const godina=parseInt(req.query.godina)
+    let imeFakturi = []
+    let fakturibr = 0
+    
 
-function getDaysInMonth(m, y) {
-    return m===2 ? y & 3 || !(y%25) && y & 15 ? 28 : 29 : 30 + (m+(m>>3)&1);
+    const fakturi = await Faktura.findAll({where:{
+        mesec, godina
+    }})
+    for(faktura of fakturi){
+        if(faktura.vkupnaNaplata>0){
+            const firma = await Firma.findOne({where:{id:faktura.firmaId}})
+            await exportService.toExcel(faktura.id)
+            fakturibr = fakturibr +1
+            imeFakturi.push("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx")
+            zip.file(firma.name+"-"+faktura.arhivskiBroj+".xlsx", fs.readFileSync(path.join(__dirname, "/../"+imeFakturi[0])));
+
+        }
+    }
+    if(fakturibr==0){return}
+    console.log(__dirname +"/../"+ imeFakturi[0])
+    var data = zip.generate({ base64:false, compression: 'DEFLATE' });
+    fs.writeFileSync("../mesecni/"+mesec+"-"+godina+'.zip', data, 'binary');
+    res.attachment("../mesecni/"+mesec+"-"+godina+'.zip')
+    res.sendFile("mesecni/"+mesec+"-"+godina+'.zip',{"root":".."})
 }
+
 
 const platiFaktura = async function(req, res){
     const fakturaid=req.body.id;
@@ -420,4 +450,4 @@ const platiFaktura = async function(req, res){
 
 
 
-module.exports={generirajFakturi, zemiFaktura, platiFaktura, dodeliNagradi, getFakturi}
+module.exports={generirajFakturi, zemiFaktura, platiFaktura, dodeliNagradi, getFakturi, zemiFakturiMesec}

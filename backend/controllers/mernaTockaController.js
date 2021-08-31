@@ -13,6 +13,9 @@ const dodadiMernaTocka = (req, res) => {
     const cena=parseFloat(req.body.cena)
     const firmaID=req.body.firmaID
     let tarifa=req.body.tarifa
+    if(tockaID===undefined || cena===undefined || firmaID===undefined || tarifa===undefined){
+        return res.status(301)
+    }
     if(tarifa == 0){
         tarifa="1.1.1.8.1.255"
     }

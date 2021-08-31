@@ -35,19 +35,54 @@ function PatchedPagination(props) {
 }
 
 
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
-
+axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
 export default function FirmiTable () {
     const [data, setData] = useState([])
     const [vraboteni, setVraboteni] = useState([])
+    const [selectedFile, setSelectedFile] = useState(null)
 
 
     useEffect(() => {
       getData()
       }, [])
+
+
+      function onFileUpload(){
+        const formData = new FormData();
+        if(selectedFile!==null){
+        formData.append(
+          "sensorData",
+          selectedFile,
+          selectedFile.name
+        )
+      
+        axios.post("/broilo/asd", formData,{withCredentials:true}).then((res)=>{
+          if(res.data.message==="success"){
+          }
+        });
+        }
+      }
+      
+      function fileData(){
+      
+        if (selectedFile) {
+           
+         
+        } else {
+          return (
+            <div>
+              <br />
+              <h4>Изберете документ пред да прикачите</h4>
+            
+            </div>
+          );
+        }
+      }
+
+
 
 
 
@@ -116,6 +151,7 @@ export default function FirmiTable () {
     
     
         return (
+          <div>
             <MaterialTable
               title="Фирми"
               columns={columns}
@@ -173,6 +209,23 @@ export default function FirmiTable () {
                 }
               }}
             />
+            <div>
+          
+          <center>
+            <h1> 
+              Прикачи документ (Листа на фирми)<br/><br/>
+
+            </h1>
+            <div>
+                <input type="file" name="firmiList" accept=".csv"   onChange={(e)=>{console.log(e.target.files[0]);setSelectedFile(e.target.files[0])}}/><br/>
+                <button onClick={onFileUpload}>
+                  Прикачи!
+                </button>
+            </div>
+          {fileData}
+          </center>
+        </div>
+            </div>
     );
         
 

@@ -36,7 +36,7 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
 
 
     cell= worksheet.getCell('E'+(red+0))
-    console.log(brojmernomesto)
+
     cell.value=brojmernomesto
 
 
@@ -44,7 +44,6 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     cell.value=adresa
 
     cell= worksheet.getCell('E'+(red+2))
-    console.log(datumpocetok)
     cell.value=datumpocetok.replace("-",".").replace("-",".")+" - "+datumkraj.replace("-",".").replace("-",".")
 
 
@@ -112,7 +111,6 @@ const toExcel = async function(fakturaId){
         
     })
     if(faktura===null){
-        console.log("Nepostoecka faktura")
         return 
     }
     const vkupno = await VkupnoPotrosena.findOne({where:{
@@ -170,9 +168,7 @@ const toExcel = async function(fakturaId){
 
     cell = worksheet.getCell("J30");
     cell.value = faktura.vkupenIznosNaFakturaBezDDV.toFixed(2)
-    console.log(faktura.id)
-    console.log(faktura.vkupenIznosNaFakturaBezDDV.toFixed(2))
-        
+    
 
     cell = worksheet.getCell("B32");
     cell.value = "ДДВ ("+vkupno.DDVProcent+"%):"
@@ -193,7 +189,7 @@ const toExcel = async function(fakturaId){
         for(broilo of broila){
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
-            console.log('broilo')
+
             const istiBroila = await BroiloStatus.findAll({where:{fakturaId:faktura.id,brojBroilo:broilo.brojBroilo}})
             if(istiBroila!==null){
                
@@ -225,9 +221,7 @@ const toExcel = async function(fakturaId){
         for(storno of storni){
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
-            let vkupno
-            
-            console.log('storno')
+
             const istiStorni = await StornoDisplay.findAll({where:{fakturaId:faktura.id,brojNaBroilo:storno.brojNaBroilo}})
             if(istiStorni!==null){
                
@@ -262,7 +256,6 @@ const toExcel = async function(fakturaId){
         try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
         cell = worksheet.getCell("B"+kamatarow);
         cell.value = "Казнена камата за фактура " + fakturastokasni.arhivskiBroj
-        console.log(fakturastokasni.arhivskiBroj)
         cell = worksheet.getCell("J"+kamatarow);
         cell.value = kamata.suma
         cell = worksheet.getCell("K"+kamatarow)

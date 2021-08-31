@@ -6,8 +6,7 @@ import axios from 'axios';
 
 
 
-axios.defaults.baseUrl = 'http://10.30.91.51:5000';
-
+axios.defaults.baseUrl = 'http://localhost:5000';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -193,7 +192,7 @@ export default function ZelenaEnergijaData(props) {
             style: {fontSize: 15}
           }}
           inputProps={{
-            step: "0.001"
+            step: "0.00000001"
           }}
           InputLabelProps={{
             style: {fontSize: 15}

@@ -84,7 +84,7 @@ POST http://localhost:5000/mernaTocka/dodadiMernaTocka HTTP/1.1
 content-type: application/json
 
 {
-    "tockaID":"MK0001000000000000000103000183248",
+    "tockaID":"MK00010000000000000yeet00103000183248",
     "cena":"5.00",
     "firmaID":"1"
 }
@@ -168,6 +168,10 @@ Content-Type: application/json
 POST http://localhost:5000/faktura/toExcel HTTP/1.1
 Content-Type: application/json
         
+
+###
+GET http://localhost:5000/faktura/zemiFakturiMesec?mesec=3&godina=2021
+
 
 ###
 POST http://localhost:5000/faktura/toExcel HTTP/1.1
