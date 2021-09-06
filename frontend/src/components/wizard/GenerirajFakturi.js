@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-import FakturiTable from './FakturiTable';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 import { createTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';

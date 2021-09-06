@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 
 
 //Fix to the broken pagination
@@ -75,7 +75,7 @@ export default function FirmiTable () {
           return (
             <div>
               <br />
-              <h4>Изберете документ пред да прикачите</h4>
+              <span style={{fontSize: "16px"}}>Изберете документ пред да прикачите</span>
             
             </div>
           );
@@ -91,7 +91,7 @@ export default function FirmiTable () {
          var users = {}
          var usersid = {}
           axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
-            response.data.map((user)=>{
+            response.data.forEach((user)=>{
                 console.log(user)
                 users[user.id] = user.username
                 //{id:username}
@@ -101,7 +101,7 @@ export default function FirmiTable () {
               setVraboteni(users)
           }).then(()=>{
             axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
-              response.data.rows.map(row=>{
+              response.data.rows.forEach(row=>{
                 row.agent=usersid[row.agent]
               })   
               

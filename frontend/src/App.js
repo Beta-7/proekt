@@ -28,6 +28,9 @@ export default function App () {
       const [isAdmin, setIsAdmin] = useState(JSON.parse(localStorage.getItem("isAdmin")));
       const [username, setUsername] = useState(localStorage.getItem("Username"));
       const [route, setRoute]=useState("")
+      const garbage = () => {
+        return (isAdmin, username)
+      }
       useEffect(() => {
         axios.post("/auth/whoami",{},{withCredentials:true}).then((res)=>{
           console.log("Logged in with user "+res.data.username)
@@ -40,7 +43,9 @@ export default function App () {
             localStorage.setItem("Username","");
             
           }
+          garbage()
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [])
 
 

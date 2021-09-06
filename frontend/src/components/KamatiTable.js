@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 
 
 //Fix to the broken pagination
@@ -47,22 +47,11 @@ export default function KamatiTable () {
       getData()
       }, [])
 
-
-
-      
        function getData(){
-         var usersid = {}
           axios.post("/misc/getKamati",{},{withCredentials:true}).then((response)=>{
               setData(response.data)
           })
-
-
-
         }
-
-    
-
-    
 
     const columns = [
         { title: "id", field: "id",

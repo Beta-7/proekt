@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 
 
 //Fix to the broken pagination
@@ -46,14 +46,17 @@ export default function FirmiTable () {
 
     useEffect(() => {
       getData()
+      garbage()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
 
 
-
+      const garbage = () =>{
+        return vraboteni
+      }
       
        function getData(){
          var users = {}
-         var usersid = {}
           axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
               setData(response.data)
               setVraboteni(users)

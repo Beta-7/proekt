@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps, Button } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import TextField from '@material-ui/core/TextField';
@@ -49,6 +49,7 @@ export default function FakturaTable(props) {
     useEffect(() => {
       setData(props.data)
       getData()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
 
 
@@ -74,7 +75,7 @@ export default function FakturaTable(props) {
       
        function getData(){
           axios.post("/faktura/getFakturi",{},{withCredentials:true}).then((response)=>{
-            response.data.map((row)=>{
+            response.data.forEach((row)=>{
               row.datumNaIzdavanje=row.datumNaIzdavanje.replace("-",".").replace("-",".")
               row.rokZaNaplata=row.rokZaNaplata.replace("-",".").replace("-",".")
             })  

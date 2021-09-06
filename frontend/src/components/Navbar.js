@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from "@material-ui/core/styles";
-import { Link } from '@material-ui/core';
 
 const StyledMenu = withStyles({
   paper: {
@@ -29,22 +28,19 @@ const StyledMenu = withStyles({
 ));
 
 
-const styles = {
-  instMenu: {
-    marginTop: 15,
-    marginBottom: 0,
-    display: 'inline-flex'
-  }
-};
-
-
-const Navbar = ({loggedStatus,changeStatus, route, setRoute }) => {
-
+const Navbar = ({loggedStatus,changeStatus }) => {
+  const [route, setRoute] = useState("")
   const [active, setActive] = useState([0,0,0,0])
+
+  const garbage = () =>{
+    return route
+  }
+
   const logoutBtn = (e) => {
     e.preventDefault();
     auth.logout();
     changeStatus(false);
+    garbage()
   };
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorE2, setAnchorE2] = React.useState(null);
@@ -63,33 +59,32 @@ const Navbar = ({loggedStatus,changeStatus, route, setRoute }) => {
   };
   useEffect(() => {
    var loc = window.location.pathname
-   console.log(loc)
+   var newState
    switch (loc) {
     case "/":
-      var newState=active;
+      newState=active;
       newState[0]=1
       setActive([...newState])
       return;
     case "/dodadiData":
-      var newState=active;
+      newState=active;
       newState[1]=1
       setActive([...newState])
       return
     case "/wizard":
-      var newState=active;
+      newState=active;
       newState[2]=1
       setActive([...newState])
       return
     case 3:
-      var newState=active;
+      newState=active;
       newState[3]=1
       setActive([...newState])
       return
     default:
       return ;
   }
-
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -98,7 +93,7 @@ const Navbar = ({loggedStatus,changeStatus, route, setRoute }) => {
           return  <div>
           <ul className="nav navbar-nav">
           <div style={{padding: "3px"}}></div>
-          <li className={active[2]?"active":""}><a href="/wizard" onClick={setRoute("/wizard")}>Волшебник</a></li>
+          <li className={active[2]?"active":""}><a href="/wizard" onClick={() => setRoute("/wizard")}>Волшебник</a></li>
             <li className={active[1]?"active":""}>
       
             

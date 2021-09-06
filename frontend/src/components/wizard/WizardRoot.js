@@ -13,9 +13,9 @@ import ZelenaEnergijaData from './ZelenaEnergijaData';
 import UploadStornoData from './UploadStornoData';
 import FakturiTable from './FakturiTable';
 import GenerirajFakturi from './GenerirajFakturi'
-import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider, createTheme} from "@material-ui/core/styles";
 
-const theme = createMuiTheme({
+const theme = createTheme({
   overrides: {
     MuiTypography: {
       body2: {
@@ -70,7 +70,7 @@ export default function HorizontalNonLinearStepperWithError() {
           case 0:
             return <div>
               <Typography variant="h4" >
-                <p>Прикачи го фајлот од елем во кој се запишани податоците за потрошувачите</p>
+                <span>Прикачи го фајлот од елем во кој се запишани податоците за потрошувачите</span>
                 </Typography>
                 <Typography variant="h5" >
                 <UploadSensorData step={0} stepState={errors} editStep={editStep}/>
@@ -79,7 +79,7 @@ export default function HorizontalNonLinearStepperWithError() {
           case 1:
             return <div>
                 <Typography variant="h4" >
-                <p>Прикачи го фајлот од елем во кој се запишани сторно податоците</p>
+                <span>Прикачи го фајлот од елем во кој се запишани сторно податоците</span>
                 </Typography>
                 <Typography variant="h5" >
                 <UploadStornoData/>
@@ -149,20 +149,20 @@ export default function HorizontalNonLinearStepperWithError() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
+  // const handleSkip = () => {
+  //   if (!isStepOptional(activeStep)) {
+  //     // You probably want to guard against something like this,
+  //     // it should never occur unless someone's actively trying to break something.
+  //     throw new Error("You can't skip a step that isn't optional.");
+  //   }
 
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  //   setSkipped((prevSkipped) => {
+  //     const newSkipped = new Set(prevSkipped.values());
+  //     newSkipped.add(activeStep);
+  //     return newSkipped;
+  //   });
+  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  // };
 
   const handleReset = () => {
     setActiveStep(0);
@@ -187,12 +187,12 @@ export default function HorizontalNonLinearStepperWithError() {
           <div>
             
             <div>
-              <div className="nav navbar-nav navbar-left" style={{"margin-left": "5px"}}>
+              <div className="nav navbar-nav navbar-left" style={{marginLeft: "5px"}}>
               <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                 Back
               </Button>
               </div>
-                <div className="nav navbar-nav navbar-right" style={{"margin-right": "5px"}}>
+                <div className="nav navbar-nav navbar-right" style={{marginRight: "5px"}}>
                 <Button
                 variant="contained"
                 color="primary"

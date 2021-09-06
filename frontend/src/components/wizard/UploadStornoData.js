@@ -70,7 +70,7 @@ class UploadStornoData extends Component {
         return (
           <div>
             <br />
-            <h4>Изберете документ пред да прикачите</h4>
+            <span style={{fontSize: "16px"}}>Изберете документ пред да прикачите</span>
           
           </div>
         );

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 
 //Fix to the broken pagination
@@ -42,12 +42,9 @@ export default function FirmiTable () {
     const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
     const [nemaNeasocirani, setNemaAsocirani] = useState(false)
-    const tarifi = [
-        "1.1.1.8.1.255",
-        "1.1.1.8.2.255"
-    ]
     useEffect(() => {
       getData()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
     
       const reasociraj =()=>{
@@ -72,7 +69,7 @@ export default function FirmiTable () {
         
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
-             firmi.data.rows.map((firma)=>{
+             firmi.data.rows.forEach((firma)=>{
                 firmiNiza[firma.id] = firma.name 
                 })
                 

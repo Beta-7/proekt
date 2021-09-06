@@ -1,12 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
-
-import { makeStyles } from "@material-ui/core";
-
-
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 
 //Fix to the broken pagination
 function PatchedPagination(props) {

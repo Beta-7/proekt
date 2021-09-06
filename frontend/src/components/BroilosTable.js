@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-import MaterialTable, { MaterialTableProps } from 'material-table';
-import { TablePagination, TablePaginationProps } from '@material-ui/core';
+import MaterialTable from 'material-table';
+import { TablePagination } from '@material-ui/core';
 
-import { makeStyles } from "@material-ui/core";
 
 
 
@@ -44,19 +43,12 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 export default function FirmiTable () {
     const [data, setData] = useState([])
-    const [vraboteni, setVraboteni] = useState([])
-
 
     useEffect(() => {
       getData()
       }, [])
 
-
-
-      
        function getData(){
-         var users = {}
-         var usersid = {}
           axios.post("/broilo/getBroilos",{},{withCredentials:true}).then((response)=>{
               console.log(response.data)
                 setData(response.data)

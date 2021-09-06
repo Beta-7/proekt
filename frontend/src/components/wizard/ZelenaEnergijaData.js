@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Typography from "@material-ui/core/Typography";
 import axios from 'axios';
 
 
@@ -35,17 +34,10 @@ export default function ZelenaEnergijaData(props) {
   const [kamataError, setKamataError] = React.useState(false);
   const [organizacijaError, setOrganizacijaError] = React.useState(false);
   const [DDVProcentError, setDDVProcentError] = React.useState(false);
-  
-
-  const handleChange = (event) => {
-    //   console.log(event.target)
-    // setValue(event.target.value);
-  };
 
   const test = (asd) =>{
     props.editStep(props.step,asd)
   }
-
 
   const onSubmitForm = (e) => {
     e.preventDefault();
