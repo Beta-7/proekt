@@ -73,15 +73,9 @@ export default function FirmiTable () {
                 
               setFirmi(firmiNiza)
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
-                response.data.map((tocka)=>{
-                    if(tocka.firmaId === null){
-                      proveriNeasocirani()
-                      
-                    }
-                })  
-                
             setData(response.data)
-            })
+            proveriNeasocirani()  
+          })
 
         })
 
@@ -104,11 +98,10 @@ export default function FirmiTable () {
           type: "numeric"
         },
         {
-            title: "Тарифа", field: "tarifa",
-            validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
-            filtering:false,
-            editable:'onAdd',
-            lookup: {...tarifi}
+          title: "Тарифа", field: "tarifa",
+          validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
+          filtering:false,
+          editable: "onAdd"
           },
         {
           title: "Фирма", field: "firmaId",
