@@ -41,13 +41,12 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 export default function FirmiTable () {
     const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
-    const [nemaNeasocirani, setNemaAsocirani] = useState(true)
+    const [nemaNeasocirani, setNemaAsocirani] = useState(false)
     const tarifi = [
         "1.1.1.8.1.255",
         "1.1.1.8.2.255"
     ]
     useEffect(() => {
-      
       getData()
       }, [])
     
@@ -55,9 +54,10 @@ export default function FirmiTable () {
         axios.post("/storno/reasociraj",{},{withCredentials:true})
       }
       const proveriNeasocirani = () => {
-        console.log("asd")
         axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
-          setNemaAsocirani(!res.data.message)
+          console.log(res.data.message)
+          setNemaAsocirani(res.data.message == "true" ? true : false)
+          console.log(nemaNeasocirani)
         })
       }
       
@@ -113,7 +113,7 @@ export default function FirmiTable () {
     
         return (
             <div>
-                {nemaNeasocirani ? <Typography style={{color:"#00aa00"}} ><h1>Нема неасоцирани мерни точки</h1></Typography>:<Typography style={{color:"#ff0000"}}><h1>Има неасоцирани мерни точки</h1></Typography>}
+                {nemaNeasocirani ? <Typography style={{color:"#00aa00"}} ><h1>Нема неасоцирани мерни точки </h1></Typography>:<Typography style={{color:"#ff0000"}}><h1>Има неасоцирани мерни точки</h1></Typography>}
             
             <MaterialTable
               title="Мерни точки"

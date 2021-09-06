@@ -57,6 +57,9 @@ export default function FirmiTable (props) {
         console.log("asd")
         axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
           setNemaAsocirani(!res.data.message)
+          if(!res.data.message){
+            EnableButton(1)
+          }
         })
       }
 
@@ -79,12 +82,12 @@ export default function FirmiTable (props) {
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
                 response.data.map((tocka)=>{
                     if(tocka.firmaId === null){
-                      proveriNeasocirani()
-                      EnableButton(1)
+                      
+                      
                       
                     }
                 })  
-                
+                proveriNeasocirani()    
             setData(response.data)
             })
 
