@@ -54,11 +54,17 @@ export default function FirmiTable () {
       const reasociraj =()=>{
         axios.post("/storno/reasociraj",{},{withCredentials:true})
       }
-
+      const proveriNeasocirani = () => {
+        console.log("asd")
+        axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
+          setNemaAsocirani(!res.data.message)
+        })
+      }
       
-       function getData(){
+      function getData(){
         reasociraj()
-        setNemaAsocirani(true)
+        proveriNeasocirani()
+        
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
              firmi.data.rows.map((firma)=>{
@@ -68,11 +74,8 @@ export default function FirmiTable () {
               setFirmi(firmiNiza)
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
                 response.data.map((tocka)=>{
-                    if(tocka.tarifa==="1.1.1.8.1.255") tocka.tarifa=0
-                    else if(tocka.tarifa==="1.1.1.8.2.255") tocka.tarifa=1
-                    
                     if(tocka.firmaId === null){
-                      setNemaAsocirani(false)
+                      proveriNeasocirani()
                       
                     }
                 })  

@@ -61,7 +61,6 @@ export default function HorizontalNonLinearStepperWithError() {
         var newErrors = [...errors]
         newErrors[step]=state
         setErrors(newErrors)
-        console.log(errors)
     }
     function getStepContent(step) {
         

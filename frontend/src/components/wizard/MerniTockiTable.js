@@ -44,12 +44,20 @@ export default function FirmiTable (props) {
     const [nemaNeasocirani, setNemaAsocirani] = useState(true)
 
     useEffect(() => {
-      
+      proveriNeasocirani()
       getData()
+      
       }, [])
     
       const reasociraj =()=>{
         axios.post("/storno/reasociraj",{},{withCredentials:true})
+      }
+
+      const proveriNeasocirani = () => {
+        console.log("asd")
+        axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
+          setNemaAsocirani(!res.data.message)
+        })
       }
 
       const EnableButton = (asd) =>{
@@ -59,7 +67,8 @@ export default function FirmiTable (props) {
        function getData(){
         reasociraj()
         EnableButton(0) 
-        setNemaAsocirani(true)
+        proveriNeasocirani()
+        
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
              firmi.data.rows.map((firma)=>{
@@ -70,7 +79,7 @@ export default function FirmiTable (props) {
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
                 response.data.map((tocka)=>{
                     if(tocka.firmaId === null){
-                      setNemaAsocirani(false)
+                      proveriNeasocirani()
                       EnableButton(1)
                       
                     }

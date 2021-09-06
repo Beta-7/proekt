@@ -83,15 +83,19 @@ const uploadFile = async (req,res)=>{
             vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(2)
             mesec=niza[red].mesec.slice(5,7)
             godina=niza[red].mesec.slice(0,4)
-            MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
-                defaults: {
-                    tockaID:niza[red].brojMernaTocka,
-                    cena:0,
-                    tarifa:niza[red].tarifa
+            console.log(niza[red])
+            if(niza[red].brojMernaTocka!==null && niza[red].tarifa!==null){
+
+                MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
+                    defaults: {
+                        tockaID:niza[red].brojMernaTocka,
+                        cena:0,
+                        tarifa:niza[red].tarifa
+                    }
                 }
+                )
             }
-            )
-            
+                
             BroiloStatus.findOne({where:{
                 brojMernaTocka: niza[red].brojMernaTocka,
                 mesec: niza[red].mesec,
@@ -100,7 +104,8 @@ const uploadFile = async (req,res)=>{
                 datumKraj: niza[red].datumKraj,
                 pocetnaSostojba: niza[red].pocetnaSostojba.replace(",","."),
                 krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
-                brojMernoMesto: niza[red].brojMernoMesto,
+                // koga ke se otvori so excel se krsi formatot. doveduva do duplikati
+                // brojMernoMesto: niza[red].brojMernoMesto,
                 brojBroilo: niza[red].brojBroilo,
                 datumOdEvn: niza[red].datumOdEvn
             }}).then((broilo)=>{

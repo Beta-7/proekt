@@ -91,4 +91,16 @@ const getMerniTocki= async function(req,res){
     return res.json(tocki)
 }
 
-module.exports={dodadiMernaTocka,promeniMernaTocka,izbrisiMernaTocka,getMerniTocki}
+const najdiNeasocirani = async function(req,res){
+    const tocka = await MernaTocka.findOne({where:{
+        firmaId:null
+    }})
+    if(tocka==null){
+        return res.json({message:"false"})
+    }else{
+        return res.json({message:"true"})
+    }
+}
+
+
+module.exports={dodadiMernaTocka,promeniMernaTocka,izbrisiMernaTocka,getMerniTocki,najdiNeasocirani}

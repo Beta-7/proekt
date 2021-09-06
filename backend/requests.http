@@ -185,3 +185,8 @@ Content-Type: application/json
 ###
 POST http://localhost:5000/misc/getKamati HTTP/1.1
 Content-Type: application/json
+
+###
+POST http://localhost:5000/mernaTocka/najdiNeasocirani HTTP/1.1
+Content-Type: application/json
+
