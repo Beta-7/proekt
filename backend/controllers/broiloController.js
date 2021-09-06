@@ -187,11 +187,13 @@ async function asocirajBroiloSoKompanija(){
             MernaTocka.findOne({where:{
                 tockaID:broilo.brojMernaTocka 
             }}).then((mernatocka)=>{
-                BroiloStatus.update({firmaId:mernatocka.firmaId},{where:{
-                    id:broilo.id
-                }}).then(()=>{
-                    return
-                })
+                if(mernatocka!==null){
+                    await BroiloStatus.update({firmaId:mernatocka.firmaId},{where:{
+                        id:broilo.id
+                    }}).then(()=>{
+                        return
+                    })
+                }
             })
         });
     })

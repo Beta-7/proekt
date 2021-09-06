@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import UploadSensorData from './UploadSensorData';
 import MerniTockiTable from './MerniTockiTable';
 import FirmiTable from './FirmiTable';
+import UsersTable from './UsersTable'
 import ZelenaEnergijaData from './ZelenaEnergijaData';
 import UploadStornoData from './UploadStornoData';
 import FakturiTable from './FakturiTable';
@@ -41,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 function getSteps() {
-  return ['Сензор дата',"Сторно", 'Агент на фирма', 'Мерна точка на фирма', "Дополнителни информации", "Платени фактури", "Генерирање фактура"];
+  return ['Сензор дата',"Сторно", 'Агенти', 'Агент на фирма', 'Мерна точка на фирма', "Дополнителни информации", "Платени фактури", "Генерирање фактура"];
 }
 
 
@@ -50,7 +51,7 @@ export default function HorizontalNonLinearStepperWithError() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
-  const [errors, setErrors] = React.useState([1,0,0,1,1,0,0]);
+  const [errors, setErrors] = React.useState([1,0,0,0,1,1,0,0]);
   const steps = getSteps();
   var errorMessages="Незавршен чекор"  
   
@@ -61,6 +62,7 @@ export default function HorizontalNonLinearStepperWithError() {
         var newErrors = [...errors]
         newErrors[step]=state
         setErrors(newErrors)
+        console.log(errors)
     }
     function getStepContent(step) {
         
@@ -86,26 +88,31 @@ export default function HorizontalNonLinearStepperWithError() {
           case 2:
             return <div>
                 <Typography variant="h5" >
-                <FirmiTable/>
+                <UsersTable/>
                 </Typography></div>;
           case 3:
             return <div>
-                <Typography variant="h5">
-                <MerniTockiTable step={3} stepState={errors} editStep={editStep}/>
-                </Typography>
-                </div>;
+                <Typography variant="h5" >
+                <FirmiTable/>
+                </Typography></div>;
           case 4:
             return <div>
-                <ZelenaEnergijaData step={4} stepState={errors} editStep={editStep}/>
+                <Typography variant="h5">
+                <MerniTockiTable step={4} stepState={errors} editStep={editStep}/>
+                </Typography>
+                </div>;
+          case 5:
+            return <div>
+                <ZelenaEnergijaData step={5} stepState={errors} editStep={editStep}/>
                 </div>;
           
-          case 5:
+          case 6:
             return <div>
                 <Typography variant="h5">
                 <FakturiTable/>
                 </Typography>
                 </div>;
-          case 6:
+          case 7:
             return <div>
                 <Typography variant="h5">
                 <GenerirajFakturi/>
@@ -159,7 +166,7 @@ export default function HorizontalNonLinearStepperWithError() {
 
   const handleReset = () => {
     setActiveStep(0);
-    setErrors([1,0,0,1,1,0,0])
+    setErrors([1,0,0,0,1,1,0,0])
   };
 
   return (

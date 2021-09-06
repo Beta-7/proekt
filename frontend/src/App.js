@@ -4,7 +4,7 @@ import LoggedInRoute from './components/LoggedInRoute';
 import Home from './components/Home';
 import AddData from './components/AddData'
 import FirmiTable from './components/wizard/FirmiTable'
-import UsersTable from './components/UsersTable'
+import UsersTable from './components/wizard/UsersTable'
 import BroilosTable from './components/BroilosTable'
 import MernaTocka from './components/wizard/MerniTockiTable'
 import WizardRoot from './components/wizard/WizardRoot'

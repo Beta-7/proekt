@@ -123,6 +123,7 @@ const reasociate = async(req,res)=>{
 
         })
     })
+    return res.json({"message":"success","detail":"reasociated"})
 }
 
 const updateID = async (created)=>{

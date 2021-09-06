@@ -4,7 +4,7 @@ import axios from 'axios';
 import UploadSensorData from "./wizard/UploadSensorData"
 import BroilosTable from "./BroilosTable"
 import FirmiTable from "./wizard/FirmiTable"
-import UsersTable from "./UsersTable"
+import UsersTable from "./wizard/UsersTable"
 import ZelenaEnergijaData from "./wizard/ZelenaEnergijaData"
 import MerniTockiTable from "./wizard/MerniTockiTable"
 axios.defaults.baseUrl = 'http://localhost:5000';
