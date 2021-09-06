@@ -41,7 +41,7 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 export default function FirmiTable (props) {
     const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
-    const [nemaNeasocirani, setNemaAsocirani] = useState(true)
+    const [nemaNeasocirani, setNemaAsocirani] = useState(false)
 
     useEffect(() => {
       proveriNeasocirani()
@@ -51,14 +51,18 @@ export default function FirmiTable (props) {
     
       const reasociraj =()=>{
         axios.post("/storno/reasociraj",{},{withCredentials:true})
+        proveriNeasocirani()
       }
 
       const proveriNeasocirani = () => {
-        console.log("asd")
         axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
-          setNemaAsocirani(!res.data.message)
-          if(!res.data.message){
+          if(res.data.message==='true'){
             EnableButton(1)
+            setNemaAsocirani(false)
+          }
+          if(res.data.message==='false'){
+            EnableButton(0)
+            setNemaAsocirani(true)
           }
         })
       }
@@ -69,8 +73,7 @@ export default function FirmiTable (props) {
       
        function getData(){
         reasociraj()
-        EnableButton(0) 
-        proveriNeasocirani()
+        EnableButton(1) 
         
         var firmiNiza = []
          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
@@ -80,15 +83,17 @@ export default function FirmiTable (props) {
                 
               setFirmi(firmiNiza)
            axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
+            
                 response.data.map((tocka)=>{
+                  
                     if(tocka.firmaId === null){
                       
                       
                       
                     }
-                })  
-                proveriNeasocirani()    
-            setData(response.data)
+                })
+                reasociraj()
+                setData(response.data)
             })
 
         })
@@ -123,7 +128,20 @@ export default function FirmiTable (props) {
           validate: rowData => rowData.firmaId === undefined || rowData.firmaId === "" ? "Required" : true,
           filtering:true,
           lookup: {...firmi}
-        }]
+        },
+        {
+          title: "Адреса на мерна точка", field: "adresa",
+          validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
+          filtering:true,
+          lookup: {...firmi}
+        },
+        {
+          title: "Број на место на потрошувачка", field: "mestoNaPotrosuvacka",
+          validate: rowData => rowData.mestoNaPotrosuvacka === undefined || rowData.mestoNaPotrosuvacka === "" ? "Required" : true,
+          filtering:true,
+          lookup: {...firmi}
+        }
+      ]
     
     
         return (
@@ -153,7 +171,7 @@ export default function FirmiTable (props) {
                     firmaId:updatedRow.firmaId,
                     cena:updatedRow.cena
                   },{withCredentials:true}).then(()=>{
-                    axios.post("/storno/reasociraj")
+                    reasociraj()
                     getData()
                     resolve()
                   })

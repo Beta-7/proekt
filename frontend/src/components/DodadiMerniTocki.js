@@ -55,9 +55,14 @@ export default function FirmiTable () {
       }
       const proveriNeasocirani = () => {
         axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
-          console.log(res.data.message)
-          setNemaAsocirani(res.data.message == "true" ? true : false)
-          console.log(nemaNeasocirani)
+          if(res.data.message==='true'){
+            //EnableButton(1)
+            setNemaAsocirani(false)
+          }
+          if(res.data.message==='false'){
+            //EnableButton(0)
+            setNemaAsocirani(true)
+          }
         })
       }
       
