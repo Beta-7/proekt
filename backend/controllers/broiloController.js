@@ -106,7 +106,7 @@ const uploadFile = async (req,res)=>{
                 krajnaSostojba: niza[red].krajnaSostojba.replace(",","."),
                 // koga ke se otvori so excel se krsi formatot. doveduva do duplikati
                 // brojMernoMesto: niza[red].brojMernoMesto,
-                brojBroilo: niza[red].brojBroilo,
+                // brojBroilo: niza[red].brojBroilo,
                 datumOdEvn: niza[red].datumOdEvn
             }}).then((broilo)=>{
                 if(broilo===null){
@@ -191,6 +191,7 @@ async function asocirajBroiloSoKompanija(){
             await BroiloStatus.update({firmaId:mernaTocka.firmaId},{where:{
                 id:broilo.id
             }})
+            console.log("Asociram "+broilo.id+" so "+mernaTocka.firmaId)
         }
     }
 }

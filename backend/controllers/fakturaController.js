@@ -91,9 +91,10 @@ const generirajFakturi = async function(req,res){
                 let elektricnaEnergijaNT=0
                 let elektricnaEnergijaVT=0
                 for(broilo of broila){
+                    console.log("broilo")
                     let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
                     //dokolku MT e null znaci deka ne se vneseni site merni tocki
-                    if(MT!==null){
+                    if(MT!==null && MT.firmaId !==null){
                     await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                     await faktura.addBroilo(broilo)
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
@@ -146,10 +147,10 @@ const generirajFakturi = async function(req,res){
                             await Storno.destroy({where:{id:stornoData.id}})
 
                             await Faktura.update({where:{id:faktura.id}},{
-                                elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
                             })
                             faktura.reload()
                         }
@@ -198,10 +199,10 @@ const generirajFakturi = async function(req,res){
                                 firmaId:faktura.firmaId
                             })
                             await Faktura.update({where:{id:faktura.id}},{
-                                elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
-                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
                                 
                             })
                             await Storno.destroy({where:{id:stornoData.id}})
@@ -229,10 +230,10 @@ const generirajFakturi = async function(req,res){
                         await Storno.destroy({where:{id:stornoData.id}})
 
                         await Faktura.update({where:{id:faktura.id}},{
-                            elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
                         })
                         faktura.reload()
                     }
@@ -281,10 +282,10 @@ const generirajFakturi = async function(req,res){
                             firmaId:faktura.firmaId
                         })
                         await Faktura.update({where:{id:faktura.id}},{
-                            elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
-                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
                             
                         })
                         await Storno.destroy({where:{id:stornoData.id}})
@@ -343,10 +344,12 @@ const dodeliNagradi = async function(req, res){
         }
     
 
-    //dodeli zelena energija
+    //dodeli zelena energija i presmetaj gi site polinja
     
     if (vkupnoPotrosena!==null){
         if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
+            // const MTNT = await MernaTocka.findOne({})
+
             var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
             var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
             var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/2).toFixed(2)
