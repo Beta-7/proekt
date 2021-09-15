@@ -309,65 +309,61 @@ const dodeliNagradi = async function(req, res){
     var mesec=req.body.mesec
     var godina=req.body.godina
     generateLog("Доделува награди",req.session.username,mesec+"-"+godina)
-    Faktura.findAll({
-        where:{
-            mesec, godina
-        }
-    }).then((fakturi)=>{
-        fakturi.map((faktura)=>{
-            Firma.findOne({where:{id:faktura.firmaId}}).then((firma)=>{
-                Nagradi.findOne({where:{
+
+
+    //pomini gi site fakturi i dodeli nagradi na agenti bazirano na kolku elektricna energija imaat potroseno
+    const fakturi = await faktura.findAll({where:{
+        mesec, godina
+    }})
+    for(faktura of fakturi){
+        const firma = await Firma.findOne({where:{id:faktura.firmaId}})
+        const postoeckaNagrada = await Nagradi.findOne({where:{
+            agent:firma.agent,
+            mesec,
+            godina,
+            firma:firma.name
+        }}) 
+        if(faktura.elektricnaEnergijaBezZelena>0 && faktura.agent!==null){
+            if(postoecka===null){
+                await Nagradi.create({
                     agent:firma.agent,
                     mesec,
                     godina,
+                    suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
                     firma:firma.name
-                }}).then((postoecka)=>{
-                    if(faktura.elektricnaEnergija>0 && faktura.agent!==null){
-                        if(postoecka===null){
-
-                        
-                        Nagradi.create({
-                            agent:firma.agent,
-                            mesec,
-                            godina,
-                            suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
-                            firma:firma.name
-                        })
-                    }else{
-                        Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoecka.id}})
-                    }
-                }
                 })
+            }else{
+                Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoecka.id}})
+            }
+        }
+    }
 
-            }).then(()=>{
-                VkupnoPotrosena.findOne({where:{mesec, godina}}).then((vkupnoPotrosena)=>{
-                    if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
-                    var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
-                    var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
-                    var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
-                    var vkupenIznosBezDDV = (faktura.cenaKwhBezDDV*elektricnaEnergija).toFixed(2)
-                    var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
-                   
-                    Faktura.update({
-                        elektricnaEnergija,
-                        obnovlivaEnergija,
-                        cenaObnovlivaEnergija:vkupnoPotrosena.zelenaCena,
-                        vkupnaObnovlivaEnergijaBezDDV,
-                        vkupenIznosBezDDV,
-                        nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
-                        nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija),
-                        vkupenIznosNaFakturaBezDDV,
-                        DDV:vkupnoPotrosena.DDVProcent,
-                        vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
+    //dodeli zelena energija
+    const vkupnoPotrosena = await VkupnoPotrosena.findOne({where:{mesec, godina}})
+    if (vkupnoPotrosena!==null){
+        if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
+            var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
+            var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
+            var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
+            var vkupenIznosBezDDV = (faktura.cenaKwhBezDDV*elektricnaEnergija).toFixed(2)
+            var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
+           
+            await Faktura.update({
+                elektricnaEnergija,
+                obnovlivaEnergija,
+                cenaObnovlivaEnergija:vkupnoPotrosena.zelenaCena,
+                vkupnaObnovlivaEnergijaBezDDV,
+                vkupenIznosBezDDV,
+                nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
+                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija),
+                vkupenIznosNaFakturaBezDDV,
+                DDV:vkupnoPotrosena.DDVProcent,
+                vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
 
-                    },{where:{id:faktura.id}})
-                    }
-            })
-
-            })
-            
-        })
-    })
+            },{where:{id:faktura.id}})
+            }
+    }
+    
     return res.json({"status":"success"})
 
 }
