@@ -91,31 +91,36 @@ const generirajFakturi = async function(req,res){
                 let elektricnaEnergijaNT=0
                 let elektricnaEnergijaVT=0
                 for(broilo of broila){
+                    let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
+                    //dokolku MT e null znaci deka ne se vneseni site merni tocki
+                    if(MT!==null){
                     await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                     await faktura.addBroilo(broilo)
-                    let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
                     if(broilo.tarifa==="1.1.1.8.1.255"){
-                        elektricnaEnergijaNT = elektricnaEnergijaNT + broilo.vkupnaKolicina
+                        elektricnaEnergijaNT = elektricnaEnergijaNT + broilo.vkupnoKolicina
+                        console.log("Niska tarifa:"+ elektricnaEnergijaNT +" "+ broilo.vkupnoKolicina)
                     }
                     if(broilo.tarifa==="1.1.1.8.2.255"){
-                        elektricnaEnergijaVT = elektricnaEnergijaVT + broilo.vkupnaKolicina
+                        elektricnaEnergijaVT = elektricnaEnergijaVT + broilo.vkupnoKolicina
+                        console.log("Visoka tarifa:"+ elektricnaEnergijaVT +" "+ broilo.vkupnoKolicina)
                     }
                     await Faktura.update({
                         elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
                         elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
-                        elektricnaEnergijaNT,
-                        elektricnaEnergijaNTBezZelena:elektricnaEnergijaNT,
-                        elektricnaEnergijaVT,
-                        elektricnaEnergijaVTBezZelena:elektricnaEnergijaVT,
+                        elektricnaEnergijaNT:parseFloat(elektricnaEnergijaNT).toFixed(2),
+                        elektricnaEnergijaNTBezZelena:parseFloat(elektricnaEnergijaNT).toFixed(2),
+                        elektricnaEnergijaVT:parseFloat(elektricnaEnergijaVT).toFixed(2),
+                        elektricnaEnergijaVTBezZelena:parseFloat(elektricnaEnergijaVT).toFixed(2),
                         cenaKwhBezDDV:MT.cena,
                         dataOd:broilo.datumPocetok,
                         dataDo:broilo.datumKraj    
                     },{where:{
                         id:faktura.id
                     }})
+                    await faktura.reload()
                 }
-                await faktura.reload()
+            }
                 let storni = await Storno.findAll({where:{
                     firmaId:firma.id
                 }})
@@ -304,6 +309,7 @@ const generirajFakturi = async function(req,res){
         }
         return res.json({"status":"success"})
     }
+}
     
 const dodeliNagradi = async function(req, res){
     var mesec=req.body.mesec
@@ -312,7 +318,7 @@ const dodeliNagradi = async function(req, res){
 
 
     //pomini gi site fakturi i dodeli nagradi na agenti bazirano na kolku elektricna energija imaat potroseno
-    const fakturi = await faktura.findAll({where:{
+    const fakturi = await Faktura.findAll({where:{
         mesec, godina
     }})
     for(faktura of fakturi){
@@ -324,7 +330,7 @@ const dodeliNagradi = async function(req, res){
             firma:firma.name
         }}) 
         if(faktura.elektricnaEnergijaBezZelena>0 && faktura.agent!==null){
-            if(postoecka===null){
+            if(postoeckaNagrada===null){
                 await Nagradi.create({
                     agent:firma.agent,
                     mesec,
@@ -333,7 +339,7 @@ const dodeliNagradi = async function(req, res){
                     firma:firma.name
                 })
             }else{
-                Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoecka.id}})
+                await Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoeckaNagrada.id}})
             }
         }
     }
@@ -344,6 +350,8 @@ const dodeliNagradi = async function(req, res){
         if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
             var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
             var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
+            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/2).toFixed(2)
+            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)/2).toFixed(2)
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
             var vkupenIznosBezDDV = (faktura.cenaKwhBezDDV*elektricnaEnergija).toFixed(2)
             var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
@@ -351,6 +359,8 @@ const dodeliNagradi = async function(req, res){
             await Faktura.update({
                 elektricnaEnergija,
                 obnovlivaEnergija,
+                elektricnaEnergijaNT,
+                elektricnaEnergijaVT,
                 cenaObnovlivaEnergija:vkupnoPotrosena.zelenaCena,
                 vkupnaObnovlivaEnergijaBezDDV,
                 vkupenIznosBezDDV,
