@@ -49,6 +49,18 @@ const Faktura = db.define('faktura',{
     elektricnaEnergijaBezZelena:{
         type:Sequelize.FLOAT
     },
+    elektricnaEnergijaNT:{
+        type:Sequelize.FLOAT
+    },
+    elektricnaEnergijaNTBezZelena:{
+        type:Sequelize.FLOAT
+    },
+    elektricnaEnergijaVT:{
+        type:Sequelize.FLOAT
+    },
+    elektricnaEnergijaVTBezZelena:{
+        type:Sequelize.FLOAT
+    },
     cenaKwhBezDDV:{
         type:Sequelize.FLOAT
     },

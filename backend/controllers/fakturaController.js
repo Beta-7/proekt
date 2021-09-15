@@ -88,14 +88,26 @@ const generirajFakturi = async function(req,res){
                     mesec:godina+"."+tempmesec+"-"+tempmesec
                 }})
                 let kolicinaOdSiteBroila=0
+                let elektricnaEnergijaNT=0
+                let elektricnaEnergijaVT=0
                 for(broilo of broila){
                     await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                     await faktura.addBroilo(broilo)
                     let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
+                    if(broilo.tarifa==="1.1.1.8.1.255"){
+                        elektricnaEnergijaNT = elektricnaEnergijaNT + broilo.vkupnaKolicina
+                    }
+                    if(broilo.tarifa==="1.1.1.8.2.255"){
+                        elektricnaEnergijaVT = elektricnaEnergijaVT + broilo.vkupnaKolicina
+                    }
                     await Faktura.update({
                         elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
                         elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
+                        elektricnaEnergijaNT,
+                        elektricnaEnergijaNTBezZelena:elektricnaEnergijaNT,
+                        elektricnaEnergijaVT,
+                        elektricnaEnergijaVTBezZelena:elektricnaEnergijaVT,
                         cenaKwhBezDDV:MT.cena,
                         dataOd:broilo.datumPocetok,
                         dataDo:broilo.datumKraj    
@@ -108,6 +120,92 @@ const generirajFakturi = async function(req,res){
                     firmaId:firma.id
                 }})
                 for(stornoData of storni){
+                    //niska tarifa
+                    if(stornoData.tarifa === "1.1.1.8.1.255"){
+                        //stornoto dodava ekstra kolicina na fakturata. ne treba da se pravat proverki
+                        if(stornoData.vkupnoKolicina>0){
+                            await StornoDisplay.create({
+                                tarifa: stornoData.tarifa,
+                                pocetnaSostojba:stornoData.pocetnaSostojba,
+                                krajnaSostojba:stornoData.krajnaSostojba,
+                                brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                                kolicina:stornoData.kolicina,
+                                multiplikator:stornoData.multiplikator,
+                                datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                vkupnoKolicina: stornoData.vkupnoKolicina,
+                                brojNaBroilo: stornoData.brojNaBroilo,
+                                fakturaId: faktura.id,
+                                firmaId:faktura.firmaId
+                            })
+                            await Storno.destroy({where:{id:stornoData.id}})
+
+                            await Faktura.update({where:{id:faktura.id}},{
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                            })
+                            faktura.reload()
+                        }
+                        //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
+                        else if(stornoData.vkupnoKolicina>faktura.elektricnaEnergijaNT){
+                            let novaVrednostNaStorno =  stornoData.vkupnoKolicina + faktura.elektricnaEnergijaNT
+                            await StornoDisplay.create({
+                                tarifa: stornoData.tarifa,
+                                pocetnaSostojba:stornoData.pocetnaSostojba,
+                                krajnaSostojba:stornoData.krajnaSostojba,
+                                brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                                kolicina:faktura.elektricnaEnergijaNT,
+                                multiplikator:stornoData.multiplikator,
+                                datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                vkupnoKolicina: stornoData.vkupnoKolicina,
+                                brojNaBroilo: stornoData.brojNaBroilo,
+                                fakturaId: faktura.id,
+                                firmaId:faktura.firmaId
+                            })
+                            await Storno.update({where:{id:stornoData.id}},{
+                               vkupnoKolicina:novaVrednostNaStorno
+                            })
+                            await Faktura.update({where:{id:faktura.id}},{
+                                elektricnaEnergija:faktura.elektricnaEnergija-faktura.elektricnaEnergijaNT,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-faktura.elektricnaEnergijaNT,
+                                elektricnaEnergijaNT:0,
+                                elektricnaEnergijaNTBezZelena:0,
+                            })
+                            faktura.reload()
+                        }
+                        //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
+                        else if(stornoData.vkupnoKolicina<=faktura.elektricnaEnergijaNT){
+                            await StornoDisplay.create({
+                                tarifa: stornoData.tarifa,
+                                pocetnaSostojba:stornoData.pocetnaSostojba,
+                                krajnaSostojba:stornoData.krajnaSostojba,
+                                brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                                kolicina:stornoData.vkupnoKolicina,
+                                multiplikator:stornoData.multiplikator,
+                                datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
+                                datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
+                                vkupnoKolicina: stornoData.vkupnoKolicina,
+                                brojNaBroilo: stornoData.brojNaBroilo,
+                                fakturaId: faktura.id,
+                                firmaId:faktura.firmaId
+                            })
+                            await Faktura.update({where:{id:faktura.id}},{
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornodata.vkupnaKolicina,
+                                
+                            })
+                            await Storno.destroy({where:{id:stornoData.id}})
+                            faktura.reload()
+                        }
+                }
+                //visoka tarifa
+                if(stornoData.tarifa === "1.1.1.8.1.255"){
+                    //stornoto dodava ekstra kolicina na fakturata. ne treba da se pravat proverki
                     if(stornoData.vkupnoKolicina>0){
                         await StornoDisplay.create({
                             tarifa: stornoData.tarifa,
@@ -124,15 +222,25 @@ const generirajFakturi = async function(req,res){
                             firmaId:faktura.firmaId
                         })
                         await Storno.destroy({where:{id:stornoData.id}})
+
+                        await Faktura.update({where:{id:faktura.id}},{
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                        })
+                        faktura.reload()
                     }
-                    else if(stornoData.vkupnoKolicina < faktura.elektricnaEnergija){
+                    //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
+                    else if(stornoData.vkupnoKolicina>faktura.elektricnaEnergijaVT){
+                        let novaVrednostNaStorno =  stornoData.vkupnoKolicina + faktura.elektricnaEnergijaVT
                         await StornoDisplay.create({
                             tarifa: stornoData.tarifa,
                             pocetnaSostojba:stornoData.pocetnaSostojba,
                             krajnaSostojba:stornoData.krajnaSostojba,
-                            kolicina:stornoData.kolicina,
-                            multiplikator:stornoData.multiplikator,
                             brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                            kolicina:faktura.elektricnaEnergijaVT,
+                            multiplikator:stornoData.multiplikator,
                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
                             vkupnoKolicina: stornoData.vkupnoKolicina,
@@ -140,42 +248,44 @@ const generirajFakturi = async function(req,res){
                             fakturaId: faktura.id,
                             firmaId:faktura.firmaId
                         })
-                        console.log(faktura.elektricnaEnergija+stornoData.vkupnoKolicina,faktura.id)
-                        
-                        await Faktura.update({
-                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
-                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina
-                        },{where:{
-                            id:faktura.id
-                        }})
-                        await faktura.reload()
-                        await Storno.destroy({where:{id:stornoData.id}})
+                        await Storno.update({where:{id:stornoData.id}},{
+                           vkupnoKolicina:novaVrednostNaStorno
+                        })
+                        await Faktura.update({where:{id:faktura.id}},{
+                            elektricnaEnergija:faktura.elektricnaEnergija-faktura.elektricnaEnergijaVT,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-faktura.elektricnaEnergijaVT,
+                            elektricnaEnergijaVT:0,
+                            elektricnaEnergijaVTBezZelena:0,
+                        })
+                        faktura.reload()
                     }
-                    else if(stornoData.vkupnoKolicina >= faktura.elektricnaEnergija){
-                        await Faktura.update({elektricnaEnergija:0, elektricnaEnergijaBezZelena:0},{where:{
-                            id:faktura.id
-                        }})
-                        await faktura.reload()
+                    //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
+                    else if(stornoData.vkupnoKolicina<=faktura.elektricnaEnergijaVT){
                         await StornoDisplay.create({
                             tarifa: stornoData.tarifa,
                             pocetnaSostojba:stornoData.pocetnaSostojba,
                             krajnaSostojba:stornoData.krajnaSostojba,
-                            kolicina:stornoData.kolicina,
-                            multiplikator:stornoData.multiplikator,
                             brojNaMernoMesto:stornoData.brojNaMernoMesto,
+                            kolicina:stornoData.vkupnoKolicina,
+                            multiplikator:stornoData.multiplikator,
                             datumNaPocetokNaMerenje: stornoData.datumNaPocetokNaMerenje,
                             datumNaZavrshuvanjeNaMerenje: stornoData.datumNaZavrshuvanjeNaMerenje,
-                            vkupnoKolicina: faktura.elektricnaEnergija,
+                            vkupnoKolicina: stornoData.vkupnoKolicina,
                             brojNaBroilo: stornoData.brojNaBroilo,
                             fakturaId: faktura.id,
                             firmaId:faktura.firmaId
                         })
-                        await Storno.update({
-                            vkupnoKolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))*parseFloat(stornoData.multiplikator),
-                            kolicina:(parseFloat(stornoData.vkupnoKolicina)+parseFloat(faktura.elektricnaEnergija))
-                        },{where:{id:stornoData.id}})
+                        await Faktura.update({where:{id:faktura.id}},{
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornodata.vkupnaKolicina,
+                            
+                        })
+                        await Storno.destroy({where:{id:stornoData.id}})
+                        faktura.reload()
                     }
-                }
+            }
                 
                 
                 var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
