@@ -30,7 +30,7 @@ const generirajFakturi = async function(req,res){
     let rok = new Date()
     rok.setDate(date.getDate()+10)
 
-    let firmi = await Firma.findAll({})
+    let firmi = await Firma.findAll({where:{}})
     for(firma of firmi){
         let postoecka = await Faktura.findOne({where:{
             mesec,
@@ -307,8 +307,8 @@ const generirajFakturi = async function(req,res){
             }
             
         }
-        return res.json({"status":"success"})
     }
+    return res.json({"status":"success"})
 }
     
 const dodeliNagradi = async function(req, res){
@@ -321,6 +321,7 @@ const dodeliNagradi = async function(req, res){
     const fakturi = await Faktura.findAll({where:{
         mesec, godina
     }})
+    const vkupnoPotrosena = await VkupnoPotrosena.findOne({where:{mesec, godina}})
     for(faktura of fakturi){
         const firma = await Firma.findOne({where:{id:faktura.firmaId}})
         const postoeckaNagrada = await Nagradi.findOne({where:{
@@ -338,14 +339,12 @@ const dodeliNagradi = async function(req, res){
                     suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
                     firma:firma.name
                 })
-            }else{
-                await Nagradi.update({suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada))},{where:{id:postoeckaNagrada.id}})
             }
         }
-    }
+    
 
     //dodeli zelena energija
-    const vkupnoPotrosena = await VkupnoPotrosena.findOne({where:{mesec, godina}})
+    
     if (vkupnoPotrosena!==null){
         if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
             var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
@@ -373,7 +372,7 @@ const dodeliNagradi = async function(req, res){
             },{where:{id:faktura.id}})
             }
     }
-    
+}
     return res.json({"status":"success"})
 
 }
