@@ -400,12 +400,7 @@ const getFakturi = async function(req, res){
         mesec:req.body.mesec,
         godina:req.body.godina
     },attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
-<<<<<<< HEAD
-
-  
-=======
      
->>>>>>> c0ce7965a5b092e47b688dd9c72d79091505b3ad
     }
     return res.json(fakturi)
 }

@@ -100,17 +100,11 @@ export default function FakturaTable(props) {
                 mesec,
                 godina
             },{withCredentials:true}).then(()=>{
-<<<<<<< HEAD
 
                     getData()
 
         })
       }
-=======
-                    getData()
-            })
-        }
->>>>>>> c0ce7965a5b092e47b688dd9c72d79091505b3ad
 
         const columns = [
             { title: "id", field: "id",

@@ -285,17 +285,6 @@ const toExcel = async function(req, res){
 
 
     console.log(faktura.elektricnaEnergijaNT)
-    // worksheet.insertRow(24)
-
-    // cell = worksheet.getCell("B24");
-    // cell.value = "Цена по kWh без ДДВ(НТ):"
-    
-    // cell = worksheet.getCell("J24");
-    // cell.value = faktura.cenaKwhBezDDVNT.toFixed(4)
-
-    // cell = worksheet.getCell("B23");
-    // cell.value = "Електрична енергија (НТ):"
-    
 
         await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     
