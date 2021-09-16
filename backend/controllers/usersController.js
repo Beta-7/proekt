@@ -15,6 +15,10 @@ const dodadiUser = (req, res) => {
     const isAdmin=req.body.isAdmin;
     const password="password";
 
+    if(username == undefined || ime == undefined || prezime == undefined || isAdmin == undefined){
+        return res.json({"message":"Error","detail":"Missing arguments"})
+    }
+
     User.findOne({where:{username: username}}).then((user)=>{
         if(!(user===null)){
             return res.json({"message":"Not unique","detail":"Username must be unique"})
@@ -39,6 +43,14 @@ const dodadiUser = (req, res) => {
 
 }
 const promeniUser = (req,res) =>{
+
+    const username=req.body.username;
+    const ime=req.body.ime;
+    const prezime=req.body.prezime;
+    const isAdmin=req.body.isAdmin;
+    if(username == "" || ime == "" || prezime == ""){
+        return res.json({"message":"Error","detail":"Missing arguments"})
+    }
     
     var user = User.findOne({where:{id:req.body.id}});
     User.findOne({where:{id:req.body.id}}).then((id)=>{

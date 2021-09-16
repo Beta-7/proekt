@@ -29,6 +29,10 @@ const dodadiStorno = async (req, res) => {
     const pomireno=req.body.pomireno;
 
 
+    if(brojNaMernaTocka==null || mesecNaFakturiranje==null || tarifa==null || datumNaPocetokNaMerenje==null || datumNaZavrshuvanjeNaMerenje==null || pocetnaSostojba==null || krajnaSostojba==null || kolicina==null || multiplikator==null || vkupnoKolicina==null || brojNaMernoMesto==null || brojNaBroilo==null || datumNaIzrabotkaEVN==null){
+        return res.send({"message":"error","detail":"missing arguments"})
+    }
+
 
     let created = await Storno.create({
         brojNaMernaTocka,
@@ -60,22 +64,45 @@ const promeniStorno = (req,res) =>{
         if(id===null){
            return res.json({message:"No Storno",detail:"No Storno with that id"})
         }
-        storno.brojNaMernaTocka=req.body.brojNaMernaTocka;
-        storno.mesecNaFakturiranje=req.body.mesecNaFakturiranje;
-        storno.tarifa=req.body.tarifa;
-        storno.datumNaPocetokNaMerenje=req.body.datumNaPocetokNaMerenje;
-        storno.datumNaZavrshuvanjeNaMerenje=req.body.datumNaZavrshuvanjeNaMerenje;
-        storno.pocetnaSostojba=req.body.pocetnaSostojba;
-        storno.krajnaSostojba=req.body.krajnaSostojba;
-        storno.kolicina=req.body.kolicina;
-        storno.multiplikator=req.body.multiplikator;
-        storno.vkupnoKolicina=req.body.vkupnoKolicina;
-        storno.nebitno=req.body.nebitno;
-        storno.brojNaMernoMesto=req.body.brojNaMernoMesto;
-        storno.brojNaBroilo=req.body.brojNaBroilo;
-        storno.nebitno2=req.body.nebitno2;
-        storno.datumNaIzrabotkaEVN=req.body.datumNaIzrabotkaEVN;
-        storno.pomireno=req.body.pomireno;
+
+        const brojNaMernaTocka=req.body.brojNaMernaTocka;
+        const mesecNaFakturiranje=req.body.mesecNaFakturiranje;
+        const tarifa=req.body.tarifa;
+        const datumNaPocetokNaMerenje=req.body.datumNaPocetokNaMerenje;
+        const datumNaZavrshuvanjeNaMerenje=req.body.datumNaZavrshuvanjeNaMerenje;
+        const pocetnaSostojba=parseFloat(req.body.pocetnaSostojba);
+        const krajnaSostojba=parseFloat(req.body.krajnaSostojba);
+        const kolicina=parseFloat(req.body.kolicina);
+        const multiplikator=parseFloat(req.body.multiplikator);
+        const vkupnoKolicina=parseFloat(req.body.vkupnoKolicina);
+        const nebitno="/";
+        const brojNaMernoMesto=req.body.brojNaMernoMesto;
+        const brojNaBroilo=req.body.brojNaBroilo;
+        const nebitno2="/";
+        const datumNaIzrabotkaEVN=req.body.datumNaIzrabotkaEVN;
+        const pomireno=req.body.pomireno;
+
+
+        if(brojNaMernaTocka==null || mesecNaFakturiranje==null || tarifa==null || datumNaPocetokNaMerenje==null || datumNaZavrshuvanjeNaMerenje==null || pocetnaSostojba==null || krajnaSostojba==null || kolicina==null || multiplikator==null || vkupnoKolicina==null || brojNaMernoMesto==null || brojNaBroilo==null || datumNaIzrabotkaEVN==null){
+            return res.send({"message":"error","detail":"missing arguments"})
+        }
+
+        storno.brojNaMernaTocka=brojNaMernaTocka;
+        storno.mesecNaFakturiranje=mesecNaFakturiranje;
+        storno.tarifa=tarifa;
+        storno.datumNaPocetokNaMerenje=datumNaPocetokNaMerenje;
+        storno.datumNaZavrshuvanjeNaMerenje=datumNaZavrshuvanjeNaMerenje;
+        storno.pocetnaSostojba=pocetnaSostojba;
+        storno.krajnaSostojba=krajnaSostojba;
+        storno.kolicina=kolicina;
+        storno.multiplikator=multiplikator;
+        storno.vkupnoKolicina=vkupnoKolicina;
+        storno.nebitno=nebitno;
+        storno.brojNaMernoMesto=brojNaMernoMesto;
+        storno.brojNaBroilo=brojNaBroilo;
+        storno.nebitno2=nebitno2;
+        storno.datumNaIzrabotkaEVN=datumNaIzrabotkaEVN;
+        storno.pomireno=pomireno;
     Storno.update(storno, {
         where:{id:req.body.id}
     }).then(()=>{

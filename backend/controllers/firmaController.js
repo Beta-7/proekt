@@ -14,6 +14,11 @@ const dodadiFirma = (req, res) => {
     const adresa=req.body.adresaNaFirma;
     const agent=req.body.agent;
     const nagrada=req.body.nagrada;
+
+    if( name==null || broj==null || adresa==null || agent==null || nagrada==null){
+        return res.json({"message":"Error","detail":"Missing arguments"})
+    }
+
     User.findOne({where:{username: agent}}).then((user)=>{
         if(user===null){
             return res.json({"message":"No agent","detail":"No agent with that username"})
@@ -39,6 +44,15 @@ const dodadiFirma = (req, res) => {
 }
 const promeniFirma = (req,res) =>{
     
+
+    const name=req.body.name;
+    const broj=req.body.broj;
+    const adresa=req.body.adresaNaFirma;
+    const agent=req.body.agent;
+    const nagrada=req.body.nagrada;
+    if( req.body.name=="" || req.body.broj=="" || req.body.adresaNaFirma=="" || req.body.agent=="" || req.body.nagrada==""){
+        return res.json({"message":"Error","detail":"Missing arguments"})
+    }
     const firma = Firma.findOne({where:{id:req.body.id}});
     User.findOne({where:{username:req.body.agent}}).then((agent)=>{
         if(agent===null){
@@ -58,9 +72,8 @@ const promeniFirma = (req,res) =>{
         return res.json({message:"Success",detail:"Updated firma"})
     })
     })
-    
-
 }
+
 const izbrisiFirma = async (req,res) =>{
     const firma = await Firma.findOne({where:{id:req.body.id}})
     Firma.destroy({
