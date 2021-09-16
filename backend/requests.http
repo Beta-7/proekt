@@ -11,26 +11,6 @@ content-type: application/json
 
 
 
-###
-POST http://localhost:5000/faktura/generirajFakturi HTTP/1.1
-Content-Type: application/json
-
-{
-    "id":"5",   
-    "mesec":3,
-    "godina":2021
-}
-
-###
-POST http://localhost:5000/faktura/dodeliNagradi HTTP/1.1
-Content-Type: application/json
-
-{
-    "id":"5",
-    "mesec":3,
-    "godina":2021
-}
-
 
 
 ###
@@ -54,7 +34,7 @@ POST http://localhost:5000/faktura/toExcel HTTP/1.1
 Content-Type: application/json
 
 {
-    "fakturaId":"2"
+    "fakturaId":"1"
 }
 
 
@@ -66,4 +46,14 @@ content-type: application/json
 {
     "username":"asd",
     "password":"asd"
+}
+
+###
+POST http://localhost:5000/faktura/generirajFakturi HTTP/1.1
+Content-Type: application/json
+
+{
+    "id":"5",   
+    "mesec":3,
+    "godina":2021
 }
