@@ -149,12 +149,12 @@ const generirajFakturi = async function(req,res){
                             })
                             await Storno.destroy({where:{id:stornoData.id}})
 
-                            await Faktura.update({where:{id:faktura.id}},{
+                            await Faktura.update({
                                 elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
-                            })
+                            },{where:{id:faktura.id}})
                             faktura.reload()
                         }
                         //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
@@ -174,15 +174,15 @@ const generirajFakturi = async function(req,res){
                                 fakturaId: faktura.id,
                                 firmaId:faktura.firmaId
                             })
-                            await Storno.update({where:{id:stornoData.id}},{
+                            await Storno.update({
                                vkupnoKolicina:novaVrednostNaStorno
-                            })
-                            await Faktura.update({where:{id:faktura.id}},{
+                            },{where:{id:stornoData.id}})
+                            await Faktura.update({
                                 elektricnaEnergija:faktura.elektricnaEnergija-faktura.elektricnaEnergijaNT,
                                 elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-faktura.elektricnaEnergijaNT,
                                 elektricnaEnergijaNT:0,
                                 elektricnaEnergijaNTBezZelena:0,
-                            })
+                            },{where:{id:faktura.id}})
                             faktura.reload()
                         }
                         //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
@@ -201,13 +201,13 @@ const generirajFakturi = async function(req,res){
                                 fakturaId: faktura.id,
                                 firmaId:faktura.firmaId
                             })
-                            await Faktura.update({where:{id:faktura.id}},{
+                            await Faktura.update({
                                 elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
                                 elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
                                 
-                            })
+                            },{where:{id:faktura.id}})
                             await Storno.destroy({where:{id:stornoData.id}})
                             faktura.reload()
                         }
@@ -232,12 +232,12 @@ const generirajFakturi = async function(req,res){
                         })
                         await Storno.destroy({where:{id:stornoData.id}})
 
-                        await Faktura.update({where:{id:faktura.id}},{
+                        await Faktura.update({
                             elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                             elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                             elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
                             elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
-                        })
+                        },{where:{id:faktura.id}})
                         faktura.reload()
                     }
                     //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
@@ -257,15 +257,15 @@ const generirajFakturi = async function(req,res){
                             fakturaId: faktura.id,
                             firmaId:faktura.firmaId
                         })
-                        await Storno.update({where:{id:stornoData.id}},{
+                        await Storno.update({
                            vkupnoKolicina:novaVrednostNaStorno
-                        })
-                        await Faktura.update({where:{id:faktura.id}},{
+                        },{where:{id:stornoData.id}})
+                        await Faktura.update({
                             elektricnaEnergija:faktura.elektricnaEnergija-faktura.elektricnaEnergijaVT,
                             elektricnaEnergijaBezZelena:faktura.elektricnaEnergija-faktura.elektricnaEnergijaVT,
                             elektricnaEnergijaVT:0,
                             elektricnaEnergijaVTBezZelena:0,
-                        })
+                        },{where:{id:faktura.id}})
                         faktura.reload()
                     }
                     //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
@@ -284,13 +284,13 @@ const generirajFakturi = async function(req,res){
                             fakturaId: faktura.id,
                             firmaId:faktura.firmaId
                         })
-                        await Faktura.update({where:{id:faktura.id}},{
+                        await Faktura.update({
                             elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                             elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
                             elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
                             elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
                             
-                        })
+                        },{where:{id:faktura.id}})
                         await Storno.destroy({where:{id:stornoData.id}})
                         faktura.reload()
                     }
@@ -394,13 +394,14 @@ const dodeliNagradi = async function(mesec, godina){
 const getFakturi = async function(req, res){
     let fakturi=null
     if(req.body.mesec===undefined || req.body.godina===undefined)
-    fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
     else{
     fakturi = await Faktura.findAll({where:{
         mesec:req.body.mesec,
         godina:req.body.godina
-    },attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDV", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
-     
+    },attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+
+  
     }
     return res.json(fakturi)
 }
