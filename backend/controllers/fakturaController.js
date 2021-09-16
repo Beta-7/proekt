@@ -102,11 +102,11 @@ const generirajFakturi = async function(req,res){
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
                     if(broilo.tarifa==="1.1.1.8.1.255"){
                         elektricnaEnergijaNT = elektricnaEnergijaNT + broilo.vkupnoKolicina
-                        console.log("Niska tarifa:"+ elektricnaEnergijaNT +" "+ broilo.vkupnoKolicina)
+                        //console.log("Niska tarifa:"+ elektricnaEnergijaNT +" "+ broilo.vkupnoKolicina)
                     }
                     if(broilo.tarifa==="1.1.1.8.2.255"){
                         elektricnaEnergijaVT = elektricnaEnergijaVT + broilo.vkupnoKolicina
-                        console.log("Visoka tarifa:"+ elektricnaEnergijaVT +" "+ broilo.vkupnoKolicina)
+                        //console.log("Visoka tarifa:"+ elektricnaEnergijaVT +" "+ broilo.vkupnoKolicina)
                     }
                     await Faktura.update({
                         elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
@@ -150,15 +150,15 @@ const generirajFakturi = async function(req,res){
                             await Storno.destroy({where:{id:stornoData.id}})
 
                             await Faktura.update({
-                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnoKolicina,
                             },{where:{id:faktura.id}})
                             faktura.reload()
                         }
                         //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
-                        else if(stornoData.vkupnoKolicina>faktura.elektricnaEnergijaNT){
+                        else if(stornoData.vkupnoKolicina*(-1.00)>faktura.elektricnaEnergijaNT){
                             let novaVrednostNaStorno =  stornoData.vkupnoKolicina + faktura.elektricnaEnergijaNT
                             await StornoDisplay.create({
                                 tarifa: stornoData.tarifa,
@@ -186,7 +186,7 @@ const generirajFakturi = async function(req,res){
                             faktura.reload()
                         }
                         //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
-                        else if(stornoData.vkupnoKolicina<=faktura.elektricnaEnergijaNT){
+                        else if(stornoData.vkupnoKolicina*(-1.00)<=faktura.elektricnaEnergijaNT){
                             await StornoDisplay.create({
                                 tarifa: stornoData.tarifa,
                                 pocetnaSostojba:stornoData.pocetnaSostojba,
@@ -202,10 +202,10 @@ const generirajFakturi = async function(req,res){
                                 firmaId:faktura.firmaId
                             })
                             await Faktura.update({
-                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
-                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnaKolicina,
+                                elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaNT:faktura.elektricnaEnergijaNT+stornoData.vkupnoKolicina,
+                                elektricnaEnergijaNTBezZelena:faktura.elektricnaEnergijaNT+stornoData.vkupnoKolicina,
                                 
                             },{where:{id:faktura.id}})
                             await Storno.destroy({where:{id:stornoData.id}})
@@ -233,15 +233,15 @@ const generirajFakturi = async function(req,res){
                         await Storno.destroy({where:{id:stornoData.id}})
 
                         await Faktura.update({
-                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnoKolicina,
                         },{where:{id:faktura.id}})
                         faktura.reload()
                     }
                     //ako stornoto ima poveke za odzemanje odkolku sto ima vo fakturata odzemi kolku sto mozes za vrednosta da e 0
-                    else if(stornoData.vkupnoKolicina>faktura.elektricnaEnergijaVT){
+                    else if(stornoData.vkupnoKolicina*(-1.00)>faktura.elektricnaEnergijaVT){
                         let novaVrednostNaStorno =  stornoData.vkupnoKolicina + faktura.elektricnaEnergijaVT
                         await StornoDisplay.create({
                             tarifa: stornoData.tarifa,
@@ -269,7 +269,7 @@ const generirajFakturi = async function(req,res){
                         faktura.reload()
                     }
                     //ako stornoto e pomalo ili ednakvo na kolicinata moze celoto da se odzeme
-                    else if(stornoData.vkupnoKolicina<=faktura.elektricnaEnergijaVT){
+                    else if(stornoData.vkupnoKolicina*(-1.00)<=faktura.elektricnaEnergijaVT){
                         await StornoDisplay.create({
                             tarifa: stornoData.tarifa,
                             pocetnaSostojba:stornoData.pocetnaSostojba,
@@ -285,10 +285,10 @@ const generirajFakturi = async function(req,res){
                             firmaId:faktura.firmaId
                         })
                         await Faktura.update({
-                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
-                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnaKolicina,
+                            elektricnaEnergija:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaBezZelena:faktura.elektricnaEnergija+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaVT:faktura.elektricnaEnergijaVT+stornoData.vkupnoKolicina,
+                            elektricnaEnergijaVTBezZelena:faktura.elektricnaEnergijaVT+stornoData.vkupnoKolicina,
                             
                         },{where:{id:faktura.id}})
                         await Storno.destroy({where:{id:stornoData.id}})
@@ -368,7 +368,7 @@ const dodeliNagradi = async function(mesec, godina){
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
             var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena)).toFixed(2)
             var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
-           console.log(vkupnaObnovlivaEnergijaBezDDV + faktura.kamataOdPrethodniFakturi + vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija)
+            //console.log(vkupnaObnovlivaEnergijaBezDDV , faktura.kamataOdPrethodniFakturi , vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija)
             await Faktura.update({
                 elektricnaEnergija,
                 obnovlivaEnergija,
@@ -453,7 +453,7 @@ const zemiFakturiMesec = async function(req,res){
         }
     }
     if(fakturibr==0){return}
-    console.log(__dirname +"/../"+ imeFakturi[0])
+    //console.log(__dirname +"/../"+ imeFakturi[0])
     var data = zip.generate({ base64:false, compression: 'DEFLATE' });
     fs.writeFileSync("../mesecni/"+mesec+"-"+godina+'.zip', data, 'binary');
     res.attachment("../mesecni/"+mesec+"-"+godina+'.zip')

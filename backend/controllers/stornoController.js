@@ -10,7 +10,7 @@ const { removeListener } = require("../routes/fakturaRoutes");
 
 
 
-const dodadiStorno = (req, res) => {
+const dodadiStorno = async (req, res) => {
     const brojNaMernaTocka=req.body.brojNaMernaTocka;
     const mesecNaFakturiranje=req.body.mesecNaFakturiranje;
     const tarifa=req.body.tarifa;
@@ -21,16 +21,16 @@ const dodadiStorno = (req, res) => {
     const kolicina=parseFloat(req.body.kolicina);
     const multiplikator=parseFloat(req.body.multiplikator);
     const vkupnoKolicina=parseFloat(req.body.vkupnoKolicina);
-    const nebitno=req.body.nebitno;
+    const nebitno="/";
     const brojNaMernoMesto=req.body.brojNaMernoMesto;
     const brojNaBroilo=req.body.brojNaBroilo;
-    const nebitno2=req.body.nebitno2;
+    const nebitno2="/";
     const datumNaIzrabotkaEVN=req.body.datumNaIzrabotkaEVN;
     const pomireno=req.body.pomireno;
 
 
 
-    Storno.create({
+    let created = await Storno.create({
         brojNaMernaTocka,
         mesecNaFakturiranje,
         tarifa,
@@ -47,14 +47,10 @@ const dodadiStorno = (req, res) => {
         nebitno2,
         datumNaIzrabotkaEVN,
         pomireno,
-        }).then(()=>{
-            generateLog("Додаде нов сторно ред",req.session.username, req.body.username)
-            updateID(created)
-            return res.send({"message":"success","detail":"Successfully added storno"})}).catch(err=>{
-              console.error( 'Captured validation error: ', err.errors[0]);
-              return res.json({"code":err.code,"message":err.errors[0].message,"detail":err.errors[0].message});
         })
-    
+        generateLog("Додаде нов сторно ред",req.session.username, req.body.username)
+        updateID(created)
+        return res.send({"message":"success","detail":"Successfully added storno"})
 
 }
 const promeniStorno = (req,res) =>{
@@ -130,12 +126,12 @@ const updateID = async (created)=>{
     MernaTocka.findOne({where:{
         tockaID:created.brojNaMernaTocka
     }}).then((res)=>{
-        console.log(res)
+        //(res)
         if(res===null){
             MernaTocka.create({
                 tockaID:created.brojNaMernaTocka,
                 tarifa:created.tarifa,
-                cena:1
+                cena:0
             }).then(()=>{
                 generateLog("Генерирана мерна точка од сторно фајл",actedon=created.brojNaMernaTocka)
                 return

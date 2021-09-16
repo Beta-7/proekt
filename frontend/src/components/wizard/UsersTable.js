@@ -61,9 +61,6 @@ export default function FirmiTable () {
               setData(response.data)
               setVraboteni(users)
           })
-
-
-
         }
 
     

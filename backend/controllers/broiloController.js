@@ -12,7 +12,7 @@ const getBroilos= async function(req,res){
 }
 
 const uploadFile = async (req,res)=>{
-    console.log(req.session)
+    //console.log(req.session)
     generateLog("Прикачи фајл со состојба на броилата",req.session.username)
    new Promise((reject, success)=>{
 
@@ -83,7 +83,7 @@ const uploadFile = async (req,res)=>{
             vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(2)
             mesec=niza[red].mesec.slice(5,7)
             godina=niza[red].mesec.slice(0,4)
-            console.log(niza[red])
+            //console.log(niza[red])
             if(niza[red].brojMernaTocka!==null && niza[red].tarifa!==null){
 
                 MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
@@ -191,7 +191,7 @@ async function asocirajBroiloSoKompanija(){
             await BroiloStatus.update({firmaId:mernaTocka.firmaId},{where:{
                 id:broilo.id
             }})
-            console.log("Asociram "+broilo.id+" so "+mernaTocka.firmaId)
+            //console.log("Asociram "+broilo.id+" so "+mernaTocka.firmaId)
         }
     }
 }

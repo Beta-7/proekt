@@ -89,13 +89,13 @@ return worksheet
 
 }
 
-const toExcel = async function(req, res){
-    const fakturaId = req.body.fakturaId
+const toExcel = async function(fakID){
+    const fakturaId = fakID
     let workbook = new ExcelJS.Workbook();
     try{
         await workbook.xlsx.readFile("../template.xlsx");
     } catch(e){
-        console.log(e)
+        //console.log(e)
         return
     }
     let worksheet = workbook.getWorksheet('Sheet1');
@@ -284,7 +284,7 @@ const toExcel = async function(req, res){
     worksheet.getCell("K26").value = "ден."
 
 
-    console.log(faktura.elektricnaEnergijaNT)
+    //console.log(faktura.elektricnaEnergijaNT)
 
         await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     
