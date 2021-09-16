@@ -252,7 +252,7 @@ const toExcel = async function(fakID){
         let fakturastokasni = await Faktura.findOne({where:{id:kamata.fakturaStoKasniId}})
         try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
         cell = worksheet.getCell("B"+kamatarow);
-        cell.value = "Казнена камата за фактура " + fakturastokasni.arhivskiBroj
+        cell.value = "Казнена камата за фактура " + kamata.arhivskiBroj
         cell = worksheet.getCell("J"+kamatarow);
         cell.value = kamata.suma
         cell = worksheet.getCell("K"+kamatarow)
