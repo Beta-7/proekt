@@ -10,6 +10,9 @@ const Kamata = db.define('kamata',{
     fakturaStoKasniId:{
         type:Sequelize.INTEGER
     },
+    arhivskiBroj:{
+        type:Sequelize.STRING
+    },
     fakturaDisplayId:{
         type:Sequelize.INTEGER
     },
