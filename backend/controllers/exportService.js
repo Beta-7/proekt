@@ -89,7 +89,8 @@ return worksheet
 
 }
 
-const toExcel = async function(fakturaId){
+const toExcel = async function(req, res){
+    const fakturaId = req.body.fakturaId
     let workbook = new ExcelJS.Workbook();
     try{
         await workbook.xlsx.readFile("../template.xlsx");
@@ -142,11 +143,7 @@ const toExcel = async function(fakturaId){
     cell = worksheet.getCell("H20");
     cell.value = faktura.dataOd + " - " + faktura.dataDo
 
-    cell = worksheet.getCell("J23");
-    cell.value = faktura.elektricnaEnergija.toFixed(2)
-
-    cell = worksheet.getCell("J24");
-    cell.value = faktura.cenaKwhBezDDV.toFixed(2)
+    
 
     cell = worksheet.getCell("J25");
     cell.value = parseFloat(faktura.vkupenIznosBezDDV).toFixed(2)
@@ -264,6 +261,41 @@ const toExcel = async function(fakturaId){
         kamatarow=kamatarow+1
 
     }
+
+
+    worksheet.getCell("B23").value = "Електрична енергија (НТ):"
+    worksheet.getCell("J23").value = faktura.elektricnaEnergijaNT
+
+    worksheet.insertRow(24)
+
+    worksheet.getCell("B24").value = "Цена по kWh без ДДВ (НТ):"
+    worksheet.getCell("J24").value = faktura.cenaKwhBezDDVNT
+    worksheet.getCell("K24").value = "ден."
+
+    worksheet.insertRow(25)
+
+
+    worksheet.getCell("B25").value = "Електрична енергија (ВТ):"
+    worksheet.getCell("J25").value = faktura.elektricnaEnergijaVT
+    worksheet.getCell("K25").value = "kWh"
+
+    worksheet.getCell("B26").value = "Цена по kWh без ДДВ (ВТ):"
+    worksheet.getCell("J26").value = faktura.cenaKwhBezDDVVT
+    worksheet.getCell("K26").value = "ден."
+
+
+    console.log(faktura.elektricnaEnergijaNT)
+    // worksheet.insertRow(24)
+
+    // cell = worksheet.getCell("B24");
+    // cell.value = "Цена по kWh без ДДВ(НТ):"
+    
+    // cell = worksheet.getCell("J24");
+    // cell.value = faktura.cenaKwhBezDDVNT.toFixed(4)
+
+    // cell = worksheet.getCell("B23");
+    // cell.value = "Електрична енергија (НТ):"
+    
 
         await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     

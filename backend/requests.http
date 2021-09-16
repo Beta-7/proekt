@@ -9,15 +9,6 @@ content-type: application/json
     "isAdmin":true
 }
 
-###
-POST http://localhost:5000/auth/login HTTP/1.1
-content-type: application/json
-
-{
-    "username":"asd",
-    "password":"asd"
-}
-
 
 
 ###
@@ -61,6 +52,18 @@ Content-Type: application/json
 ###
 POST http://localhost:5000/faktura/toExcel HTTP/1.1
 Content-Type: application/json
-        
+
+{
+    "fakturaId":"2"
+}
 
 
+
+###
+POST http://localhost:5000/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username":"asd",
+    "password":"asd"
+}
