@@ -100,13 +100,7 @@ export default function FakturaTable(props) {
                 mesec,
                 godina
             },{withCredentials:true}).then(()=>{
-                axios.post("/faktura/dodeliNagradi",{
-                    mesec,
-                    godina
-                    },{withCredentials:true}).then(()=>{
-                    console.log("asdasd ")
                     getData()
-                })
             })
         }
 

@@ -9,7 +9,7 @@ app.post("/generirajFakturi", auth.authMiddleware, faktura.generirajFakturi)
 app.get("/zemiFaktura", faktura.zemiFaktura)
 app.get("/zemiFakturiMesec", faktura.zemiFakturiMesec)
 app.post("/platiFaktura", auth.authMiddleware, faktura.platiFaktura)
-app.post("/dodeliNagradi", auth.authMiddleware, faktura.dodeliNagradi)
+//app.post("/dodeliNagradi", auth.authMiddleware, faktura.dodeliNagradi)
 app.post("/toExcel", auth.authMiddleware, exportService.toExcel)
 app.post('/getFakturi', auth.authMiddleware,  faktura.getFakturi)
 
