@@ -29,7 +29,7 @@ const generirajFakturi = async function(req,res){
     let date = new Date()
     let rok = new Date()
     rok.setDate(date.getDate()+10)
-
+    generateLog("Генерираше фактури за", req.session.username, mesec+"-"+godina)
     let firmi = await Firma.findAll({where:{}})
     for(firma of firmi){
         let postoecka = await Faktura.findOne({where:{
@@ -298,13 +298,7 @@ const generirajFakturi = async function(req,res){
             }
                 
                 
-                var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
-                    mesec,
-                    godina
-                }})
-                var rezultatFaktura = await Faktura.findOne({where:{mesec, godina, firmaId:firma.id}})
-                vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
-                await VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+                
                 
             }
                 
@@ -312,8 +306,19 @@ const generirajFakturi = async function(req,res){
             }
             
         }
+
+        
+        var rezultatFaktura = await Faktura.findOne({where:{mesec, godina, firmaId:firma.id}})
+        vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
+        
     }
-    // await dodeliNagradi(mesec, godina)
+    var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
+        mesec,
+        godina
+    }})
+    await VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+    await dodeliNagradi(mesec, godina)
+
     return res.json({"status":"success"})
 }
     
@@ -387,6 +392,12 @@ const dodeliNagradi = async function(mesec, godina){
             },{where:{id:faktura.id}})
             }
         }
+    }
+    await faktura.reload()
+    if(faktura.vkupnaNaplata==0 || faktura.vkupnaNaplata==null){
+    generateLog("Бришам празна фактура за",actor="SYSTEM", faktura.firmaId)
+    await Faktura.destroy({where:{id:faktura.id}})
+
     }
 }
 
