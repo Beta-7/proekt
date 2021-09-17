@@ -63,24 +63,24 @@ const uploadFile = async (req,res)=>{
                     }else{
                         
                         niza[brojac].krajnaSostojba=grupirani[brojBroilo][tarifa][merka].krajnaSostojba
-                        niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", ".")))
+                        niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(10)
                         niza[brojac].datumKraj=grupirani[brojBroilo][tarifa][merka].datumKraj
-                        niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina))  
+                        niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(10)
                         
             }
             }
 
             
-            niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", ".")))
+            niza[brojac].kolicina=parseFloat(parseFloat(niza[brojac].krajnaSostojba.replace(",", "."))-parseFloat(niza[brojac].pocetnaSostojba.replace(",", "."))).toFixed(10)
 
-            niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina))
+            niza[brojac].vkupnoKolicina=parseFloat(parseFloat(niza[brojac].multiplikator) * parseFloat(niza[brojac].kolicina)).toFixed(10)
         }
             
             
             
         }
         for( let red in niza){
-            vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",",".")))
+            vkupnoPotrosena=parseFloat(parseFloat(vkupnoPotrosena)+parseFloat(niza[red].vkupnoKolicina.replace(",","."))).toFixed(10)
             mesec=niza[red].mesec.slice(5,7)
             godina=niza[red].mesec.slice(0,4)
             //console.log(niza[red])
@@ -167,9 +167,9 @@ function presmetajProcent(mesec, godina, vkupnoPotrosena, vkupnaZelenaEnergija){
         mesec:godina+"."+tempmesec+"-"+tempmesec
     }}).then((results)=>{
         results.map((row)=>{
-            const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100)
+            const procentOdVkupnoPotrosenaEnergija = parseFloat(row.vkupnoKolicina / vkupnoPotrosena * 100).toFixed(10)
 
-            const vkupnaPotroshenaZelenaOdKlient = parseFloat(procentOdVkupnoPotrosenaEnergija * (parseFloat(vkupnaZelenaEnergija)/100.00))
+            const vkupnaPotroshenaZelenaOdKlient = parseFloat(procentOdVkupnoPotrosenaEnergija * (parseFloat(vkupnaZelenaEnergija)/100.00)).toFixed(10)
             row.update({
                 procentOdVkupnoPotrosenaEnergija:procentOdVkupnoPotrosenaEnergija,
                 potrosenaZelenaEnergija:vkupnaPotroshenaZelenaOdKlient

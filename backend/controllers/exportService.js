@@ -5,7 +5,8 @@ const BroiloStatus = require("../models/broiloStatus");
 
 const VkupnoPotrosena = require('../models/vkupnoPotrosena');
 const StornoDisplay = require('../models/stornoDisplay');
-const Kamata = require("../models/kamata")
+const Kamata = require("../models/kamata");
+const MernaTocka = require('../models/mernaTocka');
 const toPdf = async function(req,res){
 
 
@@ -19,7 +20,7 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     for(let column=0;column<7;column++){
         for(let row=0;row<9;row++){
             cell= worksheet.getCell(String.fromCharCode("A".charCodeAt(0) + column)+(red+row))
-            cell2 = worksheet.getCell(String.fromCharCode("A".charCodeAt(0) + column)+(60+row))
+            cell2 = worksheet.getCell(String.fromCharCode("A".charCodeAt(0) + column)+(55+row))
             cell.value=cell2.value
             cell.style=cell2.style
         }
@@ -125,61 +126,43 @@ const toExcel = async function(fakturaId){
         godina:faktura.godina
     }})
     const firma = await Firma.findOne({where:{id:faktura.firmaId}})
+    const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id}})
+    const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id}})
+
+    worksheet.getCell('B8').value = firma.name;
+    worksheet.getCell("B10").value = firma.adresaNaFirma
+    worksheet.getCell("J13").value = faktura.datumNaIzdavanje
+    worksheet.getCell("E13").value = faktura.arhivskiBroj
+    worksheet.getCell("H17").value = faktura.dataOd + " - " + faktura.dataDo
     
-    let cell = worksheet.getCell('B11');
-    cell.value = firma.name;
+    worksheet.getCell("J20").value = faktura.elektricnaEnergijaVT
+    worksheet.getCell("B21").value = "Вкупен износ без ДДВ за ел. енергија ВТ  ("+parseFloat(MTVT.cena).toFixed(2)+" ден/kWh)"    
+    worksheet.getCell("J21").value = parseFloat(faktura.elektricnaEnergijaVT) * parseFloat(MTVT.cena)
     
-    cell = worksheet.getCell("B13")
-    cell.value = firma.adresaNaFirma
-
-    cell = worksheet.getCell("J16");
-    cell.value = faktura.datumNaIzdavanje
-   
-    cell = worksheet.getCell("E16");
-    cell.value = faktura.arhivskiBroj
-
-   
-    cell = worksheet.getCell("K17");
-    cell.value = faktura.rokZaNaplata
-
-
-
-    cell = worksheet.getCell("H20");
-    cell.value = faktura.dataOd + " - " + faktura.dataDo
-
+    worksheet.getCell("J22").value = faktura.elektricnaEnergijaNT
+    worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија ВТ  ("+parseFloat(MTNT.cena).toFixed(2)+" ден/kWh)"    
+    worksheet.getCell("J23").value = parseFloat(faktura.elektricnaEnergijaNT) * parseFloat(MTNT.cena)
     
-
-    cell = worksheet.getCell("J25");
+    worksheet.getCell("J24").value = faktura.obnovlivaEnergija
+    worksheet.getCell("J25").value = faktura.cenaObnovlivaEnergija
+    worksheet.getCell("J26").value = faktura.vkupnaObnovlivaEnergijaBezDDV
     
-
-    worksheet.getCell("J26").value = faktura.obnovlivaEnergija
-
-    worksheet.getCell("J27").value = parseFloat(faktura.vkupenIznosBezDDV)
-
-    worksheet.getCell("J28").value = faktura.obnovlivaEnergija
-
-    worksheet.getCell("J29").value = faktura.cenaObnovlivaEnergija
+    worksheet.getCell("B27").value = "Надомест за организирање на пазарот на ел. енергија ("+faktura.nadomestZaOrganizacijaOdKwh + " мкд по kWh):"
+    worksheet.getCell("J27").value = faktura.nadomestZaOrganizacija
     
-    worksheet.getCell("B31").value = "Надомест за организирање на пазарот на ел. енергија ("+faktura.nadomestZaOrganizacijaOdKwh + " мкд по kWh):"
+    worksheet.getCell("J28").value = faktura.vkupenIznosNaFakturaBezDDV
     
-    worksheet.getCell("J30").value = faktura.vkupnaObnovlivaEnergijaBezDDV
+    worksheet.getCell("B29").value = "ДДВ ("+vkupno.DDVProcent+"%):"
     
-    worksheet.getCell("J31").value = faktura.nadomestZaOrganizacija
+    worksheet.getCell("J29").value = (faktura.vkupenIznosNaFakturaBezDDV * (vkupno.DDVProcent/100.0))
     
-    worksheet.getCell("J32").value = faktura.vkupenIznosNaFakturaBezDDV
-
-    worksheet.getCell("J34").value = (faktura.vkupenIznosNaFakturaBezDDV * (vkupno.DDVProcent/100.0))
     
-    worksheet.getCell("B34").value = "ДДВ ("+vkupno.DDVProcent+"%):"
-
-
-    worksheet.getCell("J36").value = faktura.vkupnaNaplata
-
-
-
-    worksheet.getCell("J38").value = faktura.rokZaNaplata.replace("-",".").replace("-",".")
+    worksheet.getCell("J31").value = faktura.vkupnaNaplata
+    worksheet.getCell("J33").value = faktura.rokZaNaplata.replace("-",".").replace("-",".")
     
-    var red=60
+    
+    
+    var red=55
     const broila =await  BroiloStatus.findAll({where:{fakturaId:faktura.id, tarifa:"1.1.1.8.1.255"}})
     if(broila!==null){
         for(broilo of broila){
@@ -263,7 +246,7 @@ const toExcel = async function(fakturaId){
 
     worksheet.getCell("J23").value = faktura.elektricnaEnergijaNT
     worksheet.getCell("J24").value = faktura.cenaKwhBezDDVNT
-    worksheet.getCell("J25").value = faktura.elektricnaEnergijaVT
+    
     worksheet.getCell("J26").value = faktura.cenaKwhBezDDVVT
 
 
