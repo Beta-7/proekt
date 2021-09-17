@@ -109,12 +109,12 @@ const generirajFakturi = async function(req,res){
                         //console.log("Visoka tarifa:"+ elektricnaEnergijaVT +" "+ broilo.vkupnoKolicina)
                     }
                     await Faktura.update({
-                        elektricnaEnergija:parseFloat(kolicinaOdSiteBroila).toFixed(2),
-                        elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila).toFixed(2),
-                        elektricnaEnergijaNT:parseFloat(elektricnaEnergijaNT).toFixed(2),
-                        elektricnaEnergijaNTBezZelena:parseFloat(elektricnaEnergijaNT).toFixed(2),
-                        elektricnaEnergijaVT:parseFloat(elektricnaEnergijaVT).toFixed(2),
-                        elektricnaEnergijaVTBezZelena:parseFloat(elektricnaEnergijaVT).toFixed(2),
+                        elektricnaEnergija:parseFloat(kolicinaOdSiteBroila),
+                        elektricnaEnergijaBezZelena:parseFloat(kolicinaOdSiteBroila),
+                        elektricnaEnergijaNT:parseFloat(elektricnaEnergijaNT),
+                        elektricnaEnergijaNTBezZelena:parseFloat(elektricnaEnergijaNT),
+                        elektricnaEnergijaVT:parseFloat(elektricnaEnergijaVT),
+                        elektricnaEnergijaVTBezZelena:parseFloat(elektricnaEnergijaVT),
                         cenaKwhBezDDVNT:MTNT.cena,
                         cenaKwhBezDDVVT:MTVT.cena,
                         dataOd:broilo.datumPocetok,
@@ -345,7 +345,7 @@ const dodeliNagradi = async function(mesec, godina){
                     agent:firma.agent,
                     mesec,
                     godina,
-                    suma:parseInt(parseFloat(faktura.elektricnaEnergija).toFixed(2)*parseFloat(firma.nagrada)),
+                    suma:parseInt(parseFloat(faktura.elektricnaEnergija)*parseFloat(firma.nagrada)),
                     firma:firma.name
                 })
             }
@@ -367,13 +367,13 @@ const dodeliNagradi = async function(mesec, godina){
             if(MTNT!==null && MTVT!==null){
 
             
-            var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina).toFixed(2)
-            var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija)).toFixed(2)
-            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/2).toFixed(2)
-            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)/2).toFixed(2)
-            var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija).toFixed(2)
+            var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina)
+            var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija))
+            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/2)
+            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)/2)
+            var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija)
 
-            var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena)).toFixed(2)
+            var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena))
             var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
            await Faktura.update({
                 elektricnaEnergija,

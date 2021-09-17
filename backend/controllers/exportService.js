@@ -152,28 +152,28 @@ const toExcel = async function(fakturaId){
     cell = worksheet.getCell("J25");
     
 
-    worksheet.getCell("J26").value = faktura.obnovlivaEnergija.toFixed(2)
+    worksheet.getCell("J26").value = faktura.obnovlivaEnergija
 
-    worksheet.getCell("J27").value = parseFloat(faktura.vkupenIznosBezDDV).toFixed(2)
+    worksheet.getCell("J27").value = parseFloat(faktura.vkupenIznosBezDDV)
 
-    worksheet.getCell("J28").value = faktura.obnovlivaEnergija.toFixed(2)
+    worksheet.getCell("J28").value = faktura.obnovlivaEnergija
 
-    worksheet.getCell("J29").value = faktura.cenaObnovlivaEnergija.toFixed(2)
+    worksheet.getCell("J29").value = faktura.cenaObnovlivaEnergija
     
     worksheet.getCell("B31").value = "Надомест за организирање на пазарот на ел. енергија ("+faktura.nadomestZaOrganizacijaOdKwh + " мкд по kWh):"
     
-    worksheet.getCell("J30").value = faktura.vkupnaObnovlivaEnergijaBezDDV.toFixed(2)
+    worksheet.getCell("J30").value = faktura.vkupnaObnovlivaEnergijaBezDDV
     
     worksheet.getCell("J31").value = faktura.nadomestZaOrganizacija
     
     worksheet.getCell("J32").value = faktura.vkupenIznosNaFakturaBezDDV
 
-    worksheet.getCell("J34").value = (faktura.vkupenIznosNaFakturaBezDDV * (vkupno.DDVProcent/100.0)).toFixed(2)
+    worksheet.getCell("J34").value = (faktura.vkupenIznosNaFakturaBezDDV * (vkupno.DDVProcent/100.0))
     
     worksheet.getCell("B34").value = "ДДВ ("+vkupno.DDVProcent+"%):"
 
 
-    worksheet.getCell("J36").value = faktura.vkupnaNaplata.toFixed(2)
+    worksheet.getCell("J36").value = faktura.vkupnaNaplata
 
 
 
@@ -193,13 +193,13 @@ const toExcel = async function(fakturaId){
                     if(istoBroilo.tarifa==="1.1.1.8.1.255"){
                         vtpocetna=istoBroilo.pocetnaSostojba
                         vtkrajna=istoBroilo.krajnaSostojba
-                        vtrazlika=(parseFloat(vtkrajna)-parseFloat(vtpocetna)).toFixed(1)
+                        vtrazlika=(parseFloat(vtkrajna)-parseFloat(vtpocetna))
                         vtmulti=istoBroilo.multiplikator
                         vtkolicina=istoBroilo.vkupnoKolicina
                     }else if(istoBroilo.tarifa==="1.1.1.8.2.255"){
                         ntpocetna=istoBroilo.pocetnaSostojba
                         ntkrajna=istoBroilo.krajnaSostojba
-                        ntrazlika=(parseFloat(ntkrajna)-parseFloat(ntpocetna)).toFixed(1)
+                        ntrazlika=(parseFloat(ntkrajna)-parseFloat(ntpocetna))
                         ntmulti=istoBroilo.multiplikator
                         ntkolicina=istoBroilo.vkupnoKolicina
                     }
@@ -225,13 +225,13 @@ const toExcel = async function(fakturaId){
                     if(istoStorno.tarifa==="1.1.1.8.1.255"){
                         vtpocetna=istoStorno.pocetnaSostojba
                         vtkrajna=istoStorno.krajnaSostojba
-                        vtrazlika=(parseFloat(vtkrajna)-parseFloat(vtpocetna)).toFixed(1)
+                        vtrazlika=(parseFloat(vtkrajna)-parseFloat(vtpocetna))
                         vtmulti=istoStorno.multiplikator
                         vtkolicina=istoStorno.vkupnoKolicina
                     }else if(istoStorno.tarifa==="1.1.1.8.2.255"){
                         ntpocetna=istoStorno.pocetnaSostojba
                         ntkrajna=istoStorno.krajnaSostojba
-                        ntrazlika=(parseFloat(ntkrajna)-parseFloat(ntpocetna)).toFixed(1)
+                        ntrazlika=(parseFloat(ntkrajna)-parseFloat(ntpocetna))
                         ntmulti=istoStorno.multiplikator
                         ntkolicina=istoStorno.vkupnoKolicina
                     }
