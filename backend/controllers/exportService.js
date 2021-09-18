@@ -59,7 +59,7 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     cell.value=vtmulti
     
     cell= worksheet.getCell('G'+(red+5))
-    cell.value=parseFloat(vtkolicina.toFixed(3))
+    cell.value=parseFloat(vtkolicina).toFixed(3)
 
 
     cell= worksheet.getCell('C'+(red+6))
@@ -75,7 +75,7 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     cell.value=ntmulti
 
     cell= worksheet.getCell('G'+(red+6))
-    cell.value=parseFloat(ntkolicina.toFixed(3))
+    cell.value=parseFloat(ntkolicina).toFixed(3)
 
     cell= worksheet.getCell('G'+(red+7))
     let kolicina = parseFloat(vtkolicina+ntkolicina).toFixed(3)
@@ -138,7 +138,7 @@ const toExcel = async function(fakturaId){
     worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија НТ  ("+parseFloat(MTNT.cena).toFixed(2)+" ден/kWh)"    
     worksheet.getCell("J23").value = parseFloat(faktura.elektricnaEnergijaNT) * parseFloat(MTNT.cena)
     
-    worksheet.getCell("J24").value = faktura.obnovlivaEnergija
+    worksheet.getCell("J24").value = faktura.obnovlivaEnergija.toFixed(4)
     worksheet.getCell("J25").value = faktura.cenaObnovlivaEnergija
     worksheet.getCell("J26").value = faktura.vkupnaObnovlivaEnergijaBezDDV
     
@@ -226,11 +226,17 @@ const toExcel = async function(fakturaId){
     for(kamata of kamati){
         worksheet.insertRow(kamatarow);
         
+        for(let a=0;a<5;a++){
+            let cell1 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+kamatarow)
+            let cell2 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+(kamatarow-2))
+
+            cell1.value=cell2.value
+            cell1.style=cell2.style
+        }
         try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
         worksheet.getCell("B"+kamatarow).value = "Казнена камата за фактура " + kamata.arhivskiBroj
         worksheet.getCell("J"+kamatarow).value = parseInt(kamata.suma)
         worksheet.getCell("K"+kamatarow).value = "ден."
-        worksheet.mergeCells('B'+kamatarow+':I'+kamatarow);
         kamatarow=kamatarow+1
 
     }
