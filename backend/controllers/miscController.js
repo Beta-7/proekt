@@ -28,6 +28,7 @@ const updateZelenaEnergija = (req, res) => {
             godina:req.body.godina
         }
     }).then((row)=>{
+        if(row!==null){
         row.zelenaKolicina=req.body.vkupno
         row.zelenaCena=req.body.cena
         vkupnoPotrosena = row.vkupnoPotrosena
@@ -38,6 +39,7 @@ const updateZelenaEnergija = (req, res) => {
             kamatnaStapka:req.body.kamata,
             DDVProcent:req.body.DDVProcent
         })
+    }
     }).then(()=>{
         BroiloController.presmetajProcent(req.body.mesec,req.body.godina, vkupnoPotrosena, req.body.vkupno)
 

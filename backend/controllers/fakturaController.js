@@ -80,7 +80,7 @@ const generirajFakturi = async function(req,res){
                     await Kamata.update({
                         fakturaDisplayId:faktura.id
                     },{where:{id:kamata.id}})
-                    await Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
+                    await Faktura.update({kamataOdPrethodniFakturi:parseFloat(kamata.suma)+parseFloat(faktura.kamataOdPrethodniFakturi)},{where:{id:faktura.id}})
                 }
 
                 
@@ -309,16 +309,18 @@ const generirajFakturi = async function(req,res){
 
         
         var rezultatFaktura = await Faktura.findOne({where:{mesec, godina, firmaId:firma.id}})
+        if(rezultatFaktura!==null){
         vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
-        
+        }
     }
     var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
         mesec,
         godina
     }})
+    if(vkupnopotrosena!==null){
     await VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+}
     await dodeliNagradi(mesec, godina)
-
     return res.json({"status":"success"})
 }
     
@@ -371,12 +373,12 @@ const dodeliNagradi = async function(mesec, godina){
             var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija))
             var procentZelenaNT = parseFloat(faktura.elektricnaEnergijaNTBezZelena)/parseFloat(faktura.elektricnaEnergijaBezZelena)
             var procentZelenaVT = parseFloat(faktura.elektricnaEnergijaVTBezZelena)/parseFloat(faktura.elektricnaEnergijaBezZelena)
-            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/procentZelenaNT)
-            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)/procentZelenaVT)
+            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)*procentZelenaNT)
+            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)*procentZelenaVT)
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija)
 
             var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena))
-            var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
+            var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*faktura.elektricnaEnergijaBezZelena))
            await Faktura.update({
                 elektricnaEnergija,
                 obnovlivaEnergija,
@@ -386,7 +388,7 @@ const dodeliNagradi = async function(mesec, godina){
                 vkupnaObnovlivaEnergijaBezDDV,
                 vkupenIznosBezDDV,
                 nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
-                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija),
+                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*faktura.elektricnaEnergijaBezZelena),
                 vkupenIznosNaFakturaBezDDV,
                 DDV:vkupnoPotrosena.DDVProcent,
                 vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
@@ -542,35 +544,46 @@ const platiFaktura = async function(req, res){
     {
         var denoviZakasneto = (platenaDate.getTime()-fakturaDate.getTime()) / (1000 * 3600 * 24)
 
-        Kamata.create({
+        await Kamata.create({
             firmaid:faktura.firmaId,
             fakturaStoKasniId:faktura.id,
             fakturaDisplayId:null,
             arhivskiBroj:faktura.arhivskiBroj,
-            suma:(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
+            suma:parseInt(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
             rok:faktura.rokZaNaplata,
             platenoData:den+"-"+mesec+"-"+godina
         })
     }
-    Faktura.update({
-        platena:true,
-        platenaNaDatum:den+"-"+mesec+"-"+godina
-    },{where:{
-        id:faktura.id
-    }})
+        await Faktura.update({
+            platena:true,
+            platenaNaDatum:den+"-"+mesec+"-"+godina
+        },{where:{
+            id:faktura.id
+        }})
     }
 
     
 
     //Greska, fakturata ne bila platena. Vragi go platena statusot na false i izbrisi ja kamatata.
     // Sleden pat koga ke se plati ke bide generirana
-    if(!platena && faktura.platena){
-        Kamata.destroy({where:{
+    if(platena && faktura.platena){
+        await Kamata.destroy({where:{
             fakturaStoKasniId:faktura.id
         }})
-        Faktura.update({
-            platena:false,
-            platenaNaDatum:null
+
+        await Kamata.create({
+            firmaid:faktura.firmaId,
+            fakturaStoKasniId:faktura.id,
+            fakturaDisplayId:null,
+            arhivskiBroj:faktura.arhivskiBroj,
+            suma:parseInt(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
+            rok:faktura.rokZaNaplata,
+            platenoData:den+"-"+mesec+"-"+godina
+        })
+
+        await Faktura.update({
+            platena:true,
+            platenaNaDatum:den+"-"+mesec+"-"+godina
         },{where:{
             id:faktura.id
         }})
@@ -579,13 +592,15 @@ const platiFaktura = async function(req, res){
     if(platena && faktura.platena){
 
 
-            Faktura.update({
+            await Faktura.update({
                 platenaNaDatum:den+"-"+mesec+"-"+godina
             },{where:{
                 id:faktura.id
             }})
         
     }
+
+    
 
 
     return res.json({message:"Success",detail:"Updated data"})
