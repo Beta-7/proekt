@@ -161,7 +161,7 @@ const toExcel = async function(fakturaId){
     const broila =await  BroiloStatus.findAll({where:{fakturaId:faktura.id, tarifa:"1.1.1.8.1.255"}})
     if(broila!==null){
         for(broilo of broila){
-            const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
+            const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id,tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.1.255"}})
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
 
