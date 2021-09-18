@@ -10,6 +10,7 @@ app.post("/GetNagradi", auth.authMiddleware, misc.getNagradi)
 app.post("/GetLogs", auth.authMiddleware, misc.getLogs)
 app.post("/getKamati", auth.authMiddleware, misc.getKamati)
 app.post("/addKamata", auth.authMiddleware, misc.addKamata)
+app.post("/editKamata", auth.authMiddleware, misc.editKamata)
 app.post("/deleteKamata", auth.authMiddleware, misc.deleteKamata)
 
 module.exports = app;

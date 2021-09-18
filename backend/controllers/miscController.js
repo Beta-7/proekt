@@ -88,19 +88,22 @@ const getLogs = async (req, res)=>{
 
 const addKamata = async function(req,res){
     const firmaid = req.body.firma
-    const faktura = req.body.faktura
+    const arhivskiBroj = req.body.arhivskiBroj
     const suma = req.body.suma
     const rok = req.body.rok
+    const platenoData = req.body.platenoData
     console.log(req.body)
-    if(firmaid!==undefined &&faktura!==undefined &&suma!==undefined &&rok!==undefined){
+    if(firmaid!==undefined &&arhivskiBroj!==undefined &&suma!==undefined &&rok!==undefined){
+        console.log("asdasd")
         await Kamata.create({
             firmaid,
-            arhivskiBroj: req.body.faktura,
+            arhivskiBroj,
             suma,
-            rok
+            rok,
+            platenoData
         })
     }
-    return res.status(200)
+    return res.status(200).send()
 }
 
 
@@ -114,22 +117,26 @@ const getKamati= async function(req,res){
 }
 const deleteKamata = async function(req,res){
     const kamata = await Kamata.findOne({where:{id:req.body.id}}) 
-    generateLog("Избриша камата",req.session.username,kamata.arhivskiBroj)
+    await generateLog("Избриша камата",req.session.username,kamata.arhivskiBroj)
     await Kamata.destroy({where:{id:req.body.id}})
+    return res.status(200).send()
 }
 const editKamata = async function(req,res){ 
     const firmaid = req.body.firma
-    const faktura = req.body.faktura
+    const arhivskiBroj = req.body.arhivskiBroj
     const suma = req.body.suma
     const rok = req.body.rok
-    generateLog("Промени камата",req.session.username,kamata.arhivskiBroj)
+    const platenoData = req.body.platenoData
+    await generateLog("Промени камата",req.session.username,arhivskiBroj)
     await Kamata.update({
         firmaid,
-        arhivskiBroj: req.body.faktura,
+        arhivskiBroj,
         suma,
-        rok
+        rok,
+        platenoData
     }
     ,{where:{id:req.body.id}})
+    return res.status(200).send()
 }
 
-module.exports={updateZelenaEnergija,updateNagradi,getNagradi,getLogs,getKamati,addKamata,deleteKamata}
+module.exports={editKamata,updateZelenaEnergija,updateNagradi,getNagradi,getLogs,getKamati,addKamata,deleteKamata}

@@ -80,6 +80,7 @@ export default function KamatiTable () {
         {
           title: "Сума", field: 'suma',
           validate: rowData => rowData.suma === undefined || rowData.suma === "" ? "Required" : true,
+          type: "numeric"
         },
         {
           title: "Рок", field: 'rok',
@@ -107,7 +108,8 @@ export default function KamatiTable () {
                     firma:newRow.firmaid,
                     arhivskiBroj:newRow.arhivskiBroj,
                     suma:newRow.suma,
-                    rok:newRow.rok  
+                    rok:newRow.rok,
+                    platenoData:newRow.platenoData
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()
@@ -130,7 +132,8 @@ export default function KamatiTable () {
                     firma:updatedRow.firmaid,
                     arhivskiBroj:updatedRow.arhivskiBroj,
                     suma:updatedRow.suma,
-                    rok:updatedRow.rok  
+                    rok:updatedRow.rok,
+                    platenoData:updatedRow.platenoData
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()

@@ -1,7 +1,7 @@
 const Log = require("./models/log")
 
-const generateLog = (message, actor="SYSTEM",actedon=null) =>{
-    Log.create({
+const generateLog = async(message, actor="SYSTEM",actedon=null) =>{
+    await Log.create({
         message,
         actor,
         actedon
