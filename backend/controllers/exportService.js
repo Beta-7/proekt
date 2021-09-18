@@ -53,13 +53,13 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     cell.value=vtkrajna
 
     cell= worksheet.getCell('E'+(red+5))
-    cell.value=vtrazlika
+    cell.value=parseFloat(vtrazlika).toFixed(3)
 
     cell= worksheet.getCell('F'+(red+5))
     cell.value=vtmulti
-
+    
     cell= worksheet.getCell('G'+(red+5))
-    cell.value=vtkolicina
+    cell.value=parseFloat(vtkolicina.toFixed(3))
 
 
     cell= worksheet.getCell('C'+(red+6))
@@ -69,21 +69,21 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     cell.value=ntkrajna
 
     cell= worksheet.getCell('E'+(red+6))
-    cell.value=ntrazlika
+    cell.value=parseFloat(ntrazlika).toFixed(3)
 
     cell= worksheet.getCell('F'+(red+6))
     cell.value=ntmulti
 
     cell= worksheet.getCell('G'+(red+6))
-    cell.value=ntkolicina
+    cell.value=parseFloat(ntkolicina.toFixed(3))
 
     cell= worksheet.getCell('G'+(red+7))
-    let kolicina = vtkolicina+ntkolicina
+    let kolicina = parseFloat(vtkolicina+ntkolicina).toFixed(3)
     if(vtkolicina===undefined){
-        kolicina = ntkolicina
+        kolicina = parseFloat(ntkolicina).toFixed(3)
     }
     if(ntkolicina===undefined){
-        kolicina = vtkolicina
+        kolicina = parseFloat(vtkolicina).toFixed(3)
     }
 
     cell.value=kolicina
@@ -222,18 +222,15 @@ const toExcel = async function(fakturaId){
 
     }
     const kamati =await  Kamata.findAll({where:{fakturaDisplayId:faktura.id}})
-    let kamatarow=31
+    let kamatarow=30
     for(kamata of kamati){
         worksheet.insertRow(kamatarow);
         
         try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
-        cell = worksheet.getCell("B"+kamatarow);
-        cell.value = "Казнена камата за фактура " + kamata.arhivskiBroj
-        cell = worksheet.getCell("J"+kamatarow);
-        cell.value = kamata.suma
-        cell = worksheet.getCell("K"+kamatarow)
-        cell.value = "ден."
-        
+        worksheet.getCell("B"+kamatarow).value = "Казнена камата за фактура " + kamata.arhivskiBroj
+        worksheet.getCell("J"+kamatarow).value = parseInt(kamata.suma)
+        worksheet.getCell("K"+kamatarow).value = "ден."
+        worksheet.mergeCells('B'+kamatarow+':I'+kamatarow);
         kamatarow=kamatarow+1
 
     }
@@ -241,7 +238,7 @@ const toExcel = async function(fakturaId){
 
 
 
-    await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
+    await workbook.xlsx.writeFile("../fakturi/"+faktura.arhivskiBroj+".xlsx");
     
         
 

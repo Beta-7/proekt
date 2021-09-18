@@ -547,7 +547,7 @@ const platiFaktura = async function(req, res){
             fakturaStoKasniId:faktura.id,
             fakturaDisplayId:null,
             arhivskiBroj:faktura.arhivskiBroj,
-            suma:(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
+            suma:parseInt(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
             rok:faktura.rokZaNaplata,
             platenoData:den+"-"+mesec+"-"+godina
         })
