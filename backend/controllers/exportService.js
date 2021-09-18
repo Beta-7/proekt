@@ -126,8 +126,8 @@ const toExcel = async function(fakturaId){
         godina:faktura.godina
     }})
     const firma = await Firma.findOne({where:{id:faktura.firmaId}})
-    const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id}})
-    const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id}})
+    const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
+    const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.2.255"}})
 
     worksheet.getCell('B8').value = firma.name;
     worksheet.getCell("B10").value = firma.adresaNaFirma
@@ -140,7 +140,7 @@ const toExcel = async function(fakturaId){
     worksheet.getCell("J21").value = parseFloat(faktura.elektricnaEnergijaVT) * parseFloat(MTVT.cena)
     
     worksheet.getCell("J22").value = faktura.elektricnaEnergijaNT
-    worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија ВТ  ("+parseFloat(MTNT.cena).toFixed(2)+" ден/kWh)"    
+    worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија НТ  ("+parseFloat(MTNT.cena).toFixed(2)+" ден/kWh)"    
     worksheet.getCell("J23").value = parseFloat(faktura.elektricnaEnergijaNT) * parseFloat(MTNT.cena)
     
     worksheet.getCell("J24").value = faktura.obnovlivaEnergija

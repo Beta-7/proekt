@@ -91,8 +91,8 @@ const generirajFakturi = async function(req,res){
                 let elektricnaEnergijaNT=0
                 let elektricnaEnergijaVT=0
                 for(broilo of broila){
-                    let MTNT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.1.255"}})
-                    let MTVT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.2.255"}})
+                    let MTNT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.2.255"}})
+                    let MTVT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.1.255"}})
                     
                     
                     //dokolku MT e null znaci deka ne se vneseni site merni tocki
@@ -100,11 +100,11 @@ const generirajFakturi = async function(req,res){
                     await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                     await faktura.addBroilo(broilo)
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
-                    if(broilo.tarifa==="1.1.1.8.1.255"){
+                    if(broilo.tarifa==="1.1.1.8.2.255"){
                         elektricnaEnergijaNT = elektricnaEnergijaNT + broilo.vkupnoKolicina
                         //console.log("Niska tarifa:"+ elektricnaEnergijaNT +" "+ broilo.vkupnoKolicina)
                     }
-                    if(broilo.tarifa==="1.1.1.8.2.255"){
+                    if(broilo.tarifa==="1.1.1.8.1.255"){
                         elektricnaEnergijaVT = elektricnaEnergijaVT + broilo.vkupnoKolicina
                         //console.log("Visoka tarifa:"+ elektricnaEnergijaVT +" "+ broilo.vkupnoKolicina)
                     }
@@ -130,7 +130,7 @@ const generirajFakturi = async function(req,res){
                 }})
                 for(stornoData of storni){
                     //niska tarifa
-                    if(stornoData.tarifa === "1.1.1.8.1.255"){
+                    if(stornoData.tarifa === "1.1.1.8.2.255"){
                         await faktura.reload()
                         //stornoto dodava ekstra kolicina na fakturata. ne treba da se pravat proverki
                         if(stornoData.vkupnoKolicina>0){
@@ -214,7 +214,7 @@ const generirajFakturi = async function(req,res){
                         }
                 }
                 //visoka tarifa
-                if(stornoData.tarifa === "1.1.1.8.2.255"){
+                if(stornoData.tarifa === "1.1.1.8.1.255"){
                     //stornoto dodava ekstra kolicina na fakturata. ne treba da se pravat proverki
                     if(stornoData.vkupnoKolicina>0){
                         await StornoDisplay.create({
@@ -357,11 +357,11 @@ const dodeliNagradi = async function(mesec, godina){
     if (vkupnoPotrosena!==null){
         if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
             const MTNT = await MernaTocka.findOne({where:{
-                tarifa:"1.1.1.8.1.255",
+                tarifa:"1.1.1.8.2.255",
                 firmaId:faktura.firmaId
             }})
             const MTVT = await MernaTocka.findOne({where:{
-                tarifa:"1.1.1.8.2.255",
+                tarifa:"1.1.1.8.1.255",
                 firmaId:faktura.firmaId
             }})
             if(MTNT!==null && MTVT!==null){
