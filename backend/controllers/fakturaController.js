@@ -74,11 +74,12 @@ const generirajFakturi = async function(req,res){
                 
                 let kamati = await Kamata.findAll({where:{
                     firmaid:firma.id,
-                    fakturaDisplayId:null
+                    platenoData:null
                 }})
+                let data = new Date() 
                 for(kamata of kamati){
                     await Kamata.update({
-                        fakturaDisplayId:faktura.id
+                        platenoData: data.getDate() + "-" + data.getMonth()+1 + "-" + data.getFullYear()   
                     },{where:{id:kamata.id}})
                     await Faktura.update({kamataOdPrethodniFakturi:parseFloat(kamata.suma)+parseFloat(faktura.kamataOdPrethodniFakturi)},{where:{id:faktura.id}})
                 }
