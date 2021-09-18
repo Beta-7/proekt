@@ -28,61 +28,56 @@ const generirajBroiloTabela = async function(adresa,brojmernomesto,datumpocetok,
     
     try{
         for(let row=0;row<4;row++){
-            worksheet.mergeCells('A'+(red+row)+':D'+(red+row));
-            worksheet.mergeCells('E'+(red+row)+':G'+(red+row));
+            worksheet.mergeCells('B'+(red+row)+':E'+(red+row));
+            worksheet.mergeCells('F'+(red+row)+':H'+(red+row));
         }
     }catch(err){
 
     }
 
 
-    cell= worksheet.getCell('E'+(red+0))
-
-    cell.value=brojmernomesto
+    worksheet.getCell('F'+(red+0)).value=brojmernomesto
 
 
-    cell= worksheet.getCell('E'+(red+1))
-    cell.value=adresa
+    worksheet.getCell('F'+(red+1)).value=adresa
 
-    cell= worksheet.getCell('E'+(red+2))
-    cell.value=datumpocetok.replace("-",".").replace("-",".")+" - "+datumkraj.replace("-",".").replace("-",".")
+    worksheet.getCell('F'+(red+2)).value=datumpocetok.replace("-",".").replace("-",".")+" - "+datumkraj.replace("-",".").replace("-",".")
 
 
-    cell= worksheet.getCell('E'+(red+3))
-    cell.value=brojbroilo
-
-    cell= worksheet.getCell('B'+(red+5))
-    cell.value=vtpocetna
+    worksheet.getCell('F'+(red+3)).value=brojbroilo
 
     cell= worksheet.getCell('C'+(red+5))
-    cell.value=vtkrajna
+    cell.value=vtpocetna
 
     cell= worksheet.getCell('D'+(red+5))
-    cell.value=vtrazlika
+    cell.value=vtkrajna
 
     cell= worksheet.getCell('E'+(red+5))
-    cell.value=vtmulti
+    cell.value=vtrazlika
 
     cell= worksheet.getCell('F'+(red+5))
+    cell.value=vtmulti
+
+    cell= worksheet.getCell('G'+(red+5))
     cell.value=vtkolicina
 
 
-    cell= worksheet.getCell('B'+(red+6))
+    cell= worksheet.getCell('C'+(red+6))
     cell.value=ntpocetna
 
-    cell= worksheet.getCell('C'+(red+6))
+    cell= worksheet.getCell('D'+(red+6))
     cell.value=ntkrajna
 
-    cell= worksheet.getCell('D'+(red+6))
+    cell= worksheet.getCell('E'+(red+6))
     cell.value=ntrazlika
 
-    cell= worksheet.getCell('E'+(red+6))
+    cell= worksheet.getCell('F'+(red+6))
     cell.value=ntmulti
 
-    cell= worksheet.getCell('F'+(red+6))
+    cell= worksheet.getCell('G'+(red+6))
     cell.value=ntkolicina
 
-    cell= worksheet.getCell('F'+(red+7))
+    cell= worksheet.getCell('G'+(red+7))
     let kolicina = vtkolicina+ntkolicina
     if(vtkolicina===undefined){
         kolicina = ntkolicina
