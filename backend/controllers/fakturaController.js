@@ -371,8 +371,8 @@ const dodeliNagradi = async function(mesec, godina){
             var elektricnaEnergija=(parseFloat(faktura.elektricnaEnergijaBezZelena)-parseFloat(obnovlivaEnergija))
             var procentZelenaNT = parseFloat(faktura.elektricnaEnergijaNTBezZelena)/parseFloat(faktura.elektricnaEnergijaBezZelena)
             var procentZelenaVT = parseFloat(faktura.elektricnaEnergijaVTBezZelena)/parseFloat(faktura.elektricnaEnergijaBezZelena)
-            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)/procentZelenaNT)
-            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)/procentZelenaVT)
+            var elektricnaEnergijaNT=(parseFloat(faktura.elektricnaEnergijaNTBezZelena)-parseFloat(obnovlivaEnergija)*procentZelenaNT)
+            var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)*procentZelenaVT)
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija)
 
             var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena))
