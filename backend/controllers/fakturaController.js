@@ -386,7 +386,7 @@ const dodeliNagradi = async function(mesec, godina){
                 vkupnaObnovlivaEnergijaBezDDV,
                 vkupenIznosBezDDV,
                 nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
-                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija),
+                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergijaBezZelena),
                 vkupenIznosNaFakturaBezDDV,
                 DDV:vkupnoPotrosena.DDVProcent,
                 vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
