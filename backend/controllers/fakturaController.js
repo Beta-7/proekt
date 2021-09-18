@@ -376,7 +376,7 @@ const dodeliNagradi = async function(mesec, godina){
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija)
 
             var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena))
-            var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergija))
+            var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*faktura.elektricnaEnergijaBezZelena))
            await Faktura.update({
                 elektricnaEnergija,
                 obnovlivaEnergija,
@@ -386,7 +386,7 @@ const dodeliNagradi = async function(mesec, godina){
                 vkupnaObnovlivaEnergijaBezDDV,
                 vkupenIznosBezDDV,
                 nadomestZaOrganizacijaOdKwh:vkupnoPotrosena.nadomestZaOrganizacija,
-                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*elektricnaEnergijaBezZelena),
+                nadomestZaOrganizacija: (vkupnoPotrosena.nadomestZaOrganizacija*faktura.elektricnaEnergijaBezZelena),
                 vkupenIznosNaFakturaBezDDV,
                 DDV:vkupnoPotrosena.DDVProcent,
                 vkupnaNaplata: vkupenIznosNaFakturaBezDDV + (vkupenIznosNaFakturaBezDDV * (vkupnoPotrosena.DDVProcent/100))
