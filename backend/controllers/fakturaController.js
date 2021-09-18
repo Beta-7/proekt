@@ -542,7 +542,7 @@ const platiFaktura = async function(req, res){
     {
         var denoviZakasneto = (platenaDate.getTime()-fakturaDate.getTime()) / (1000 * 3600 * 24)
 
-        Kamata.create({
+        await Kamata.create({
             firmaid:faktura.firmaId,
             fakturaStoKasniId:faktura.id,
             fakturaDisplayId:null,
@@ -552,25 +552,36 @@ const platiFaktura = async function(req, res){
             platenoData:den+"-"+mesec+"-"+godina
         })
     }
-    Faktura.update({
-        platena:true,
-        platenaNaDatum:den+"-"+mesec+"-"+godina
-    },{where:{
-        id:faktura.id
-    }})
+        await Faktura.update({
+            platena:true,
+            platenaNaDatum:den+"-"+mesec+"-"+godina
+        },{where:{
+            id:faktura.id
+        }})
     }
 
     
 
     //Greska, fakturata ne bila platena. Vragi go platena statusot na false i izbrisi ja kamatata.
     // Sleden pat koga ke se plati ke bide generirana
-    if(!platena && faktura.platena){
-        Kamata.destroy({where:{
+    if(platena && faktura.platena){
+        await Kamata.destroy({where:{
             fakturaStoKasniId:faktura.id
         }})
-        Faktura.update({
-            platena:false,
-            platenaNaDatum:null
+
+        await Kamata.create({
+            firmaid:faktura.firmaId,
+            fakturaStoKasniId:faktura.id,
+            fakturaDisplayId:null,
+            arhivskiBroj:faktura.arhivskiBroj,
+            suma:parseInt(faktura.vkupnaNaplata * (vkupnoPotrosena.kamatnaStapka/100) * denoviZakasneto),
+            rok:faktura.rokZaNaplata,
+            platenoData:den+"-"+mesec+"-"+godina
+        })
+
+        await Faktura.update({
+            platena:true,
+            platenaNaDatum:den+"-"+mesec+"-"+godina
         },{where:{
             id:faktura.id
         }})
@@ -579,13 +590,15 @@ const platiFaktura = async function(req, res){
     if(platena && faktura.platena){
 
 
-            Faktura.update({
+            await Faktura.update({
                 platenaNaDatum:den+"-"+mesec+"-"+godina
             },{where:{
                 id:faktura.id
             }})
         
     }
+
+    
 
 
     return res.json({message:"Success",detail:"Updated data"})
