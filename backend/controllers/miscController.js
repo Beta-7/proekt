@@ -90,11 +90,31 @@ const addKamata = async function(req,res){
     const firmaid = req.body.firma
     const arhivskiBroj = req.body.arhivskiBroj
     const suma = req.body.suma
-    const rok = req.body.rok
-    const platenoData = req.body.platenoData
-    console.log(req.body)
+    let rok = req.body.rok
+    if(rok.length>11)
+    {
+        let day = rok[8]+rok[9]+""
+        let dayTmp = parseInt(day)+1
+        dayTmp=dayTmp+""
+        if(dayTmp<10){dayTmp="0"+dayTmp}
+        day=dayTmp
+        let month = rok[5]+rok[6]+""
+        let year = rok[0]+rok[1]+rok[2]+rok[3]+""
+        rok = day+"-"+month+"-"+year
+    }
+    let platenoData = req.body.platenoData
+    if(platenoData.length>11)
+    {
+        let day1 = platenoData[8]+platenoData[9]+""
+        let dayTmp = parseInt(day1)+1
+        dayTmp=dayTmp+""
+        if(dayTmp<10){dayTmp="0"+dayTmp}
+        day1=dayTmp
+        let month1 = platenoData[5]+platenoData[6]+""
+        let year1 = platenoData[0]+platenoData[1]+platenoData[2]+platenoData[3]+""
+        platenoData = day1+"-"+month1+"-"+year1
+    }
     if(firmaid!==undefined &&arhivskiBroj!==undefined &&suma!==undefined &&rok!==undefined){
-        console.log("asdasd")
         await Kamata.create({
             firmaid,
             arhivskiBroj,
@@ -125,8 +145,38 @@ const editKamata = async function(req,res){
     const firmaid = req.body.firma
     const arhivskiBroj = req.body.arhivskiBroj
     const suma = req.body.suma
-    const rok = req.body.rok
-    const platenoData = req.body.platenoData
+    let rok = req.body.rok
+    if(rok.length>11)
+    {
+        let day = rok[8]+rok[9]+""
+        let dayTmp = parseInt(day)+1
+        dayTmp=dayTmp+""
+        if(dayTmp<10){dayTmp="0"+dayTmp}
+        day=dayTmp
+        let month = rok[5]+rok[6]+""
+        let monthTmp = parseInt(month)
+        monthTmp=monthTmp+""
+        if(monthTmp<10){monthTmp="0"+monthTmp}
+        month=monthTmp
+        let year = rok[0]+rok[1]+rok[2]+rok[3]+""
+        rok = day+"-"+month+"-"+year
+    }
+    let platenoData = req.body.platenoData
+    if(platenoData.length>11)
+    {
+        let day1 = platenoData[8]+platenoData[9]+""
+        let dayTmp = parseInt(day1)+1
+        dayTmp=dayTmp+""
+        if(dayTmp<10){dayTmp="0"+dayTmp}
+        day1=dayTmp
+        let month1 = platenoData[5]+platenoData[6]+""
+        let monthTmp = parseInt(month1)
+        monthTmp=monthTmp+""
+        if(monthTmp<10){monthTmp="0"+monthTmp}
+        month1=monthTmp
+        let year1 = platenoData[0]+platenoData[1]+platenoData[2]+platenoData[3]+""
+        platenoData = day1+"-"+month1+"-"+year1
+    }
     await generateLog("Промени камата",req.session.username,arhivskiBroj)
     await Kamata.update({
         firmaid,
