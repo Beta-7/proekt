@@ -121,8 +121,7 @@ const toExcel = async function(fakturaId){
         godina:faktura.godina
     }})
     const firma = await Firma.findOne({where:{id:faktura.firmaId}})
-    const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
-    const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.2.255"}})
+    
 
     worksheet.getCell('B8').value = firma.name;
     worksheet.getCell("B10").value = firma.adresaNaFirma
@@ -161,6 +160,8 @@ const toExcel = async function(fakturaId){
     const broila =await  BroiloStatus.findAll({where:{fakturaId:faktura.id, tarifa:"1.1.1.8.1.255"}})
     if(broila!==null){
         for(broilo of broila){
+            const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
+            const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.2.255"}})
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
 
@@ -193,6 +194,8 @@ const toExcel = async function(fakturaId){
     const storni =await  StornoDisplay.findAll({where:{fakturaId:faktura.id}, distinct: 'tarifa'})
     if(storni!==null){
         for(storno of storni){
+            const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
+            const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.2.255"}})
             let vtpocetna, vtkrajna, vtrazlika, vtmulti, vtkolicina
             let ntpocetna, ntkrajna, ntrazlika, ntmulti, ntkolicina
 
