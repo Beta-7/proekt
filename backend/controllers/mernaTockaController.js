@@ -17,10 +17,10 @@ const dodadiMernaTocka = (req, res) => {
         return res.json({"message":"Error","detail":"Missing argument"})
     }
     if(tarifa == 0){
-        tarifa="1.1.1.8.1.255"
+        tarifa="1.1.1.8.2.255"
     }
     if(tarifa == 1){
-        tarifa="1.1.1.8.2.255"
+        tarifa="1.1.1.8.1.255"
     }
     
 
