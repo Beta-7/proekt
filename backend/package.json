@@ -23,6 +23,6 @@
     "node-zip": "^1.1.1",
     "nodemon": "^2.0.7",
     "pg": "^8.6.0",
-    "sequelize": "^6.6.2"
+    "sequelize": "^6.6.5"
   }
 }
