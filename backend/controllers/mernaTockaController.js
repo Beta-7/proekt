@@ -1,19 +1,18 @@
-
 const BroiloStatus = require("../models/broiloStatus")
 const Firma = require("../models/firma")
 const MernaTocka = require("../models/mernaTocka")
 const BroiloController = require("./broiloController")
 const generateLog = require("../logs")
+
+
 const dodadiMernaTocka = (req, res) => {
-    //tockaID
-    //cena
-    //firma
-    //tarifa
+
     const tockaID=req.body.tockaID
-    const cena=parseFloat(req.body.cena)
+    const cenaVT=parseFloat(req.body.cenaVT)
+    const cenaNT=parseFloat(req.body.cenaNT)
     const firmaID=req.body.firmaID
-    let tarifa=req.body.tarifa
-    if(tockaID===undefined || isNaN(parseFloat(cena)) || firmaID===undefined || tarifa===undefined){
+    const tarifa=req.body.tarifa
+    if(tockaID===undefined || isNaN(parseFloat(cenaVT)) || isNaN(parseFloat(cenaNT)) || firmaID===undefined || tarifa===undefined){
         return res.json({"message":"Error","detail":"Missing argument"})
     }
     if(tarifa == 0){
@@ -24,7 +23,7 @@ const dodadiMernaTocka = (req, res) => {
     }
     
 
-    MernaTocka.findOne({where:{tockaID: req.body.tockaID, tarifa}}).then((user)=>{
+    MernaTocka.findOne({where:{tockaID: req.body.tockaID}}).then((user)=>{
         if(user!==null){
             return res.json({"message":"Error","detail":"Merna tocka already exists"})
         }
@@ -32,9 +31,10 @@ const dodadiMernaTocka = (req, res) => {
 
             MernaTocka.create({
                 tockaID,
-                cena,
-                "firmaId":firma.id,
-                tarifa
+                cenaVT,
+                cenaNT,
+                firmaId:firma.id,
+                
             }).then(()=>{
                 generateLog("Асоцира мерна точка со компанија",req.session.username, tockaID)
                 return res.send({"message":"success","detail":"Successfully added company"})})    
@@ -63,7 +63,8 @@ async function promeniMernaTocka(req,res){
 
     MernaTocka.update({
         firmaId:req.body.firmaId,
-        cena:req.body.cena, 
+        cenaVT:req.body.cenaVT,
+        cenaNT:req.body.cenaNT, 
         adresa:req.body.adresa,
         brojMestoPotrosuvacka:req.body.brojMestoPotrosuvacka
     }, {where:{id:req.body.id}
@@ -90,7 +91,7 @@ const izbrisiMernaTocka = async (req, res) =>{
 }
 
 const getMerniTocki= async function(req,res){
-    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cena","tarifa" ,"firmaId", "adresa", "brojMestoPotrosuvacka"],raw : true})
+    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cenaNT","cenaVT","tarifa" ,"firmaId", "adresa", "brojMestoPotrosuvacka"],raw : true})
     BroiloController.asocirajBroiloSoKompanija()
     return res.json(tocki)
 }

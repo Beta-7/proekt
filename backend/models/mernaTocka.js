@@ -8,20 +8,25 @@ const MernaTocka = db.define('mernaTocka',{
         type:Sequelize.STRING,
         allowNull: false
     },
-    tarifa:{
-        type:Sequelize.STRING,
-
-    },
     cena:{
+        type:Sequelize.FLOAT
+    },
+    cenaVT:{
         type:Sequelize.FLOAT,
-        allowNull: false,
+    },
+    cenaNT:{
+        type:Sequelize.FLOAT,
     },
     adresa:{
         type:Sequelize.STRING,
     },
     brojMestoPotrosuvacka:{
         type:Sequelize.STRING,
-    }
+    },
+    tarifa:{
+        type:Sequelize.STRING,
+
+    },
 })
 
 Firma.hasMany(MernaTocka, {as: "mernitocki"})

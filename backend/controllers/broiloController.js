@@ -86,10 +86,11 @@ const uploadFile = async (req,res)=>{
             //console.log(niza[red])
             if(niza[red].brojMernaTocka!==null && niza[red].tarifa!==null){
 
-                MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka, tarifa:niza[red].tarifa },
+                MernaTocka.findOrCreate({ where: { tockaID: niza[red].brojMernaTocka },
                     defaults: {
                         tockaID:niza[red].brojMernaTocka,
-                        cena:0,
+                        cenaVT:0,
+                        cenaNT:0,
                         tarifa:niza[red].tarifa
                     }
                 }
