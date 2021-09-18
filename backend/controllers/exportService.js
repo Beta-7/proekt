@@ -239,10 +239,6 @@ const toExcel = async function(fakturaId){
     }
 
 
-    worksheet.getCell("J23").value = faktura.elektricnaEnergijaNT
-    worksheet.getCell("J24").value = faktura.cenaKwhBezDDVNT
-    
-    worksheet.getCell("J26").value = faktura.cenaKwhBezDDVVT
 
 
     await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
