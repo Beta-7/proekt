@@ -244,9 +244,8 @@ const toExcel = async function(fakturaId){
 
 
 
-    await workbook.xlsx.writeFile("../fakturi/"+faktura.arhivskiBroj+".xlsx");
+    await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
     
-        
 
 }
 

@@ -80,7 +80,7 @@ const generirajFakturi = async function(req,res){
                     await Kamata.update({
                         fakturaDisplayId:faktura.id
                     },{where:{id:kamata.id}})
-                    await Faktura.update({kamataOdPrethodniFakturi:kamata.suma+faktura.kamataOdPrethodniFakturi},{where:{id:faktura.id}})
+                    await Faktura.update({kamataOdPrethodniFakturi:parseFloat(kamata.suma)+parseFloat(faktura.kamataOdPrethodniFakturi)},{where:{id:faktura.id}})
                 }
 
                 
