@@ -61,8 +61,12 @@ async function promeniMernaTocka(req,res){
         return res.json({"message":"error","detail":"MernaTocka or Firma doesn't exist"})
     }
 
-    MernaTocka.update({firmaId:req.body.firmaId,cena:req.body.cena}, {
-        where:{id:req.body.id}
+    MernaTocka.update({
+        firmaId:req.body.firmaId,
+        cena:req.body.cena, 
+        adresa:req.body.adresa,
+        brojMestoPotrosuvacka:req.body.brojMestoPotrosuvacka
+    }, {where:{id:req.body.id}
     }).then(()=>{
         generateLog("Асоцира мерна точка со компанија",req.session.username, MT.tockaID)
         return res.json({message:"Success",detail:"Updated Merna Tocka"})
@@ -86,7 +90,7 @@ const izbrisiMernaTocka = async (req, res) =>{
 }
 
 const getMerniTocki= async function(req,res){
-    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cena","tarifa" ,"firmaId"],raw : true})
+    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cena","tarifa" ,"firmaId", "adresa", "brojMestoPotrosuvacka"],raw : true})
     BroiloController.asocirajBroiloSoKompanija()
     return res.json(tocki)
 }

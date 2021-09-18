@@ -133,13 +133,11 @@ export default function FirmiTable (props) {
           title: "Адреса на мерна точка", field: "adresa",
           validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
           filtering:true,
-          lookup: {...firmi}
         },
         {
-          title: "Број на место на потрошувачка", field: "mestoNaPotrosuvacka",
-          validate: rowData => rowData.mestoNaPotrosuvacka === undefined || rowData.mestoNaPotrosuvacka === "" ? "Required" : true,
+          title: "Број на место на потрошувачка", field: "brojMestoPotrosuvacka",
+          validate: rowData => rowData.brojMestoPotrosuvacka === undefined || rowData.brojMestoPotrosuvacka === "" ? "Required" : true,
           filtering:true,
-          lookup: {...firmi}
         }
       ]
     
@@ -169,7 +167,9 @@ export default function FirmiTable (props) {
                   axios.post("/mernaTocka/PromeniMernaTocka",{
                     id:oldRow.id,
                     firmaId:updatedRow.firmaId,
-                    cena:updatedRow.cena
+                    cena:updatedRow.cena,
+                    adresa:updatedRow.adresa,
+                    brojMestoPotrosuvacka:updatedRow.brojMestoPotrosuvacka
                   },{withCredentials:true}).then(()=>{
                     reasociraj()
                     getData()

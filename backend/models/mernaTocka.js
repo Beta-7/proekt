@@ -15,7 +15,12 @@ const MernaTocka = db.define('mernaTocka',{
     cena:{
         type:Sequelize.FLOAT,
         allowNull: false,
-            
+    },
+    adresa:{
+        type:Sequelize.STRING,
+    },
+    brojMestoPotrosuvacka:{
+        type:Sequelize.STRING,
     }
 })
 
