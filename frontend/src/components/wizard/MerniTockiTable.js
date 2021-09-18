@@ -86,11 +86,7 @@ export default function FirmiTable (props) {
             
                 response.data.forEach((tocka)=>{
                   
-                    if(tocka.firmaId === null){
-                      
-                      
-                      
-                    }
+
                 })
                 reasociraj()
                 setData(response.data)

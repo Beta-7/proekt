@@ -41,7 +41,7 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 export default function KamatiTable () {
     const [data, setData] = useState([])
-
+    const [firmi, setFirmi] = useState([])
 
     useEffect(() => {
       getData()
@@ -51,8 +51,16 @@ export default function KamatiTable () {
           axios.post("/misc/getKamati",{},{withCredentials:true}).then((response)=>{
               setData(response.data)
           })
-        }
-
+          var firmiNiza = []
+          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
+              firmi.data.rows.forEach((firma)=>{
+                 firmiNiza[firma.id] = firma.name 
+                 })
+                 
+               setFirmi(firmiNiza)
+          
+        })
+      }
     const columns = [
         { title: "id", field: "id",
          hidden:true,
@@ -61,11 +69,12 @@ export default function KamatiTable () {
         {
           title: "Име на фирма", field: "firmaid",
           validate: rowData => rowData.firmaid === undefined || rowData.firmaid === "" ? "Required" : true,
-          filtering:false
+          filtering:false,
+          lookup: {...firmi}
         },
         {
-          title: "Фактура", field: "fakturaStoKasniId",
-          validate: rowData => rowData.fakturaStoKasniId === undefined || rowData.fakturaStoKasniId === "" ? "Required" : true,
+          title: "Фактура", field: "arhivskiBroj",
+          validate: rowData => rowData.arhivskiBroj === undefined || rowData.arhivskiBroj === "" ? "Required" : true,
           filtering:false
         },
         {
@@ -75,17 +84,18 @@ export default function KamatiTable () {
         {
           title: "Рок", field: 'rok',
           validate: rowData => rowData.rok === undefined || rowData.rok === "" ? "Required" : true,
+          type: 'date'
         },
         {
           title: "Платено на датум", field: 'platenoData',
-          validate: rowData => rowData.platenoData === undefined || rowData.platenoData === "" ? "Required" : true,
+          type: 'date'
         }
     ]
     
     
         return (
             <MaterialTable
-              title="Кориснички сметки"
+              title="Камати"
               columns={columns}
               data={data}
               components={{
@@ -93,11 +103,11 @@ export default function KamatiTable () {
               }}
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
-                  axios.post("/user/dodadiUser",{
-                    username:newRow.username,
-                    ime:newRow.ime,
-                    prezime:newRow.prezime,
-                    isAdmin:newRow.isAdmin  
+                  axios.post("/misc/addKamata",{
+                    firma:newRow.firmaid,
+                    arhivskiBroj:newRow.arhivskiBroj,
+                    suma:newRow.suma,
+                    rok:newRow.rok  
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()
@@ -105,7 +115,7 @@ export default function KamatiTable () {
                   
                 }),
                 onRowDelete: selectedRow => new Promise((resolve, reject) => {
-                  axios.post("/user/izbrisiUser",{
+                  axios.post("/misc/deleteKamata",{
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
@@ -115,12 +125,12 @@ export default function KamatiTable () {
                   resolve()
                 }),
                 onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
-                  axios.post("/user/promeniUser",{
+                  axios.post("/misc/editKamata",{
                     id:oldRow.id,
-                    username:updatedRow.username,
-                    ime:updatedRow.ime,
-                    prezime:updatedRow.prezime,
-                    isAdmin:updatedRow.isAdmin
+                    firma:updatedRow.firmaid,
+                    arhivskiBroj:updatedRow.arhivskiBroj,
+                    suma:updatedRow.suma,
+                    rok:updatedRow.rok  
                   },{withCredentials:true}).then(()=>{
                     getData()
                     resolve()

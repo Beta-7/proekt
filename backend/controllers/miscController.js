@@ -86,14 +86,50 @@ const getLogs = async (req, res)=>{
     return res.json(logs)
 }
 
-
-const getKamati= async function(req,res){
-    const kamati = await Kamata.findAll({attributes:["id","firmaid", "fakturaStoKasniId", "fakturaDisplayId", "suma", "rok", "platenoData"],raw : true})
-    for(let i in kamati){
-        let ime = await Firma.findOne({where: {id:kamati[i]["id"]}, attributes:["name"]}) 
-        kamati[i]["firmaid"] = ime.dataValues.name
+const addKamata = async function(req,res){
+    const firmaid = req.body.firma
+    const faktura = req.body.faktura
+    const suma = req.body.suma
+    const rok = req.body.rok
+    console.log(req.body)
+    if(firmaid!==undefined &&faktura!==undefined &&suma!==undefined &&rok!==undefined){
+        await Kamata.create({
+            firmaid,
+            arhivskiBroj: req.body.faktura,
+            suma,
+            rok
+        })
     }
-    return res.json(kamati)
+    return res.status(200)
 }
 
-module.exports={updateZelenaEnergija,updateNagradi,getNagradi,getLogs,getKamati}
+
+const getKamati= async function(req,res){
+    const kamati = await Kamata.findAll({attributes:["id","firmaid", "arhivskiBroj", "fakturaDisplayId", "suma", "rok", "platenoData"],raw : true})
+    // for(let i in kamati){
+    //     let ime = await Firma.findOne({where: {id:kamati[i]["id"]}, attributes:["name"]}) 
+    //     kamati[i]["firmaid"] = ime.dataValues.name
+    // }
+    return res.json(kamati)
+}
+const deleteKamata = async function(req,res){
+    const kamata = await Kamata.findOne({where:{id:req.body.id}}) 
+    generateLog("Избриша камата",req.session.username,kamata.arhivskiBroj)
+    await Kamata.destroy({where:{id:req.body.id}})
+}
+const editKamata = async function(req,res){ 
+    const firmaid = req.body.firma
+    const faktura = req.body.faktura
+    const suma = req.body.suma
+    const rok = req.body.rok
+    generateLog("Промени камата",req.session.username,kamata.arhivskiBroj)
+    await Kamata.update({
+        firmaid,
+        arhivskiBroj: req.body.faktura,
+        suma,
+        rok
+    }
+    ,{where:{id:req.body.id}})
+}
+
+module.exports={updateZelenaEnergija,updateNagradi,getNagradi,getLogs,getKamati,addKamata,deleteKamata}

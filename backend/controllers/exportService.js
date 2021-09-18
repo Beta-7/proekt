@@ -181,7 +181,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoBroilo.multiplikator
                         ntkolicina=istoBroilo.vkupnoKolicina
                     }
-                    await generirajBroiloTabela(firma.adresaNaFirma,broilo.brojMernoMesto,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    await generirajBroiloTabela(MTVT.adresa,MTVT.brojMestoPotrosuvacka,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }
@@ -213,7 +213,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoStorno.multiplikator
                         ntkolicina=istoStorno.vkupnoKolicina
                     }
-                    await generirajBroiloTabela(firma.adresaNaFirma,istoStorno.brojNaMernoMesto,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    await generirajBroiloTabela(MTVT.adresa,MTVT.brojMestoPotrosuvacka,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }

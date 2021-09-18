@@ -110,7 +110,18 @@ export default function FirmiTable () {
           validate: rowData => rowData.firmaId === undefined || rowData.firmaId === "" ? "Required" : true,
           filtering:true,
           lookup: {...firmi}
-        }]
+        },
+        {
+          title: "Адреса на мерна точка", field: "adresa",
+          validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
+          filtering:true,
+        },
+        {
+          title: "Број на место на потрошувачка", field: "brojMestoPotrosuvacka",
+          validate: rowData => rowData.brojMestoPotrosuvacka === undefined || rowData.brojMestoPotrosuvacka === "" ? "Required" : true,
+          filtering:true,
+        }
+      ]
     
     
         return (
@@ -131,6 +142,8 @@ export default function FirmiTable () {
                   cena:newRow.cena,
                   tarifa:newRow.tarifa,
                   firmaID:newRow.firmaId,
+                  adresa:newRow.adresa,
+                  brojMestoPotrosuvacka:newRow.brojMestoPotrosuvacka
                 },{withCredentials:true}).then(()=>{
                   getData()
                   resolve()
@@ -150,7 +163,9 @@ export default function FirmiTable () {
                   axios.post("/mernaTocka/PromeniMernaTocka",{
                     id:oldRow.id,
                     firmaId:updatedRow.firmaId,
-                    cena:updatedRow.cena
+                    cena:updatedRow.cena,
+                    adresa:updatedRow.adresa,
+                    brojMestoPotrosuvacka:updatedRow.brojMestoPotrosuvacka
                   },{withCredentials:true}).then(()=>{
                     axios.post("/storno/reasociraj")
                     getData()
