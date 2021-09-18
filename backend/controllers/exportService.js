@@ -221,24 +221,24 @@ const toExcel = async function(fakturaId){
         }
 
     }
-    const kamati =await  Kamata.findAll({where:{fakturaDisplayId:faktura.id}})
+    const kamati =await Kamata.findAll({where:{fakturaDisplayId:faktura.id}})
+
     let kamatarow=30
     for(kamata of kamati){
-        worksheet.insertRow(kamatarow);
         
+        console.log(kamatarow)
         for(let a=0;a<5;a++){
             let cell1 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+kamatarow)
-            let cell2 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+(kamatarow-2))
+            let cell2 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+25)
 
-            cell1.value=cell2.value
             cell1.style=cell2.style
         }
-        try{worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
+        
+        try{ worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
         worksheet.getCell("B"+kamatarow).value = "Казнена камата за фактура " + kamata.arhivskiBroj
         worksheet.getCell("J"+kamatarow).value = parseInt(kamata.suma)
         worksheet.getCell("K"+kamatarow).value = "ден."
         kamatarow=kamatarow+1
-
     }
 
 

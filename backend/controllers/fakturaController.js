@@ -309,16 +309,18 @@ const generirajFakturi = async function(req,res){
 
         
         var rezultatFaktura = await Faktura.findOne({where:{mesec, godina, firmaId:firma.id}})
+        if(rezultatFaktura!==null){
         vkupnoPotrosenaEnergija = vkupnoPotrosenaEnergija + rezultatFaktura.elektricnaEnergijaBezZelena 
-        
+        }
     }
     var vkupnopotrosena = await VkupnoPotrosena.findOne({where:{
         mesec,
         godina
     }})
+    if(vkupnopotrosena!==null){
     await VkupnoPotrosena.update({vkupnoPotrosena:parseFloat(vkupnoPotrosenaEnergija)},{where:{id:vkupnopotrosena.id}})
+}
     await dodeliNagradi(mesec, godina)
-
     return res.json({"status":"success"})
 }
     
