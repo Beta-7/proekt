@@ -232,27 +232,24 @@ const toExcel = async function(fakturaId){
         worksheet.insertRow(kamatarow)
         console.log(kamatarow)
         console.log("Merging B"+kamatarow+":I"+kamatarow)
-        try{
-            let range = newSheet.getRange('B'+(kamatarow)+':I'+(kamatarow))
-            range.merge();
-        } catch(e){
-            worksheet.unMergeCells('B'+(kamatarow)); 
-            worksheet.unMergeCells('B'+(kamatarow)); 
-            worksheet.unMergeCells('C'+(kamatarow)); 
-            worksheet.unMergeCells('D'+(kamatarow)); 
-            worksheet.unMergeCells('E'+(kamatarow)); 
-            worksheet.unMergeCells('F'+(kamatarow)); 
-            worksheet.unMergeCells('G'+(kamatarow)); 
-            worksheet.unMergeCells('H'+(kamatarow)); 
-            worksheet.unMergeCells('I'+(kamatarow)); 
-        }
+        
+        worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow))
+        
         worksheet.getCell("B"+kamatarow).value = "Казнена камата за фактура " + kamata.arhivskiBroj
+        worksheet.getCell("B"+kamatarow).style = worksheet.getCell("B"+(kamatarow-1)).style 
         worksheet.getCell("J"+kamatarow).value = parseInt(kamata.suma)
         worksheet.getCell("K"+kamatarow).value = "ден."
         kamatarow=kamatarow+1
     }
-
-
+    worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow))
+    worksheet.mergeCells('B'+(kamatarow+2)+':I'+(kamatarow+2))
+    worksheet.mergeCells('B'+(kamatarow+4)+':I'+(kamatarow+4))
+    console.log(kamatarow+7)
+    console.log(kamatarow+16)
+    worksheet.mergeCells('B'+(kamatarow+7)+':F'+(kamatarow+10))
+    worksheet.mergeCells('B'+(kamatarow+12)+':F'+(kamatarow+15))
+    worksheet.mergeCells('I'+(kamatarow+12)+':K'+(kamatarow+15))
+    worksheet.getCell("J"+(kamata+17)).value="_____________________"
 
 
     await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");
