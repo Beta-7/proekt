@@ -92,12 +92,11 @@ const generirajFakturi = async function(req,res){
                 let elektricnaEnergijaNT=0
                 let elektricnaEnergijaVT=0
                 for(broilo of broila){
-                    let MTNT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.2.255"}})
-                    let MTVT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka, tarifa:"1.1.1.8.1.255"}})
-                    
+                    let MT = await MernaTocka.findOne({where:{tockaID:broilo.brojMernaTocka}})
+
                     
                     //dokolku MT e null znaci deka ne se vneseni site merni tocki
-                    if(MTNT!==null && MTNT.firmaId !==null && MTVT!==null && MTVT.firmaId !==null){
+                    if(MT!==null && MT.firmaId !==null){
                     await BroiloStatus.update({fakturaId:faktura.id},{where:{id:broilo.id}})
                     await faktura.addBroilo(broilo)
                     kolicinaOdSiteBroila = kolicinaOdSiteBroila + broilo.vkupnoKolicina
@@ -116,8 +115,8 @@ const generirajFakturi = async function(req,res){
                         elektricnaEnergijaNTBezZelena:parseFloat(elektricnaEnergijaNT),
                         elektricnaEnergijaVT:parseFloat(elektricnaEnergijaVT),
                         elektricnaEnergijaVTBezZelena:parseFloat(elektricnaEnergijaVT),
-                        cenaKwhBezDDVNT:MTNT.cena,
-                        cenaKwhBezDDVVT:MTVT.cena,
+                        cenaKwhBezDDVNT:MT.cenaNT,
+                        cenaKwhBezDDVVT:MT.cenaVT,
                         dataOd:broilo.datumPocetok,
                         dataDo:broilo.datumKraj    
                     },{where:{
@@ -359,15 +358,11 @@ const dodeliNagradi = async function(mesec, godina){
     
     if (vkupnoPotrosena!==null){
         if(faktura.elektricnaEnergija===faktura.elektricnaEnergijaBezZelena){
-            const MTNT = await MernaTocka.findOne({where:{
-                tarifa:"1.1.1.8.2.255",
+
+            const MT = await MernaTocka.findOne({where:{
                 firmaId:faktura.firmaId
             }})
-            const MTVT = await MernaTocka.findOne({where:{
-                tarifa:"1.1.1.8.1.255",
-                firmaId:faktura.firmaId
-            }})
-            if(MTNT!==null && MTVT!==null){
+            if(MT!==null){
 
             
             var obnovlivaEnergija=parseFloat((faktura.elektricnaEnergijaBezZelena/vkupnoPotrosena.vkupnoPotrosena)*vkupnoPotrosena.zelenaKolicina)
@@ -378,7 +373,7 @@ const dodeliNagradi = async function(mesec, godina){
             var elektricnaEnergijaVT=(parseFloat(faktura.elektricnaEnergijaVTBezZelena)-parseFloat(obnovlivaEnergija)*procentZelenaVT)
             var vkupnaObnovlivaEnergijaBezDDV = (vkupnoPotrosena.zelenaCena*obnovlivaEnergija)
 
-            var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MTNT.cena)+parseFloat(elektricnaEnergijaVT * MTVT.cena))
+            var vkupenIznosBezDDV = (parseFloat(elektricnaEnergijaNT * MT.cenaNT)+parseFloat(elektricnaEnergijaVT * MT.cenaVT))
             var vkupenIznosNaFakturaBezDDV = parseFloat(vkupnaObnovlivaEnergijaBezDDV) + parseFloat(vkupenIznosBezDDV) + parseFloat(faktura.kamataOdPrethodniFakturi) + parseFloat((vkupnoPotrosena.nadomestZaOrganizacija*faktura.elektricnaEnergijaBezZelena))
            await Faktura.update({
                 elektricnaEnergija,

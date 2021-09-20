@@ -157,8 +157,8 @@ const updateID = async (created)=>{
         if(res===null){
             MernaTocka.create({
                 tockaID:created.brojNaMernaTocka,
-                tarifa:created.tarifa,
-                cena:0
+                cenaVT:0,
+                cenaNT:0
             }).then(()=>{
                 generateLog("Генерирана мерна точка од сторно фајл",actedon=created.brojNaMernaTocka)
                 return

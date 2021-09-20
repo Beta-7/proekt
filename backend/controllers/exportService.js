@@ -121,8 +121,7 @@ const toExcel = async function(fakturaId){
         godina:faktura.godina
     }})
     const firma = await Firma.findOne({where:{id:faktura.firmaId}})
-    const MTVT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.1.255"}})
-    const MTNT = await MernaTocka.findOne({where:{firmaId:firma.id, tarifa:"1.1.1.8.2.255"}})
+    const MT = await MernaTocka.findOne({where:{firmaId:firma.id}})
 
     worksheet.getCell('B8').value = firma.name;
     worksheet.getCell("B10").value = firma.adresaNaFirma
@@ -131,12 +130,12 @@ const toExcel = async function(fakturaId){
     worksheet.getCell("H17").value = faktura.dataOd + " - " + faktura.dataDo
     
     worksheet.getCell("J20").value = faktura.elektricnaEnergijaVT
-    worksheet.getCell("B21").value = "Вкупен износ без ДДВ за ел. енергија ВТ  ("+parseFloat(MTVT.cena).toFixed(2)+" ден/kWh)"    
-    worksheet.getCell("J21").value = parseFloat(faktura.elektricnaEnergijaVT) * parseFloat(MTVT.cena)
+    worksheet.getCell("B21").value = "Вкупен износ без ДДВ за ел. енергија ВТ  ("+parseFloat(MT.cenaVT).toFixed(2)+" ден/kWh)"    
+    worksheet.getCell("J21").value = parseFloat(faktura.elektricnaEnergijaVT) * parseFloat(MT.cenaVT)
     
     worksheet.getCell("J22").value = faktura.elektricnaEnergijaNT
-    worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија НТ  ("+parseFloat(MTNT.cena).toFixed(2)+" ден/kWh)"    
-    worksheet.getCell("J23").value = parseFloat(faktura.elektricnaEnergijaNT) * parseFloat(MTNT.cena)
+    worksheet.getCell("B23").value = "Вкупен износ без ДДВ за ел. енергија НТ  ("+parseFloat(MT.cenaNT).toFixed(2)+" ден/kWh)"    
+    worksheet.getCell("J23").value = parseFloat(faktura.elektricnaEnergijaNT) * parseFloat(MT.cenaNT)
     
     worksheet.getCell("J24").value = faktura.obnovlivaEnergija.toFixed(4)
     worksheet.getCell("J25").value = faktura.cenaObnovlivaEnergija
@@ -168,6 +167,7 @@ const toExcel = async function(fakturaId){
             const istiBroila = await BroiloStatus.findAll({where:{fakturaId:faktura.id,brojBroilo:broilo.brojBroilo}})
             if(istiBroila!==null){
                
+               const MT = await MernaTocka.findOne({where:{firmaId:firma.id}})
                for(istoBroilo of istiBroila){
                     if(istoBroilo.tarifa==="1.1.1.8.1.255"){
                         vtpocetna=istoBroilo.pocetnaSostojba
@@ -182,7 +182,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoBroilo.multiplikator
                         ntkolicina=istoBroilo.vkupnoKolicina
                     }
-                    await generirajBroiloTabela(MTVT.adresa,MTVT.brojMestoPotrosuvacka,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    await generirajBroiloTabela(MT.adresa,MT.brojMestoPotrosuvacka,broilo.datumPocetok,broilo.datumKraj,broilo.brojBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }
@@ -200,7 +200,7 @@ const toExcel = async function(fakturaId){
 
             const istiStorni = await StornoDisplay.findAll({where:{fakturaId:faktura.id,brojNaBroilo:storno.brojNaBroilo}})
             if(istiStorni!==null){
-               
+               const MT = await MernaTocka.findOne({where:{firmaId:firma.id}})
                for(istoStorno of istiStorni){
                     if(istoStorno.tarifa==="1.1.1.8.1.255"){
                         vtpocetna=istoStorno.pocetnaSostojba
@@ -215,7 +215,7 @@ const toExcel = async function(fakturaId){
                         ntmulti=istoStorno.multiplikator
                         ntkolicina=istoStorno.vkupnoKolicina
                     }
-                    await generirajBroiloTabela(MTVT.adresa,MTVT.brojMestoPotrosuvacka,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
+                    await generirajBroiloTabela(MT.adresa,MT.brojMestoPotrosuvacka,istoStorno.datumNaPocetokNaMerenje,istoStorno.datumNaZavrshuvanjeNaMerenje,istoStorno.brojNaBroilo,vtpocetna,vtkrajna,vtrazlika,vtmulti,vtkolicina,ntpocetna,ntkrajna,ntrazlika,ntmulti,ntkolicina,worksheet,red)
                     
                 }
             }
@@ -225,25 +225,33 @@ const toExcel = async function(fakturaId){
     }
     const kamati =await Kamata.findAll({where:{fakturaDisplayId:faktura.id}})
 
-    let kamatarow=30
+    let kamatarow=29
+    // for(let a =0; a <kamati.length;a++){
+    //     worksheet.insertRow(31)
+    // }
     for(kamata of kamati){
         
+        worksheet.insertRow(kamatarow)
         console.log(kamatarow)
-        for(let a=0;a<5;a++){
-            let cell1 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+kamatarow)
-            let cell2 = worksheet.getCell(String.fromCharCode("B".charCodeAt(0) + a)+25)
-
-            cell1.style=cell2.style
-        }
+        console.log("Merging B"+kamatarow+":I"+kamatarow)
         
-        try{ worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow));} catch(e){}
+        worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow))
+        
         worksheet.getCell("B"+kamatarow).value = "Казнена камата за фактура " + kamata.arhivskiBroj
+        worksheet.getCell("B"+kamatarow).style = worksheet.getCell("B"+(kamatarow-1)).style 
         worksheet.getCell("J"+kamatarow).value = parseInt(kamata.suma)
         worksheet.getCell("K"+kamatarow).value = "ден."
         kamatarow=kamatarow+1
     }
-
-
+    worksheet.mergeCells('B'+(kamatarow)+':I'+(kamatarow))
+    worksheet.mergeCells('B'+(kamatarow+2)+':I'+(kamatarow+2))
+    worksheet.mergeCells('B'+(kamatarow+4)+':I'+(kamatarow+4))
+    console.log(kamatarow+7)
+    console.log(kamatarow+16)
+    worksheet.mergeCells('B'+(kamatarow+7)+':F'+(kamatarow+10))
+    worksheet.mergeCells('B'+(kamatarow+12)+':F'+(kamatarow+15))
+    worksheet.mergeCells('I'+(kamatarow+12)+':K'+(kamatarow+15))
+    worksheet.getCell("J"+(kamata+17)).value="_____________________"
 
 
     await workbook.xlsx.writeFile("../fakturi/"+firma.name+"-"+faktura.arhivskiBroj+".xlsx");

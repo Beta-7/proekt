@@ -108,17 +108,17 @@ export default function FirmiTable (props) {
          editable: false
          },
         {
-          title: "Цена", field: "cena",
-          validate: rowData => rowData.cena === undefined || rowData.cena === "" ? "Required" : true,
+          title: "Цена ВТ", field: "cenaVT",
+          validate: rowData => rowData.cenaVT === undefined || rowData.cenaVT === "" ? "Required" : true,
           filtering:false,
           type: "numeric"
         },
         {
-            title: "Тарифа", field: "tarifa",
-            validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
-            filtering:false,
-            editable: false
-          },
+          title: "Цена НТ", field: "cenaNT",
+          validate: rowData => rowData.cenaNT === undefined || rowData.cenaNT === "" ? "Required" : true,
+          filtering:false,
+          type: "numeric"
+        },
         {
           title: "Фирма", field: "firmaId",
           validate: rowData => rowData.firmaId === undefined || rowData.firmaId === "" ? "Required" : true,
@@ -163,7 +163,8 @@ export default function FirmiTable (props) {
                   axios.post("/mernaTocka/PromeniMernaTocka",{
                     id:oldRow.id,
                     firmaId:updatedRow.firmaId,
-                    cena:updatedRow.cena,
+                    cenaVT:updatedRow.cenaVT,
+                    cenaNT:updatedRow.cenaNT,
                     adresa:updatedRow.adresa,
                     brojMestoPotrosuvacka:updatedRow.brojMestoPotrosuvacka
                   },{withCredentials:true}).then(()=>{
