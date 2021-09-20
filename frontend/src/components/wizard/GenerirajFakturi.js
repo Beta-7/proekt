@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import { TablePagination } from '@material-ui/core';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { createTheme } from '@material-ui/core/styles';

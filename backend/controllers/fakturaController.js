@@ -404,16 +404,18 @@ const dodeliNagradi = async function(mesec, godina){
 }
 
 const getFakturi = async function(req, res){
+    console.log(req.body)
     let fakturi=null
     if(req.body.mesec===undefined || req.body.godina===undefined)
-    fakturi = await Faktura.findAll({attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    fakturi = await Faktura.findAndCountAll({limit: req.body.pageSize,offset: (req.body.pageSize*(req.body.page+1)),attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
     else{
-    fakturi = await Faktura.findAll({where:{
+    fakturi = await Faktura.findAndCountAll({where:{
         mesec:req.body.mesec,
         godina:req.body.godina
-    },attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
+    },limit: req.body.pageSize,offset: (req.body.pageSize*(req.body.page+1)),attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
      
     }
+    
     return res.json(fakturi)
 }
 

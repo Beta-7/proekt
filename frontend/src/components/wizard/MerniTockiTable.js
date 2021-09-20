@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import { TablePagination } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import { TablePagination } from '@material-ui/core';
 import React,{Component} from 'react';
 
