@@ -50,9 +50,21 @@ export default function KamatiTable () {
             <MaterialTable
               title="Камати"
               columns={columns}
-              data={query = new Promise((resolve, reject)=>{
+              data={ query => new Promise((resolve, reject)=>{
                 let kamati;
-                axios.post("/misc/getKamati",{},{withCredentials:true}).then((response)=>{
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+                axios.post("/misc/getKamati",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                },{withCredentials:true}).then((response)=>{
                   kamati = response.data.rows;
               })
               var firmiNiza = []
@@ -67,12 +79,10 @@ export default function KamatiTable () {
             resolve({
               data: kamati,
               page: query.page,
-              totalCount: response.data.count,
+              totalCount: kamati.length,
           });
               })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
                   axios.post("/misc/addKamata",{
@@ -82,7 +92,6 @@ export default function KamatiTable () {
                     rok:newRow.rok,
                     platenoData:newRow.platenoData
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                   
@@ -92,7 +101,6 @@ export default function KamatiTable () {
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                   resolve()
@@ -106,7 +114,6 @@ export default function KamatiTable () {
                     rok:updatedRow.rok,
                     platenoData:updatedRow.platenoData
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                 })

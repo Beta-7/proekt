@@ -226,9 +226,7 @@ export default function FakturaTable() {
                   });
                   })
                 })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               actions={[
                 {
                   icon: () => <GetAppIcon/>,

@@ -59,8 +59,20 @@ export default function NagradiTable () {
             <MaterialTable
               title="Награди на агент базирани на потрошено количество енергија"
               columns={columns}
-              data={query = new Promise((resolve, reject)=>{
-                axios.post("/misc/GetNagradi",{},{withCredentials:true}).then((response)=>{
+              data={query => new Promise((resolve, reject)=>{
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+                axios.post("/misc/GetNagradi",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                },{withCredentials:true}).then((response)=>{
                   resolve({
                     data: response.data.rows,
                     page: query.page,
@@ -69,17 +81,13 @@ export default function NagradiTable () {
                 
             })
               })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
-              
+
                 editable={{onRowUpdate: (updatedRow,oldRow) => new Promise((resolve,reject) => {
                   axios.post("/misc/updateNagrada",{
                     id:oldRow.id,
                     pomireno:updatedRow.pomireno
                   },{withCredentials:true}).then(()=>{
                     
-                    getData()
                     resolve()
                   })
                 })}}

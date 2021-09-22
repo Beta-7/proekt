@@ -138,9 +138,13 @@ export default function FirmiTable (props) {
                         })
                         
                       setFirmi(firmiNiza)
+                  var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field="id"
+                    dir="desc"
+                  }
                    axios.post("/mernaTocka/getMerniTocki",{
-                    mesec,
-                    godina,
                     search: query.search, 
                     pageSize:query.pageSize, 
                     page:query.page,

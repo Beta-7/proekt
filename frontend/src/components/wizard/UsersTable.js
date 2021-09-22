@@ -48,12 +48,19 @@ export default function FirmiTable () {
               title="Кориснички сметки"
               columns={columns}
               data={query => new Promise((resolve, reject)=>{
+                var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field="id"
+                    dir="desc"
+                  }
                 axios.post("/auth/getUsers",{
                   search: query.search, 
                   pageSize:query.pageSize, 
                   page:query.page,
                   sortField:field,
-                  orderDirection:dir},{withCredentials:true}).then((response)=>{
+                  orderDirection:dir
+                },{withCredentials:true}).then((response)=>{
                   resolve({
                     data: response.data.rows,
                     page: query.page,
@@ -61,9 +68,7 @@ export default function FirmiTable () {
                 });
               })
               })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
                   axios.post("/user/dodadiUser",{

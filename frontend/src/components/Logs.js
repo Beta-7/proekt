@@ -48,8 +48,21 @@ export default function FirmiTable () {
             <MaterialTable
               title="Награди на агент базирани на потрошено количество енергија"
               columns={columns}
-              data={query = new Promise((resolve, reject)=>{
-                axios.post("/misc/GetLogs",{},{withCredentials:true}).then((response)=>{
+              
+              data={query => new Promise((resolve, reject)=>{
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+                axios.post("/misc/GetLogs",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                },{withCredentials:true}).then((response)=>{
                   resolve({
                     data: response.data.rows,
                     page: query.page,
@@ -57,9 +70,7 @@ export default function FirmiTable () {
                 });
             })
               })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               
               options={{
                 paging:true,
