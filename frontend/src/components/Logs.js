@@ -2,63 +2,14 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
-
-//Fix to the broken pagination
-function PatchedPagination(props) {
-  const {
-    ActionsComponent,
-    onChangePage,
-    onChangeRowsPerPage,
-    ...tablePaginationProps
-  } = props;
-
-  return (
-    <TablePagination
-      {...tablePaginationProps}
-      // @ts-expect-error onChangePage was renamed to onPageChange
-      onPageChange={onChangePage}
-      onRowsPerPageChange={onChangeRowsPerPage}
-      ActionsComponent={(subprops) => {
-        const { onPageChange, ...actionsComponentProps } = subprops;
-        return (
-          // @ts-expect-error ActionsComponent is provided by material-table
-          <ActionsComponent
-            {...actionsComponentProps}
-            onChangePage={onPageChange}
-          />
-        );
-      }}
-    />
-  );
-}
-
-
 axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
 export default function FirmiTable () {
-    const [data, setData] = useState([])
 
 
-    useEffect(() => {
-      getData()
-      }, [])
-
-
-
-      
-       function getData(){
-
-          axios.post("/misc/GetLogs",{},{withCredentials:true}).then((response)=>{
-                setData(response.data.rows)
-              
-          })
-
-
-
-        }
+  
 
     
 
@@ -97,7 +48,15 @@ export default function FirmiTable () {
             <MaterialTable
               title="Награди на агент базирани на потрошено количество енергија"
               columns={columns}
-              data={data}
+              data={query = new Promise((resolve, reject)=>{
+                axios.post("/misc/GetLogs",{},{withCredentials:true}).then((response)=>{
+                  resolve({
+                    data: response.data.rows,
+                    page: query.page,
+                    totalCount: response.data.count,
+                });
+            })
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}

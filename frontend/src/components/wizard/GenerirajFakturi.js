@@ -3,40 +3,12 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { createTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import IconButton from '@material-ui/core/IconButton';
-//Fix to the broken pagination
-function PatchedPagination(props) {
-    const {
-      ActionsComponent,
-      onChangePage,
-      onChangeRowsPerPage,
-      ...tablePaginationProps
-    } = props;
-  
-    return (
-      <TablePagination
-        {...tablePaginationProps}
-        // @ts-expect-error onChangePage was renamed to onPageChange
-        onPageChange={onChangePage}
-        onRowsPerPageChange={onChangeRowsPerPage}
-        ActionsComponent={(subprops) => {
-          const { onPageChange, ...actionsComponentProps } = subprops;
-          return (
-            // @ts-expect-error ActionsComponent is provided by material-table
-            <ActionsComponent
-              {...actionsComponentProps}
-              onChangePage={onPageChange}
-            />
-          );
-        }}
-      />
-    );
-  }
+
   
 
 
@@ -54,10 +26,9 @@ axios.defaults.baseUrl = 'http://localhost:5000';
     
 
 
-export default function FakturaTable(props) {
+export default function FakturaTable() {
     const [mesec, setMesec] = React.useState('');
     const [godina, setGodina] = React.useState('');
-    const [data, setData] = useState([])
 
     useEffect(()=>{
         
@@ -85,15 +56,7 @@ export default function FakturaTable(props) {
       })
     }
     
-    const getData=()=>{
-            console.log("asd")
-            axios.post("/faktura/getFakturi",{
-                mesec,
-                godina
-            },{withCredentials:true}).then((response)=>{
-             setData(response.data)
-            })
-          }
+
 
           const generiraj = ()=>{
             axios.post("/faktura/generirajFakturi",{
@@ -101,7 +64,7 @@ export default function FakturaTable(props) {
                 godina
             },{withCredentials:true}).then(()=>{
 
-                    getData()
+                     getData()
 
         })
       }
@@ -240,7 +203,29 @@ export default function FakturaTable(props) {
                 <MaterialTable
               title="Кориснички сметки"
               columns={columns}
-              data={data}
+              data={query =>new Promise((resolve, reject)=>{
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+                  axios.post("/faktura/getFakturi",{
+                      mesec,
+                      godina,
+                      search: query.search, 
+                      pageSize:query.pageSize, 
+                      page:query.page,
+                      sortField:field,
+                      orderDirection:dir
+                  } ,{withCredentials:true}).then((response)=>{
+                    resolve({
+                      data: response.data.rows,
+                      page: query.page,
+                      totalCount: response.data.count,
+                  });
+                  })
+                })}
               components={{
                 Pagination: PatchedPagination,
               }}
@@ -276,7 +261,6 @@ export default function FakturaTable(props) {
                     platenaNaDatum:updatedRow.platenaNaDatum,
                     platena:updatedRow.platena
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                 })

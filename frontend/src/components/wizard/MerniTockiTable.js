@@ -39,13 +39,11 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 export default function FirmiTable (props) {
-    const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
     const [nemaNeasocirani, setNemaAsocirani] = useState(false)
 
     useEffect(() => {
       proveriNeasocirani()
-      getData()
       // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
     
@@ -71,32 +69,7 @@ export default function FirmiTable (props) {
         props.editStep(props.step,asd)
       }
       
-       function getData(){
-        reasociraj()
-        EnableButton(1) 
-        
-        var firmiNiza = []
-         axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
-             firmi.data.rows.forEach((firma)=>{
-                firmiNiza[firma.id] = firma.name 
-                })
-                
-              setFirmi(firmiNiza)
-           axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
-            
-                response.data.forEach((tocka)=>{
-                  
-
-                })
-                reasociraj()
-                setData(response.data)
-            })
-
-        })
-
-        
-      }
-
+    
     
 
     
@@ -145,7 +118,48 @@ export default function FirmiTable (props) {
             <MaterialTable
               title="Мерни точки"
               columns={columns}
-              data={data}
+              data={query=>new Promise((resolve,reject)=>{
+
+                reasociraj()
+                EnableButton(1) 
+                
+                var firmiNiza = []
+
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+
+                 axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
+                     firmi.data.rows.forEach((firma)=>{
+                        firmiNiza[firma.id] = firma.name 
+                        })
+                        
+                      setFirmi(firmiNiza)
+                   axios.post("/mernaTocka/getMerniTocki",{
+                    mesec,
+                    godina,
+                    search: query.search, 
+                    pageSize:query.pageSize, 
+                    page:query.page,
+                    sortField:field,
+                    orderDirection:dir
+                   },{withCredentials:true}).then((response)=>{
+                    
+                        
+                        reasociraj()
+                        resolve({
+                          data: response.data.rows,
+                          page: query.page,
+                          totalCount: response.data.count,
+                      });
+                    })
+        
+                })
+
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}
@@ -154,7 +168,6 @@ export default function FirmiTable (props) {
                   axios.post("/mernaTocka/izbrisiMernaTocka",{
                     id:selectedRow.id
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                   resolve()
@@ -169,7 +182,6 @@ export default function FirmiTable (props) {
                     brojMestoPotrosuvacka:updatedRow.brojMestoPotrosuvacka
                   },{withCredentials:true}).then(()=>{
                     reasociraj()
-                    getData()
                     resolve()
                   })
                 })

@@ -15,14 +15,10 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 export default function FakturaTable(props) {
-    const [data, setData] = useState([])
     const [godina, setGodina] = useState("")
     const [mesec, setMesec] = useState("")
 
-    useEffect(() => {
-      getData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [])
+
 
       function hangleClick(){
         new Promise((resolve,reject) => {
@@ -44,15 +40,7 @@ export default function FakturaTable(props) {
         })
       }
       
-       function getData(){
-          // axios.post("/faktura/getFakturi",{},{withCredentials:true}).then((response)=>{
-          //   response.data.forEach((row)=>{
-          //     row.datumNaIzdavanje=row.datumNaIzdavanje.replace("-",".").replace("-",".")
-          //     row.rokZaNaplata=row.rokZaNaplata.replace("-",".").replace("-",".")
-          //   })  
-          //   setData(response.data)
-          // })
-        }
+
 
     
 
@@ -212,7 +200,6 @@ export default function FakturaTable(props) {
                     platenaNaDatum:updatedRow.platenaNaDatum,
                     platena:updatedRow.platena
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                 })

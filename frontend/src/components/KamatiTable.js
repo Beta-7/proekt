@@ -2,37 +2,6 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
-
-
-//Fix to the broken pagination
-function PatchedPagination(props) {
-  const {
-    ActionsComponent,
-    onChangePage,
-    onChangeRowsPerPage,
-    ...tablePaginationProps
-  } = props;
-
-  return (
-    <TablePagination
-      {...tablePaginationProps}
-      // @ts-expect-error onChangePage was renamed to onPageChange
-      onPageChange={onChangePage}
-      onRowsPerPageChange={onChangeRowsPerPage}
-      ActionsComponent={(subprops) => {
-        const { onPageChange, ...actionsComponentProps } = subprops;
-        return (
-          // @ts-expect-error ActionsComponent is provided by material-table
-          <ActionsComponent
-            {...actionsComponentProps}
-            onChangePage={onPageChange}
-          />
-        );
-      }}
-    />
-  );
-}
 
 
 axios.defaults.baseUrl = 'http://localhost:5000';
@@ -40,27 +9,10 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 export default function KamatiTable () {
-    const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
 
-    useEffect(() => {
-      getData()
-      }, [])
 
-       function getData(){
-          axios.post("/misc/getKamati",{},{withCredentials:true}).then((response)=>{
-              setData(response.data)
-          })
-          var firmiNiza = []
-          axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
-              firmi.data.rows.forEach((firma)=>{
-                 firmiNiza[firma.id] = firma.name 
-                 })
-                 
-               setFirmi(firmiNiza)
-          
-        })
-      }
+
     const columns = [
         { title: "id", field: "id",
          hidden:true,
@@ -98,7 +50,26 @@ export default function KamatiTable () {
             <MaterialTable
               title="Камати"
               columns={columns}
-              data={data}
+              data={query = new Promise((resolve, reject)=>{
+                let kamati;
+                axios.post("/misc/getKamati",{},{withCredentials:true}).then((response)=>{
+                  kamati = response.data.rows;
+              })
+              var firmiNiza = []
+              axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
+                  firmi.data.rows.forEach((firma)=>{
+                     firmiNiza[firma.id] = firma.name 
+                     })
+                     
+                   setFirmi(firmiNiza)
+              
+            })
+            resolve({
+              data: kamati,
+              page: query.page,
+              totalCount: response.data.count,
+          });
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}

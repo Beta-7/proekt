@@ -2,44 +2,15 @@ import React from 'react';
 import axios from 'axios';
 
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
 
 
-//Fix to the broken pagination
-function PatchedPagination(props) {
-  const {
-    ActionsComponent,
-    onChangePage,
-    onChangeRowsPerPage,
-    ...tablePaginationProps
-  } = props;
-
-  return (
-    <TablePagination
-      {...tablePaginationProps}
-      // @ts-expect-error onChangePage was renamed to onPageChange
-      onPageChange={onChangePage}
-      onRowsPerPageChange={onChangeRowsPerPage}
-      ActionsComponent={(subprops) => {
-        const { onPageChange, ...actionsComponentProps } = subprops;
-        return (
-          // @ts-expect-error ActionsComponent is provided by material-table
-          <ActionsComponent
-            {...actionsComponentProps}
-            onChangePage={onPageChange}
-          />
-        );
-      }}
-    />
-  );
-}
 
 
 axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
-export default function StornoTable(props) {
+export default function StornoTable() {
 
 
 
@@ -112,9 +83,23 @@ export default function StornoTable(props) {
     
         return (
             <MaterialTable
-              title="Кориснички сметки"
+              title="Сторно што не е вратено"
               columns={columns}
-              data={props.dataa}
+              data={query=>new Promise((resolve,reject)=>{
+                axios.post("/storno/getStornos",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                }).then(response=>{
+                  resolve({
+                    data: response.data.rows,
+                    page: query.page,
+                    totalCount: response.data.count,
+                });
+                })
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}
@@ -135,7 +120,6 @@ export default function StornoTable(props) {
                     brojNaBroilo:newRow.brojNaBroilo,
                     datumNaIzrabotkaEVN:newRow.datumNaIzrabotkaEVN,
                   },{withCredentials:true}).then(()=>{
-                    props.getData()
                     resolve()
                   })
                   
@@ -145,7 +129,6 @@ export default function StornoTable(props) {
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
-                    props.getData()
                     resolve()
                   })
                   resolve()
@@ -167,7 +150,6 @@ export default function StornoTable(props) {
                     brojNaBroilo:updatedRow.brojNaBroilo,
                     datumNaIzrabotkaEVN:updatedRow.datumNaIzrabotkaEVN
                   },{withCredentials:true}).then(()=>{
-                    props.getData()
                     resolve()
                   })
                 })

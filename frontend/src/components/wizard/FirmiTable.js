@@ -40,14 +40,10 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 export default function FirmiTable () {
-    const [data, setData] = useState([])
     const [vraboteni, setVraboteni] = useState([])
     const [selectedFile, setSelectedFile] = useState(null)
 
 
-    useEffect(() => {
-      getData()
-      }, [])
 
 
       function onFileUpload(){
@@ -86,32 +82,7 @@ export default function FirmiTable () {
 
 
 
-      
-       function getData(){
-         var users = {}
-         var usersid = {}
-          axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
-            response.data.forEach((user)=>{
-                console.log(user)
-                users[user.id] = user.username
-                //{id:username}
-                usersid[user.username]=user.id
-                //{username:id}  
-              })
-              setVraboteni(users)
-          }).then(()=>{
-            axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((response)=>{
-              response.data.rows.forEach(row=>{
-                row.agent=usersid[row.agent]
-              })   
-              
-              setData(response.data.rows)
-            })
 
-
-
-          })
-      }
 
     
 
@@ -155,7 +126,47 @@ export default function FirmiTable () {
             <MaterialTable
               title="Фирми"
               columns={columns}
-              data={data}
+              data={query =>new Promise((resolve, reject)=>{
+                var users = {}
+                var usersid = {}
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+                 axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
+                   response.data.forEach((user)=>{
+                       console.log(user)
+                       users[user.id] = user.username
+                       //{id:username}
+                       usersid[user.username]=user.id
+                       //{username:id}  
+                     })
+                     setVraboteni(users)
+                 }).then(()=>{
+                   axios.post("/firmi/zemiFirmi",{
+                    search: query.search, 
+                    pageSize:query.pageSize, 
+                    page:query.page,
+                    sortField:field,
+                    orderDirection:dir
+                   },{withCredentials:true}).then((response)=>{
+                     response.data.rows.forEach(row=>{
+                       row.agent=usersid[row.agent]
+                     })   
+                     
+                     resolve({
+                      data: response.data.rows,
+                      page: query.page,
+                      totalCount: response.data.count,
+                  });
+                   })
+       
+       
+       
+                 })
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}
@@ -168,7 +179,6 @@ export default function FirmiTable () {
                     agent:vraboteni[newRow.agent],
                     nagrada:newRow.nagrada
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                   
@@ -178,7 +188,6 @@ export default function FirmiTable () {
                     id:selectedRow.id
                     
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                   resolve()
@@ -192,7 +201,6 @@ export default function FirmiTable () {
                     agent:vraboteni[updatedRow.agent],
                     nagrada:updatedRow.nagrada
                   },{withCredentials:true}).then(()=>{
-                    getData()
                     resolve()
                   })
                 })
