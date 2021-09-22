@@ -406,7 +406,6 @@ const dodeliNagradi = async function(mesec, godina){
 }
 
 const getFakturi = async function(req, res){
-    let fakturi=null
     let users
     let order
     let order1 = [["id", "asc"]]
