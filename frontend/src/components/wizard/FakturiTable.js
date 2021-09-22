@@ -153,7 +153,16 @@ export default function FakturaTable(props) {
               columns={columns}
               data={query =>
                 new Promise((resolve, reject) => {
-                  axios.post("/faktura/getFakturi",{search: query.search, pageSize:query.pageSize, page:query.page},{withCredentials:true}).then((response)=>{
+                  var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field = "id"
+                    dir = "desc"
+                  } else{
+                    field = query.orderBy.field
+                    dir = query.orderDirection
+                  }
+                  axios.post("/faktura/getFakturi",{search: query.search, pageSize:query.pageSize, page:query.page, sortField:field, orderDirection:dir},{withCredentials:true}).then((response)=>{
                     response.data.rows.forEach((row)=>{
                       row.datumNaIzdavanje=row.datumNaIzdavanje.replace("-",".").replace("-",".")
                       row.rokZaNaplata=row.rokZaNaplata.replace("-",".").replace("-",".")

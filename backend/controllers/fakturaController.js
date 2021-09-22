@@ -9,7 +9,9 @@ const Storno = require("../models/storno.js")
 const Kamata = require("../models/kamata")
 const generateLog = require("../logs.js")
 const exportService = require("./exportService")
-
+const sequelize = require('sequelize');
+const { QueryTypes } = require('sequelize');
+const db = require('../db.js')
 var zip = new require('node-zip')();
 var fs = require("fs")
 var path=require("path")
@@ -404,19 +406,23 @@ const dodeliNagradi = async function(mesec, godina){
 }
 
 const getFakturi = async function(req, res){
-    console.log(req.body)
     let fakturi=null
-    if(req.body.mesec===undefined || req.body.godina===undefined)
-    fakturi = await Faktura.findAndCountAll({limit: req.body.pageSize,offset: (req.body.pageSize*(req.body.page+1)),attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
-    else{
-    fakturi = await Faktura.findAndCountAll({where:{
-        mesec:req.body.mesec,
-        godina:req.body.godina
-    },limit: req.body.pageSize,offset: (req.body.pageSize*(req.body.page+1)),attributes:["id","arhivskiBroj", "mesec", "godina", "platena", "platenaNaDatum", "rokZaNaplata", "kamataOdPrethodniFakturi", "datumNaIzdavanje", "kamataZaKasnenje", "dataOd", "dataDo", "elektricnaEnergija", "elektricnaEnergijaBezZelena", "cenaKwhBezDDVNT", "cenaKwhBezDDVVT", "vkupenIznosBezDDV", "obnovlivaEnergija", "cenaObnovlivaEnergija", "vkupnaObnovlivaEnergijaBezDDV", "nadomestZaOrganizacija", "nadomestZaOrganizacijaOdKwh", "vkupenIznosNaFakturaBezDDV", "DDV", "vkupnaNaplata"],raw : true})
-     
+    let users
+    let order
+    let order1 = [["id", "asc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
     }
-    
-    return res.json(fakturi)
+    if(req.body.mesec===undefined || req.body.godina===undefined){
+        users = await db.query("SELECT * FROM fakturas WHERE \"arhivskiBroj\" LIKE '%"+req.body.search+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+"%' OR \"godina\"::TEXT LIKE '%"+req.body.search+"%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+"%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+"%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+"\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+" LIMIT "+req.body.pageSize+" OFFSET "+(req.body.pageSize*(req.body.page))+"", { type: QueryTypes.SELECT });
+    }
+    else{
+        users = await db.query("SELECT * FROM fakturas WHERE \"godina\"::TEXT LIKE '%"+req.body.godina+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.mesec+"%' OR \"arhivskiBroj\" LIKE '%"+req.body.search+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+"%' OR \"godina\"::TEXT LIKE '%"+req.body.search+"%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+"%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+"%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+"\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+" LIMIT "+req.body.pageSize+" OFFSET "+(req.body.pageSize*(req.body.page))+"", { type: QueryTypes.SELECT });
+    }
+    return res.json({
+        count: users.length,
+        rows: users
+    })
 }
 
 const zemiFaktura = async function(req, res){
@@ -491,7 +497,6 @@ const platiFaktura = async function(req, res){
         mesec = datum[3]+datum[4]
         godina = datum[6]+datum[7]+datum[8]+datum[9]
     }
-    
     if(fakturaid===undefined){
         return res.json({"error":"missing fakturaid","details":"supply fakturaid parameter"})
     }
@@ -516,7 +521,6 @@ const platiFaktura = async function(req, res){
     const faktura = await Faktura.findOne({where:{
         id: fakturaid
     }})
-    
     if(faktura===null){
         return res.json({"error":"wrong id","details":"faktura doesn't exist"})
     }
