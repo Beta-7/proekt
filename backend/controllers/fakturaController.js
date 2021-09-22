@@ -408,15 +408,39 @@ const dodeliNagradi = async function(mesec, godina){
 const getFakturi = async function(req, res){
     let users
     let order
-    let order1 = [["id", "asc"]]
+    let order1 = [["id", "desc"]]
     if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
         order = [[req.body.sortField, req.body.orderDirection]]
     }
     if(req.body.mesec===undefined || req.body.godina===undefined){
-        users = await db.query("SELECT * FROM fakturas WHERE \"arhivskiBroj\" LIKE '%"+req.body.search+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+"%' OR \"godina\"::TEXT LIKE '%"+req.body.search+"%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+"%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+"%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+"\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+" LIMIT "+req.body.pageSize+" OFFSET "+(req.body.pageSize*(req.body.page))+"", { type: QueryTypes.SELECT });
+        users = await db.query("SELECT * FROM fakturas WHERE \"arhivskiBroj\" LIKE '%"+req.body.search+
+                                "%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"godina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+
+                                "%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+
+                                "%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+
+                                "%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+req.body.pageSize+
+                                " OFFSET "+(req.body.pageSize*(req.body.page)), 
+                                { type: QueryTypes.SELECT });
     }
     else{
-        users = await db.query("SELECT * FROM fakturas WHERE \"godina\"::TEXT LIKE '%"+req.body.godina+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.mesec+"%' OR \"arhivskiBroj\" LIKE '%"+req.body.search+"%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+"%' OR \"godina\"::TEXT LIKE '%"+req.body.search+"%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+"%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+"%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+"%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+"\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+" LIMIT "+req.body.pageSize+" OFFSET "+(req.body.pageSize*(req.body.page))+"", { type: QueryTypes.SELECT });
+        users = await db.query("SELECT * FROM fakturas WHERE \"godina\"::TEXT LIKE '%"+req.body.godina+
+                                "%' OR \"mesec\"::TEXT LIKE '%"+req.body.mesec+
+                                "%' OR \"arhivskiBroj\" LIKE '%"+req.body.search+
+                                "%' OR \"mesec\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"godina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"datumNaIzdavanje\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+
+                                "%' OR \"platenaNaDatum\" LIKE '%"+req.body.search+
+                                "%' OR \"rokZaNaplata\" LIKE '%"+((req.body.search == undefined) ? req.body.search : req.body.search.replace(".","-").replace(".","-"))+
+                                "%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+req.body.pageSize+
+                                " OFFSET "+(req.body.pageSize*(req.body.page)), 
+                                { type: QueryTypes.SELECT });
     }
     return res.json({
         count: users.length,
