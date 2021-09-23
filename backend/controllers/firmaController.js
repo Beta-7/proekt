@@ -89,6 +89,14 @@ const izbrisiFirma = async (req,res) =>{
     })
 }
 
+
+const zemiFirmiHelper = async (req, res) =>{
+    const firmi = await Firma.findAll({
+        attributes: ['id', 'name']
+    })
+    return res.json(firmi)
+}
+
 const zemiFirmi = async (req,res) =>{
     let firmi
     let order
@@ -129,4 +137,4 @@ function zemiBroilaNaFirma  (req, res){
 
 
 
-module.exports={dodadiFirma, promeniFirma, izbrisiFirma, zemiFirmi, zemiBroilaNaFirma}
+module.exports={dodadiFirma,zemiFirmiHelper, promeniFirma, izbrisiFirma, zemiFirmi, zemiBroilaNaFirma}

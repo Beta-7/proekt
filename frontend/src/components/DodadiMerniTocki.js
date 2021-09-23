@@ -1,7 +1,38 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import MaterialTable from '@material-table/core';
+import { TablePagination } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
+
+//Fix to the broken pagination
+function PatchedPagination(props) {
+  const {
+    ActionsComponent,
+    onChangePage,
+    onChangeRowsPerPage,
+    ...tablePaginationProps
+  } = props;
+
+  return (
+    <TablePagination
+      {...tablePaginationProps}
+      // @ts-expect-error onChangePage was renamed to onPageChange
+      onPageChange={onChangePage}
+      onRowsPerPageChange={onChangeRowsPerPage}
+      ActionsComponent={(subprops) => {
+        const { onPageChange, ...actionsComponentProps } = subprops;
+        return (
+          // @ts-expect-error ActionsComponent is provided by material-table
+          <ActionsComponent
+            {...actionsComponentProps}
+            onChangePage={onPageChange}
+          />
+        );
+      }}
+    />
+  );
+}
+
 
 axios.defaults.baseUrl = 'http://localhost:5000';
 
@@ -32,16 +63,24 @@ export default function FirmiTable () {
       }
       
       function getData(){
+        let firmiNiza = []
+        axios.post("/firmi/zemiFirmiHelper",{},{withCredentials:true}).then((firmi)=>{
+          
+          firmi.data.forEach((firma)=>{
+            firmiNiza[firma.id] = firma.name 
+            })
+            
+          })
+        setFirmi(firmiNiza)
         reasociraj()
         proveriNeasocirani()
-        
       }
 
     
 
     
 
-    const [columns] = useState([
+    const columns = [
         { title: "Мерна точка ИД", field: "tockaID",
         filtering:true,
          defaultSort:"desc",
@@ -69,7 +108,7 @@ export default function FirmiTable () {
           validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
           filtering:true,
         }
-      ])
+      ]
     
     
         return (
@@ -78,37 +117,17 @@ export default function FirmiTable () {
             
             <MaterialTable
               title="Мерни точки"
-              columns={[...columns]}
+              columns={columns}
               data={query=>new Promise((resolve,reject)=>{
-
                 reasociraj()
-                var firmiNiza = []
-                var field = null
-                var dir = null
+                var field = query.orderBy.field
+                var dir = query.orderDirection
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
                 }
                 
-                axios.post("/firmi/zemiFirmi",{
-                  
-                 },{withCredentials:true}).then((firmi)=>{
-                  firmi.data.rows.forEach((firma)=>{
-                    firmiNiza[firma.id] = firma.name 
-                    })
-                    setFirmi(firmiNiza)
-                    
-                  
-                    var field = null
-                  var dir = null
-                  if(query.orderBy === undefined){
-                    field="id"
-                    dir="desc"
-                  }
-                  else{
-                    field = query.orderBy.field
-                    dir = query.orderDirection
-                  }
+                
                    axios.post("/mernaTocka/getMerniTocki",{
                     filters: query.filters, 
                     pageSize:query.pageSize, 
@@ -117,6 +136,7 @@ export default function FirmiTable () {
                     orderDirection:dir
                    },{withCredentials:true}).then((response)=>{
                         reasociraj()
+                        console.log(response.data.rows)
                         resolve({
                           data: response.data.rows,
                           page: query.page,
@@ -126,9 +146,11 @@ export default function FirmiTable () {
                     })
         
                 })
-                console.log(firmi)
-              })}
 
+              }
+              components={{
+                Pagination: PatchedPagination,
+              }}
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
                 axios.post("/mernaTocka/dodadiMernaTocka",{
