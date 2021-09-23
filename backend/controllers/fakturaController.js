@@ -28,9 +28,14 @@ const generirajFakturi = async function(req,res){
     let godina = parseInt(req.body.godina)
     let mesec = parseInt(req.body.mesec)
     let vkupnoPotrosenaEnergija =0
-    let date = new Date()
-    let rok = new Date()
-    console.log(mesec, godina)
+    let VP = await VkupnoPotrosena.findOne({where:{mesec, godina}})
+    if(VP===null)
+    {
+        return;
+    }
+    let currentDate = new Date(godina, mesec,10)
+    let date = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0)
+    let rok = new Date(date.getFullYear(),date.getMonth(),date.getDate()+VP.rok)
     rok.setDate(date.getDate()+10)
     generateLog("Генерираше фактури за", req.session.username, mesec+"-"+godina)
     let firmi = await Firma.findAll({where:{}})

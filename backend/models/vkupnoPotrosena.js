@@ -31,7 +31,11 @@ const VkupnoPotrosena = db.define('vkupnopotrosena',{
     },
     DDVProcent:{
         type:FLOAT
-    }
+    },
+    rok:{
+        type:Sequelize.INTEGER,
+        
+    },
 })
 
 

@@ -27,6 +27,7 @@ export default function ZelenaEnergijaData(props) {
   const [kamata, setKamata] = React.useState('');
   const [organizacija, setOrganizacija] = React.useState('');
   const [DDVProcent, setDDVProcent] = React.useState('');
+  const [rok, setRok] = React.useState('');
   const [mesecError, setMesecError] = React.useState(false);
   const [godinaError, setGodinaError] = React.useState(false);
   const [vkupnoError, setVkupnoError] = React.useState(false);
@@ -34,7 +35,7 @@ export default function ZelenaEnergijaData(props) {
   const [kamataError, setKamataError] = React.useState(false);
   const [organizacijaError, setOrganizacijaError] = React.useState(false);
   const [DDVProcentError, setDDVProcentError] = React.useState(false);
-
+  const [rokError, setRokError] = React.useState(false);
   const test = (asd) =>{
     props.editStep(props.step,asd)
   }
@@ -76,6 +77,10 @@ export default function ZelenaEnergijaData(props) {
       setDDVProcentError(true)
       failed = true
     }
+    if(rok === '' || rok === "NaN"){
+      setRokError(true)
+      failed = true
+    }
     console.log(DDVProcent)
     if(failed === true){
       return
@@ -88,7 +93,8 @@ export default function ZelenaEnergijaData(props) {
         cena,
         kamata,
         organizacija,
-        DDVProcent
+        DDVProcent,
+        rok
     },{withCredentials: true}).then((res)=>{
       if(res.data.message==="success"){
         test(0)
@@ -121,7 +127,7 @@ export default function ZelenaEnergijaData(props) {
           InputLabelProps={{
             style: {fontSize: 15}
           }}
-          placeholder="Месец*"
+          placeholder="Месец (1-12)*"
           variant="outlined"
           onChange={(e)=>{
             if(e.target.value<10){
@@ -135,7 +141,7 @@ export default function ZelenaEnergijaData(props) {
           error={godinaError}
           id="godina"
           label="Година*"
-          placeholder="Година*"
+          placeholder="Година (2000-2100)*"
           variant="outlined"
           InputProps={{
             inputProps: { 
@@ -154,7 +160,7 @@ export default function ZelenaEnergijaData(props) {
           error={vkupnoError}
           id="Vkupno"
           label="Вкупно количество зелена енергија*"
-          placeholder="Вкупно количество зелена енергија*"
+          placeholder="Вкупно количество зелена енергија (kWh)*"
           variant="outlined"
           type="number"
           onChange={(e) => {setVkupno(parseFloat(e.target.value).toFixed(2))
@@ -174,7 +180,7 @@ export default function ZelenaEnergijaData(props) {
           error={cenaError}
           id="cena"
           label="Цена*"
-          placeholder="Цена*"
+          placeholder="Цена во денари*"
           variant="outlined"
           type="number"
           onChange={(e) => {setCena(parseFloat(e.target.value).toFixed(3))
@@ -195,7 +201,7 @@ export default function ZelenaEnergijaData(props) {
           error={kamataError}
           id="kamata"
           label="Каматна стапка за каснење*"
-          placeholder="Каматна стапка за каснење*"
+          placeholder="Каматна стапка за каснење(процент)*"
           variant="outlined"
           type="number"
           onChange={(e) => {setKamata(parseFloat(e.target.value).toFixed(3))
@@ -215,7 +221,7 @@ export default function ZelenaEnergijaData(props) {
           error={organizacijaError}
           id="organizacija"
           label="Надомест за организација*"
-          placeholder="Надомест за организација*"
+          placeholder="Надомест за организација(денари за kWh)*"
           variant="outlined"
           type="number"
           onChange={(e) => {setOrganizacija(parseFloat(e.target.value).toFixed(6))
@@ -251,6 +257,26 @@ export default function ZelenaEnergijaData(props) {
             style: {fontSize: 15}
           }}
           
+        /><br/>
+        <TextField
+          error={rokError}
+          id="rok"
+          label="Рок за наплата*"
+          placeholder="Рок за наплата во денови*"
+          variant="outlined"
+          type="number"
+          onChange={(e) => {setRok(parseInt(e.target.value))
+                            setRokError(false)
+          }}
+          InputProps={{
+            style: {fontSize: 15}
+          }}
+          inputProps={{
+            step: "0.001"
+          }}
+          InputLabelProps={{
+            style: {fontSize: 15}
+          }}
         /><br/>
         <button variant="outlined" color="primary" type="submit"  style={{fontSize:"15px"}}>Submit</button>
       </div>

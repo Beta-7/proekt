@@ -39,7 +39,8 @@ const updateZelenaEnergija = (req, res) => {
             zelenaCena:req.body.cena,
             nadomestZaOrganizacija:req.body.organizacija,
             kamatnaStapka:req.body.kamata,
-            DDVProcent:req.body.DDVProcent
+            DDVProcent:req.body.DDVProcent,
+            rok:req.body.rok
         })
     }
     }).then(()=>{
