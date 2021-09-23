@@ -94,7 +94,7 @@ const zemiFirmiHelper = async (req, res) =>{
     const firmi = await Firma.findAll({
         attributes: ['id', 'name']
     })
-    return res.json(firmi)
+    return res.json(firmi).send()
 }
 
 const zemiFirmi = async (req,res) =>{

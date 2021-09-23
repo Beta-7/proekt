@@ -1,37 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 
-//Fix to the broken pagination
-function PatchedPagination(props) {
-  const {
-    ActionsComponent,
-    onChangePage,
-    onChangeRowsPerPage,
-    ...tablePaginationProps
-  } = props;
 
-  return (
-    <TablePagination
-      {...tablePaginationProps}
-      // @ts-expect-error onChangePage was renamed to onPageChange
-      onPageChange={onChangePage}
-      onRowsPerPageChange={onChangeRowsPerPage}
-      ActionsComponent={(subprops) => {
-        const { onPageChange, ...actionsComponentProps } = subprops;
-        return (
-          // @ts-expect-error ActionsComponent is provided by material-table
-          <ActionsComponent
-            {...actionsComponentProps}
-            onChangePage={onPageChange}
-          />
-        );
-      }}
-    />
-  );
-}
 
 
 axios.defaults.baseUrl = 'http://localhost:5000';
@@ -45,7 +17,7 @@ export default function FirmiTable () {
       getData()
       // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
-    
+
       const reasociraj =()=>{
         axios.post("/storno/reasociraj",{},{withCredentials:true})
       }
@@ -62,19 +34,20 @@ export default function FirmiTable () {
         })
       }
       
-      function getData(){
+      async function getData(){
         let firmiNiza = []
-        axios.post("/firmi/zemiFirmiHelper",{},{withCredentials:true}).then((firmi)=>{
-          
-          firmi.data.forEach((firma)=>{
-            firmiNiza[firma.id] = firma.name 
-            })
+        let firmi = await axios.post("/firmi/zemiFirmiHelper",{},{withCredentials:true})
+        console.log(firmi)
+        for(let firma of firmi.data){
+          firmiNiza[firma.id] = firma.name
+        }
+  
             
-          })
         setFirmi(firmiNiza)
         reasociraj()
         proveriNeasocirani()
       }
+      
 
     
 
@@ -148,9 +121,7 @@ export default function FirmiTable () {
                 })
 
               }
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
                 axios.post("/mernaTocka/dodadiMernaTocka",{

@@ -95,6 +95,9 @@ const getMerniTocki= async function(req,res){
     {
         
     }
+    try{
+
+    
     for(filter1 of req.body.filters){
             if(filter1.value.length !==0){
                 console.log(filter1)
@@ -109,7 +112,8 @@ const getMerniTocki= async function(req,res){
             }
         
     }
-    console.log(whereObj)
+}
+catch(e){}
 
     
     

@@ -127,7 +127,7 @@ const addKamata = async function(req,res){
         dayTmp=dayTmp+""
         if(dayTmp<10){dayTmp="0"+dayTmp}
         day1=dayTmp
-        let month1 = platenoData[5]+platenoData[6]+""
+    let month1 = platenoData[5]+platenoData[6]+""
         let year1 = platenoData[0]+platenoData[1]+platenoData[2]+platenoData[3]+""
         platenoData = day1+"-"+month1+"-"+year1
     }
@@ -145,27 +145,49 @@ const addKamata = async function(req,res){
 
 
 const getKamati= async function(req,res){
-    let kamati
-    let order
-    let order1 = [["id", "desc"]]
-    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
-        order = [[req.body.sortField, req.body.orderDirection]]
+    console.log(req.body)
+    let whereObj = 
+    {
+        
     }
-    kamati = await db.query("SELECT * FROM \"kamata\" WHERE \"firmaid\"::TEXT LIKE '%"+req.body.search+
-                                "%' OR \"arhivskiBroj\" LIKE '%"+req.body.search+
-                                "%' OR \"suma\"::TEXT LIKE '%"+req.body.search+
-                                "%' OR \"rok\" LIKE '%"+req.body.search+
-                                "%' OR \"platenoData\" LIKE '%"+req.body.search+
-                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
-                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
-                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
-                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
-                                { type: QueryTypes.SELECT });
-    return res.json({
-        count: kamati.length,
-        rows: kamati
-    })
+    try{
+
+    
+    for(filter1 of req.body.filters){
+            if(filter1.value.length !==0){
+                // console.log(filter1)
+                if(filter1.column.field === "faktura"){
+
+                    whereObj[filter1.column.field] = {[Op.like]:"%"+filter1.value+"%"}
+                }
+                else if(filter1.column.field === "rok" || filter1.column.field === "platenoData"){
+                    let a = new Date(filter1.value)
+                    console.log(a.getDate()+"-"+parseInt(a.getMonth()+1)+"-"+a.getFullYear())
+                    whereObj[filter1.column.field] = a.getDate()+"-"+parseInt(a.getMonth()+1)+"-"+a.getFullYear()
+                }
+                else{
+                    whereObj[filter1.column.field] = filter1.value
+
+                }
+            }
+        
+    }
 }
+catch(e){}
+
+    // console.log(whereObj)
+    
+    let kamati = await Kamata.findAndCountAll({where:whereObj,
+    order: [
+        [req.body.sortField,req.body.orderDirection]
+    ],
+    limit:req.body.pageSize,
+    offset:req.body.pageSize*req.body.page
+})
+    return res.json(kamati)
+}
+
+
 const deleteKamata = async function(req,res){
     const kamata = await Kamata.findOne({where:{id:req.body.id}}) 
     await generateLog("Избриша камата",req.session.username,kamata.arhivskiBroj)

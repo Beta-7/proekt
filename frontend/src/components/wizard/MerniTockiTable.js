@@ -4,6 +4,8 @@ import MaterialTable from '@material-table/core';
 import Typography from "@material-ui/core/Typography";
 
 
+
+
 axios.defaults.baseUrl = 'http://localhost:5000';
 
 
@@ -11,19 +13,19 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 export default function FirmiTable (props) {
     const [firmi, setFirmi] = useState([])
     const [nemaNeasocirani, setNemaAsocirani] = useState(false)
-
     useEffect(() => {
-      proveriNeasocirani()
+      getData()
       // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [])
-    
+      const EnableButton = (asd) =>{
+        props.editStep(props.step,asd)
+      }
       const reasociraj =()=>{
         axios.post("/storno/reasociraj",{},{withCredentials:true})
-        proveriNeasocirani()
       }
+      async function proveriNeasocirani(){
 
-      const proveriNeasocirani = () => {
-        axios.post("/mernaTocka/najdiNeasocirani").then((res)=>{
+        let res = await axios.post("/mernaTocka/najdiNeasocirani")
           if(res.data.message==='true'){
             EnableButton(1)
             setNemaAsocirani(false)
@@ -32,34 +34,43 @@ export default function FirmiTable (props) {
             EnableButton(0)
             setNemaAsocirani(true)
           }
-        })
-      }
 
-      const EnableButton = (asd) =>{
-        props.editStep(props.step,asd)
       }
       
-    
+      
+      async function getData(){
+        let firmiNiza = []
+        proveriNeasocirani()
+        let firmi = await axios.post("/firmi/zemiFirmiHelper",{},{withCredentials:true})
+        console.log(firmi)
+        for(let firma of firmi.data){
+          firmiNiza[firma.id] = firma.name
+        }
+  
+            
+        setFirmi(firmiNiza)
+        reasociraj()
+        
+      }
     
 
     
 
     const columns = [
         { title: "Мерна точка ИД", field: "tockaID",
-         filtering:false,
+        filtering:true,
          defaultSort:"desc",
-         editable: false
          },
-        {
+         {
           title: "Цена ВТ", field: "cenaVT",
           validate: rowData => rowData.cenaVT === undefined || rowData.cenaVT === "" ? "Required" : true,
-          filtering:false,
+          filtering:true,
           type: "numeric"
         },
         {
           title: "Цена НТ", field: "cenaNT",
           validate: rowData => rowData.cenaNT === undefined || rowData.cenaNT === "" ? "Required" : true,
-          filtering:false,
+          filtering:true,
           type: "numeric"
         },
         {
@@ -72,72 +83,68 @@ export default function FirmiTable (props) {
           title: "Адреса на мерна точка", field: "adresa",
           validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
           filtering:true,
-        },
-        {
-          title: "Број на место на потрошувачка", field: "brojMestoPotrosuvacka",
-          validate: rowData => rowData.brojMestoPotrosuvacka === undefined || rowData.brojMestoPotrosuvacka === "" ? "Required" : true,
-          filtering:true,
         }
       ]
     
     
         return (
             <div>
-                {nemaNeasocirani ? <Typography style={{color:"#00aa00"}} ><h1>Нема неасоцирани мерни точки</h1></Typography>:<Typography style={{color:"#ff0000"}}><h1>Има неасоцирани мерни точки</h1></Typography>}
+                {nemaNeasocirani ? <Typography style={{color:"#00aa00"}} ><h1>Нема неасоцирани мерни точки </h1></Typography>:<Typography style={{color:"#ff0000"}}><h1>Има неасоцирани мерни точки</h1></Typography>}
             
             <MaterialTable
               title="Мерни точки"
               columns={columns}
               data={query=>new Promise((resolve,reject)=>{
-
                 reasociraj()
-                
-                var firmiNiza = []
-                var field = null
-                var dir = null
+                var field = query.orderBy.field
+                var dir = query.orderDirection
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
                 }
-                else{
-                  field = query.orderBy.field
-                  dir = query.orderDirection
-                }
-
-                axios.post("/firmi/zemiFirmi",{
-                  search: query.search, 
-                 },{withCredentials:true}).then((firmi)=>{
-                  firmi.data.rows.forEach((firma)=>{
-                    firmiNiza[firma.id] = firma.name 
-                    })
-                      setFirmi(firmiNiza)
-                  
+                
+                
                    axios.post("/mernaTocka/getMerniTocki",{
-                    search: query.search, 
+                    filters: query.filters, 
                     pageSize:query.pageSize, 
                     page:query.page,
                     sortField:field,
                     orderDirection:dir
                    },{withCredentials:true}).then((response)=>{
-                        
+                        reasociraj()
+                        console.log(response.data.rows)
                         resolve({
                           data: response.data.rows,
                           page: query.page,
                           totalCount: response.data.count,
+                          filters:query.filters
                       });
-                    }).then(()=>{
-                      reasociraj()
                     })
         
                 })
 
-              })}
+              }
 
               editable={{
+                onRowAdd: (newRow) => new Promise((resolve, reject) => {
+                axios.post("/mernaTocka/dodadiMernaTocka",{
+                  tockaID:newRow.tockaID,
+                  cenaVT:newRow.cenaVT,
+                  cenaNT:newRow.tarifaNT,
+                  firmaID:newRow.firmaId,
+                  adresa:newRow.adresa,
+                  brojMestoPotrosuvacka:newRow.brojMestoPotrosuvacka
+                },{withCredentials:true}).then(()=>{
+                  getData()
+                  resolve()
+                })
+                
+              }),
                 onRowDelete: selectedRow => new Promise((resolve, reject) => {
                   axios.post("/mernaTocka/izbrisiMernaTocka",{
                     id:selectedRow.id
                   },{withCredentials:true}).then(()=>{
+                    getData()
                     resolve()
                   })
                   resolve()
@@ -147,11 +154,12 @@ export default function FirmiTable (props) {
                     id:oldRow.id,
                     firmaId:updatedRow.firmaId,
                     cenaVT:updatedRow.cenaVT,
-                    cenaNT:updatedRow.cenaNT,
+                    cenaNT:updatedRow.tarifaNT,
                     adresa:updatedRow.adresa,
                     brojMestoPotrosuvacka:updatedRow.brojMestoPotrosuvacka
                   },{withCredentials:true}).then(()=>{
-                    reasociraj()
+                    axios.post("/storno/reasociraj")
+                    getData()
                     resolve()
                   })
                 })
@@ -159,6 +167,8 @@ export default function FirmiTable (props) {
               }}
               options={{
                 paging:true,
+                search:false,
+                filtering:true,
                 pageSize:20,       // make initial page size
                 emptyRowsWhenPaging: true,   //to make page size fix in case of less data rows
                 pageSizeOptions:[5,10,20],
