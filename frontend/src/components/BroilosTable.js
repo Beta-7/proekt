@@ -41,28 +41,7 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
-export default function FirmiTable () {
-    const [data, setData] = useState([])
-
-    useEffect(() => {
-      getData()
-      }, [])
-
-       function getData(){
-          axios.post("/broilo/getBroilos",{},{withCredentials:true}).then((response)=>{
-              console.log(response.data)
-                setData(response.data)
-              
-          })
-
-
-
-        }
-
-    
-
-    
-
+export default function broilosTable () {
     const columns = [
         { title: "id", field: "id",
          hidden:true,
@@ -139,7 +118,31 @@ export default function FirmiTable () {
             <MaterialTable
               title="Броила"
               columns={columns}
-              data={data}
+              data={query=>new Promise((resolve,reject)=>{
+                var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field="id"
+                    dir="desc"
+                  }
+                  else{
+                    field = query.orderBy.field
+                    dir = query.orderDirection
+                  }
+                axios.post("/broilo/getBroilos",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                }).then(response=>{
+                  resolve({
+                    data: response.data.rows,
+                    page: query.page,
+                    totalCount: response.data.count,
+                });
+                })
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}

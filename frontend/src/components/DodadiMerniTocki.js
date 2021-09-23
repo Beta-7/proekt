@@ -66,22 +66,6 @@ export default function FirmiTable () {
       function getData(){
         reasociraj()
         proveriNeasocirani()
-        
-        var firmiNiza = []
-         axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
-             firmi.data.rows.forEach((firma)=>{
-                firmiNiza[firma.id] = firma.name 
-                })
-                
-              setFirmi(firmiNiza)
-           axios.post("/mernaTocka/getMerniTocki",{},{withCredentials:true}).then((response)=>{
-            setData(response.data)
-            proveriNeasocirani()  
-          })
-
-        })
-
-        
       }
 
     
@@ -105,12 +89,6 @@ export default function FirmiTable () {
           filtering:false,
           type: "numeric"
         },
-        {
-          title: "Тарифа", field: "tarifa",
-          validate: rowData => rowData.tarifa === undefined || rowData.tarifa === "" ? "Required" : true,
-          filtering:false,
-          editable: "onAdd"
-          },
         {
           title: "Фирма", field: "firmaId",
           validate: rowData => rowData.firmaId === undefined || rowData.firmaId === "" ? "Required" : true,
@@ -137,7 +115,53 @@ export default function FirmiTable () {
             <MaterialTable
               title="Мерни точки"
               columns={columns}
-              data={data}
+              data={query=>new Promise((resolve,reject)=>{
+
+                reasociraj()
+                
+                var firmiNiza = []
+                var field = null
+                var dir = null
+                if(query.orderBy === undefined){
+                  field="id"
+                  dir="desc"
+                }
+
+                axios.post("/firmi/zemiFirmi",{
+                  search: query.search, 
+                 },{withCredentials:true}).then((firmi)=>{
+                  firmi.data.rows.forEach((firma)=>{
+                    firmiNiza[firma.id] = firma.name 
+                    })
+                      setFirmi(firmiNiza)
+                  var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field="id"
+                    dir="desc"
+                  }
+                  else{
+                    field = query.orderBy.field
+                    dir = query.orderDirection
+                  }
+                   axios.post("/mernaTocka/getMerniTocki",{
+                    search: query.search, 
+                    pageSize:query.pageSize, 
+                    page:query.page,
+                    sortField:field,
+                    orderDirection:dir
+                   },{withCredentials:true}).then((response)=>{
+                        reasociraj()
+                        resolve({
+                          data: response.data.rows,
+                          page: query.page,
+                          totalCount: response.data.count,
+                      });
+                    })
+        
+                })
+
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}

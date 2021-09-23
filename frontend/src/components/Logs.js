@@ -56,6 +56,10 @@ export default function FirmiTable () {
                   field="id"
                   dir="desc"
                 }
+                else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
+                }
                 axios.post("/misc/GetLogs",{
                   search: query.search, 
                   pageSize:query.pageSize, 

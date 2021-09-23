@@ -3,12 +3,40 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from '@material-table/core';
+import { TablePagination } from '@material-ui/core';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { createTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import IconButton from '@material-ui/core/IconButton';
-
+//Fix to the broken pagination
+function PatchedPagination(props) {
+    const {
+      ActionsComponent,
+      onChangePage,
+      onChangeRowsPerPage,
+      ...tablePaginationProps
+    } = props;
+  
+    return (
+      <TablePagination
+        {...tablePaginationProps}
+        // @ts-expect-error onChangePage was renamed to onPageChange
+        onPageChange={onChangePage}
+        onRowsPerPageChange={onChangeRowsPerPage}
+        ActionsComponent={(subprops) => {
+          const { onPageChange, ...actionsComponentProps } = subprops;
+          return (
+            // @ts-expect-error ActionsComponent is provided by material-table
+            <ActionsComponent
+              {...actionsComponentProps}
+              onChangePage={onPageChange}
+            />
+          );
+        }}
+      />
+    );
+  }
   
 
 
@@ -26,10 +54,11 @@ axios.defaults.baseUrl = 'http://localhost:5000';
     
 
 
-export default function FakturaTable() {
+export default function FakturaTable(props) {
     const [mesec, setMesec] = React.useState('');
     const [godina, setGodina] = React.useState('');
-
+    const [data, setData] = useState([])
+    let tableRef=React.createRef()
     useEffect(()=>{
         
         setMesec(new Date().getMonth()+1)
@@ -55,17 +84,13 @@ export default function FakturaTable() {
         });
       })
     }
-    
-
 
           const generiraj = ()=>{
             axios.post("/faktura/generirajFakturi",{
                 mesec,
                 godina
             },{withCredentials:true}).then(()=>{
-
-                     getData()
-
+              tableRef.current.onQueryChange()
         })
       }
 
@@ -203,12 +228,17 @@ export default function FakturaTable() {
                 <MaterialTable
               title="Кориснички сметки"
               columns={columns}
+              tableRef={tableRef}
               data={query =>new Promise((resolve, reject)=>{
                 var field = null
                 var dir = null
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
+                }
+                else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
                 }
                   axios.post("/faktura/getFakturi",{
                       mesec,
@@ -226,7 +256,9 @@ export default function FakturaTable() {
                   });
                   })
                 })}
-
+              components={{
+                Pagination: PatchedPagination,
+              }}
               actions={[
                 {
                   icon: () => <GetAppIcon/>,

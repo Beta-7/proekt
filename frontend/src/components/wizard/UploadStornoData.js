@@ -195,7 +195,31 @@ class UploadStornoData extends Component {
           <MaterialTable
               title="Кориснички сметки"
               columns={columns}
-              data={this.state.data}
+              data={query=>new Promise((resolve,reject)=>{
+                var field = null
+                  var dir = null
+                  if(query.orderBy === undefined){
+                    field="id"
+                    dir="desc"
+                  }
+                  else{
+                    field = query.orderBy.field
+                    dir = query.orderDirection
+                  }
+                axios.post("/storno/getStornos",{
+                  search: query.search, 
+                  pageSize:query.pageSize, 
+                  page:query.page,
+                  sortField:field,
+                  orderDirection:dir
+                }).then(response=>{
+                  resolve({
+                    data: response.data.rows,
+                    page: query.page,
+                    totalCount: response.data.count,
+                });
+                })
+              })}
               components={{
                 Pagination: PatchedPagination,
               }}

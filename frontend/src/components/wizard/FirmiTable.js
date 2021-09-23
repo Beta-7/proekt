@@ -135,16 +135,22 @@ export default function FirmiTable () {
                   field="id"
                   dir="desc"
                 }
-                 axios.post("/auth/getUsers",{},{withCredentials:true}).then((response)=>{
-                   response.data.forEach((user)=>{
-                       console.log(user)
-                       users[user.id] = user.username
-                       //{id:username}
-                       usersid[user.username]=user.id
-                       //{username:id}  
-                     })
-                     setVraboteni(users)
-                 }).then(()=>{
+                else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
+                }
+
+                axios.post("/auth/getUsers",{
+                  search: query.search, 
+                },{withCredentials:true}).then((response)=>{
+                  response.data.rows.forEach((user)=>{
+                    users[user.id] = user.username
+                    //{id:username}
+                    usersid[user.username]=user.id
+                    //{username:id}  
+                  })
+                  setVraboteni(users)
+              }).then(()=>{
                    axios.post("/firmi/zemiFirmi",{
                     search: query.search, 
                     pageSize:query.pageSize, 

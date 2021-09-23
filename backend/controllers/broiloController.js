@@ -5,10 +5,39 @@ const csv=require("csvtojson");
 const _ = require('lodash');
 const { isNull } = require("lodash");
 const generateLog = require("../logs")
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 
 const getBroilos= async function(req,res){
-    const broilos = await BroiloStatus.findAll({attributes:["id","brojMernaTocka","mesec", "tarifa", "datumPocetok", "datumKraj", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojMernoMesto", "brojBroilo", "datumOdEvn"],raw : true})
-    return res.json(broilos)
+    let broilos
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    broilos = await db.query("SELECT * FROM broilostatuses WHERE \"brojMernaTocka\" LIKE '%"+req.body.search+
+                                "%' OR \"mesec\" LIKE '%"+req.body.search+
+                                "%' OR \"tarifa\" LIKE '%"+req.body.search+
+                                "%' OR \"datumPocetok\" LIKE '%"+req.body.search+
+                                "%' OR \"datumKraj\" LIKE '%"+req.body.search+
+                                "%' OR \"pocetnaSostojba\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"krajnaSostojba\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"kolicina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"multiplikator\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"vkupnoKolicina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"brojMernoMesto\" LIKE '%"+req.body.search+
+                                "%' OR \"brojBroilo\" LIKE '%"+req.body.search+
+                                "%' OR \"datumOdEvn\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+
+    return res.json({
+        count: broilos.length,
+        rows: broilos
+    })
 }
 
 const uploadFile = async (req,res)=>{

@@ -50,37 +50,46 @@ export default function KamatiTable () {
             <MaterialTable
               title="Камати"
               columns={columns}
-              data={ query => new Promise((resolve, reject)=>{
-                let kamati;
+              data={query=>new Promise((resolve,reject)=>{
+                var kamati
+                var firmiNiza = []
                 var field = null
                 var dir = null
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
                 }
-                axios.post("/misc/getKamati",{
+                else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
+                }
+
+                axios.post("/firmi/zemiFirmi",{
                   search: query.search, 
-                  pageSize:query.pageSize, 
-                  page:query.page,
-                  sortField:field,
-                  orderDirection:dir
-                },{withCredentials:true}).then((response)=>{
-                  kamati = response.data.rows;
-              })
-              var firmiNiza = []
-              axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
+                 },{withCredentials:true}).then((firmi)=>{
                   firmi.data.rows.forEach((firma)=>{
-                     firmiNiza[firma.id] = firma.name 
-                     })
-                     
-                   setFirmi(firmiNiza)
-              
-            })
-            resolve({
-              data: kamati,
-              page: query.page,
-              totalCount: kamati.length,
-          });
+                    firmiNiza[firma.id] = firma.name 
+                    })
+                      setFirmi(firmiNiza)
+                  var field = null
+                  var dir = null
+                  
+                  axios.post("/misc/getKamati",{
+                    search: query.search, 
+                    pageSize:query.pageSize, 
+                    page:query.page,
+                    sortField:field,
+                    orderDirection:dir
+                  },{withCredentials:true}).then((response)=>{
+                    resolve({
+                      data: response.data.rows,
+                      page: query.page,
+                      totalCount: response.data.count,
+                  });
+                })
+        
+                })
+
               })}
 
               editable={{

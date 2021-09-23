@@ -5,6 +5,8 @@ const generateLog = require("../logs")
 const Log = require("../models/log")
 const Kamata = require("../models/kamata")
 const Firma = require("../models/firma.js")
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 
 const updateZelenaEnergija = (req, res) => {
     req.body.mesec=parseInt(req.body.mesec)
@@ -80,10 +82,25 @@ const updateNagradi = (req, res) => {
 }
 
 const getLogs = async (req, res)=>{
-    const logs = await Log.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id","message", "actor","actedon","createdAt"],raw : true,order: [
-        ['id', 'DESC'],
-    ]})
-    return res.json(logs)
+
+    let logs
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    logs = await db.query("SELECT * FROM logs WHERE \"message\" LIKE '%"+req.body.search+
+                                "%' OR \"actor\" LIKE '%"+req.body.search+
+                                "%' OR \"actedon\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+    return res.json({
+        count: logs.length,
+        rows: logs
+    })
 }
 
 const addKamata = async function(req,res){
@@ -128,12 +145,26 @@ const addKamata = async function(req,res){
 
 
 const getKamati= async function(req,res){
-    const kamati = await Kamata.findAll({attributes:["id","firmaid", "arhivskiBroj", "fakturaDisplayId", "suma", "rok", "platenoData"],raw : true})
-    // for(let i in kamati){
-    //     let ime = await Firma.findOne({where: {id:kamati[i]["id"]}, attributes:["name"]}) 
-    //     kamati[i]["firmaid"] = ime.dataValues.name
-    // }
-    return res.json(kamati)
+    let kamati
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    kamati = await db.query("SELECT * FROM \"kamata\" WHERE \"firmaid\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"arhivskiBroj\" LIKE '%"+req.body.search+
+                                "%' OR \"suma\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"rok\" LIKE '%"+req.body.search+
+                                "%' OR \"platenoData\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+    return res.json({
+        count: kamati.length,
+        rows: kamati
+    })
 }
 const deleteKamata = async function(req,res){
     const kamata = await Kamata.findOne({where:{id:req.body.id}}) 

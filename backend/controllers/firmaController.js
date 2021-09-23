@@ -2,7 +2,8 @@
 const Firma = require("../models/firma.js")
 const User = require("../models/users")
 const BroiloStatus = require("../models/broiloStatus")
-
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 const csv=require("csvtojson");
 const generateLog = require("../logs")
 const _ = require('lodash');
@@ -89,9 +90,26 @@ const izbrisiFirma = async (req,res) =>{
 }
 
 const zemiFirmi = async (req,res) =>{
-    
-    const firmi = await Firma.findAndCountAll({limit:req.body.limit, offset:req.body.offset, attributes:["id", "name","adresaNaFirma", "broj","agent","nagrada"],raw : true})
-    return res.json(firmi)
+    let firmi
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    firmi = await db.query("SELECT * FROM firmas WHERE \"nagrada\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"name\" LIKE '%"+req.body.search+
+                                "%' OR \"adresaNaFirma\" LIKE '%"+req.body.search+
+                                "%' OR \"broj\" LIKE '%"+req.body.search+
+                                "%' OR \"agent\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+    return res.json({
+        count: firmi.length,
+        rows: firmi
+    })
 }
 
 function zemiBroilaNaFirma  (req, res){

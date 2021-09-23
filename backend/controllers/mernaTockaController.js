@@ -3,6 +3,8 @@ const Firma = require("../models/firma")
 const MernaTocka = require("../models/mernaTocka")
 const BroiloController = require("./broiloController")
 const generateLog = require("../logs")
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 
 
 const dodadiMernaTocka = (req, res) => {
@@ -91,9 +93,42 @@ const izbrisiMernaTocka = async (req, res) =>{
 }
 
 const getMerniTocki= async function(req,res){
-    const tocki = await MernaTocka.findAll({attributes:["id","tockaID", "cenaNT","cenaVT","tarifa" ,"firmaId", "adresa", "brojMestoPotrosuvacka"],raw : true})
-    BroiloController.asocirajBroiloSoKompanija()
-    return res.json(tocki)
+    let tocki
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    tocki = await db.query("SELECT *,\"firmas\".\"name\" FROM \"mernaTockas\" LEFT JOIN public.\"firmas\" ON \"mernaTockas\".\"firmaId\" = \"firmas\".\"id\" WHERE \"firmas\".\"name\" LIKE '%"+req.body.search+
+                                "%' OR \"tockaID\" LIKE '%"+req.body.search+
+                                "%' OR \"cenaNT\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"cenaVT\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"firmaId\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"adresa\" LIKE '%"+req.body.search+
+                                "%' OR \"brojMestoPotrosuvacka\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+
+
+    // tocki = await db.query("SELECT * FROM \"mernaTockas\" WHERE \"tockaID\" LIKE '%"+req.body.search+
+    //                             "%' OR \"cenaNT\"::TEXT LIKE '%"+req.body.search+
+    //                             "%' OR \"cenaVT\"::TEXT LIKE '%"+req.body.search+
+    //                             "%' OR \"firmaId\"::TEXT LIKE '%"+req.body.search+
+    //                             "%' OR \"adresa\" LIKE '%"+req.body.search+
+    //                             "%' OR \"brojMestoPotrosuvacka\" LIKE '%"+req.body.search+
+    //                             "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+    //                             "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+    //                             " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+    //                             " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+    //                             { type: QueryTypes.SELECT });
+
+    return res.json({
+        count: tocki.length,
+        rows: tocki
+    })
 }
 
 const najdiNeasocirani = async function(req,res){

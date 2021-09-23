@@ -25,11 +25,12 @@ function formatDate(date){
 
 
 const generirajFakturi = async function(req,res){
-    let godina = req.body.godina
-    let mesec = req.body.mesec
+    let godina = parseInt(req.body.godina)
+    let mesec = parseInt(req.body.mesec)
     let vkupnoPotrosenaEnergija =0
     let date = new Date()
     let rok = new Date()
+    console.log(mesec, godina)
     rok.setDate(date.getDate()+10)
     generateLog("Генерираше фактури за", req.session.username, mesec+"-"+godina)
     let firmi = await Firma.findAll({where:{}})
@@ -422,8 +423,8 @@ const getFakturi = async function(req, res){
                                 "%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+
                                 "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
                                 "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
-                                " LIMIT "+req.body.pageSize+
-                                " OFFSET "+(req.body.pageSize*(req.body.page)), 
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
                                 { type: QueryTypes.SELECT });
     }
     else{
@@ -438,8 +439,8 @@ const getFakturi = async function(req, res){
                                 "%' OR \"vkupnaNaplata\"::TEXT LIKE '%"+req.body.search+
                                 "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
                                 "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
-                                " LIMIT "+req.body.pageSize+
-                                " OFFSET "+(req.body.pageSize*(req.body.page)), 
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
                                 { type: QueryTypes.SELECT });
     }
     return res.json({
@@ -480,8 +481,10 @@ const zemiFakturiMesec = async function(req,res){
     const godina=parseInt(req.query.godina)
     let imeFakturi = []
     let fakturibr = 0
-    
-
+    if(isNaN(mesec) || isNaN(godina))
+    {
+        return res.status(406).json({"error":"error","details":"supply month and year parameters"})
+    }
     const fakturi = await Faktura.findAll({where:{
         mesec, godina
     }})

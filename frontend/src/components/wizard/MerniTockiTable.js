@@ -121,29 +121,27 @@ export default function FirmiTable (props) {
               data={query=>new Promise((resolve,reject)=>{
 
                 reasociraj()
-                EnableButton(1) 
                 
                 var firmiNiza = []
-
                 var field = null
                 var dir = null
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
                 }
+                else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
+                }
 
-                 axios.post("/firmi/zemiFirmi",{},{withCredentials:true}).then((firmi)=>{
-                     firmi.data.rows.forEach((firma)=>{
-                        firmiNiza[firma.id] = firma.name 
-                        })
-                        
+                axios.post("/firmi/zemiFirmi",{
+                  search: query.search, 
+                 },{withCredentials:true}).then((firmi)=>{
+                  firmi.data.rows.forEach((firma)=>{
+                    firmiNiza[firma.id] = firma.name 
+                    })
                       setFirmi(firmiNiza)
-                  var field = null
-                  var dir = null
-                  if(query.orderBy === undefined){
-                    field="id"
-                    dir="desc"
-                  }
+                  
                    axios.post("/mernaTocka/getMerniTocki",{
                     search: query.search, 
                     pageSize:query.pageSize, 
@@ -151,14 +149,14 @@ export default function FirmiTable (props) {
                     sortField:field,
                     orderDirection:dir
                    },{withCredentials:true}).then((response)=>{
-                    
                         
-                        reasociraj()
                         resolve({
                           data: response.data.rows,
                           page: query.page,
                           totalCount: response.data.count,
                       });
+                    }).then(()=>{
+                      reasociraj()
                     })
         
                 })

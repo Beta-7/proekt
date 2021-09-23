@@ -10,7 +10,7 @@ axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
-export default function FirmiTable () {
+export default function UsersTable () {
 
 
 
@@ -53,6 +53,10 @@ export default function FirmiTable () {
                   if(query.orderBy === undefined){
                     field="id"
                     dir="desc"
+                  }
+                  else{
+                    field = query.orderBy.field
+                    dir = query.orderDirection
                   }
                 axios.post("/auth/getUsers",{
                   search: query.search, 

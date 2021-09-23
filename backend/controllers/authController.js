@@ -2,6 +2,8 @@ const User = require("../models/users.js")
 const bcrypt = require("bcryptjs")
 const session=require("express-session")
 const generateLog = require("../logs")
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 
 const login = async function(req,res){
     const username=req.body.username;
@@ -25,8 +27,25 @@ const login = async function(req,res){
 }
 
 const getUsers= async function(req,res){
-    const users = await User.findAll({attributes:["id","username", "ime", "prezime", "isAdmin"],raw : true})
-    return res.json(users)
+    let users
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    users = await db.query("SELECT * FROM users WHERE \"username\" LIKE '%"+req.body.search+
+                                "%' OR \"ime\" LIKE '%"+req.body.search+
+                                "%' OR \"prezime\" LIKE '%"+req.body.search+
+                                "%' OR \"isAdmin\"::TEXT LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] == undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+    return res.json({
+        count: users.length,
+        rows: users
+    })
 }
 
 const logout = async function(req,res){

@@ -7,7 +7,8 @@ const Broilos = require("../models/broiloStatus")
 const MernaTocka = require("../models/mernaTocka")
 const generateLog = require("../logs");
 const { removeListener } = require("../routes/fakturaRoutes");
-
+const db = require('../db.js')  
+const { QueryTypes } = require('sequelize');
 
 
 const dodadiStorno = async (req, res) => {
@@ -131,8 +132,35 @@ const izbrisiStorno = async (req,res) =>{
 
 
 const getStornos= async function(req,res){
-    const stornos = await Storno.findAll({attributes:["id","brojNaMernaTocka", "mesecNaFakturiranje", "tarifa", "datumNaPocetokNaMerenje", "datumNaZavrshuvanjeNaMerenje", "pocetnaSostojba", "krajnaSostojba", "kolicina", "multiplikator", "vkupnoKolicina", "nebitno", "brojNaMernoMesto", "brojNaBroilo", "nebitno2", "datumNaIzrabotkaEVN", "pomireno"],raw : true})
-    return res.json(stornos)
+    let stornos
+    let order
+    let order1 = [["id", "desc"]]
+    if(req.body.orderDirection!='desc' || req.body.orderDirection!='asc'){
+        order = [[req.body.sortField, req.body.orderDirection]]
+    }
+    stornos = await db.query("SELECT * FROM stornos WHERE \"brojNaMernaTocka\" LIKE '%"+req.body.search+
+                                "%' OR \"mesecNaFakturiranje\" LIKE '%"+req.body.search+
+                                "%' OR \"tarifa\" LIKE '%3"+req.body.search+
+                                "%' OR \"datumNaPocetokNaMerenje\" LIKE '%"+req.body.search+
+                                "%' OR \"datumNaZavrshuvanjeNaMerenje\" LIKE '%"+req.body.search+
+                                "%' OR \"pocetnaSostojba\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"krajnaSostojba\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"kolicina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"multiplikator\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"vkupnoKolicina\"::TEXT LIKE '%"+req.body.search+
+                                "%' OR \"brojNaMernoMesto\" LIKE '%"+req.body.search+
+                                "%' OR \"brojNaBroilo\" LIKE '%"+req.body.search+
+                                "%' OR \"datumNaIzrabotkaEVN\" LIKE '%"+req.body.search+
+                                "%' ORDER BY \""+((order[0][0] === undefined) ? order1[0][0] : order[0][0])+
+                                "\" "+((order[0][1] == undefined) ? order1[0][1] : order[0][1])+
+                                " LIMIT "+((req.body.pageSize == undefined) ? 20 : req.body.pageSize)+
+                                " OFFSET "+(isNaN((req.body.pageSize*(req.body.page))) ? 0 : (req.body.pageSize*(req.body.page))), 
+                                { type: QueryTypes.SELECT });
+
+    return res.json({
+        count: stornos.length,
+        rows: stornos
+    })
 }
 
 const reasociate = async(req,res)=>{
