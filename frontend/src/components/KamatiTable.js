@@ -67,11 +67,14 @@ export default function KamatiTable () {
               title="Камати"
               columns={columns}
               data={query=>new Promise((resolve,reject)=>{
-                var field = query.orderBy.field
-                var dir = query.orderDirection
+                var field = undefined
+                var dir = undefined
                 if(query.orderBy === undefined){
                   field="id"
                   dir="desc"
+                }else{
+                  field = query.orderBy.field
+                  dir = query.orderDirection
                 }
                 var response  = axios.post("/misc/getKamati",{
                     filters:query.filters,
