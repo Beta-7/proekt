@@ -1,45 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import MaterialTable from '@material-table/core';
-import { TablePagination } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
-
-//Fix to the broken pagination
-function PatchedPagination(props) {
-  const {
-    ActionsComponent,
-    onChangePage,
-    onChangeRowsPerPage,
-    ...tablePaginationProps
-  } = props;
-
-  return (
-    <TablePagination
-      {...tablePaginationProps}
-      // @ts-expect-error onChangePage was renamed to onPageChange
-      onPageChange={onChangePage}
-      onRowsPerPageChange={onChangeRowsPerPage}
-      ActionsComponent={(subprops) => {
-        const { onPageChange, ...actionsComponentProps } = subprops;
-        return (
-          // @ts-expect-error ActionsComponent is provided by material-table
-          <ActionsComponent
-            {...actionsComponentProps}
-            onChangePage={onPageChange}
-          />
-        );
-      }}
-    />
-  );
-}
-
 
 axios.defaults.baseUrl = 'http://localhost:5000';
 
 
 
 export default function FirmiTable () {
-    const [data, setData] = useState([])
     const [firmi, setFirmi] = useState([])
     const [nemaNeasocirani, setNemaAsocirani] = useState(false)
     useEffect(() => {
@@ -66,27 +34,28 @@ export default function FirmiTable () {
       function getData(){
         reasociraj()
         proveriNeasocirani()
+        
       }
 
     
 
     
 
-    const columns = [
+    const [columns] = useState([
         { title: "Мерна точка ИД", field: "tockaID",
-         filtering:false,
+        filtering:true,
          defaultSort:"desc",
          },
          {
           title: "Цена ВТ", field: "cenaVT",
           validate: rowData => rowData.cenaVT === undefined || rowData.cenaVT === "" ? "Required" : true,
-          filtering:false,
+          filtering:true,
           type: "numeric"
         },
         {
           title: "Цена НТ", field: "cenaNT",
           validate: rowData => rowData.cenaNT === undefined || rowData.cenaNT === "" ? "Required" : true,
-          filtering:false,
+          filtering:true,
           type: "numeric"
         },
         {
@@ -99,13 +68,8 @@ export default function FirmiTable () {
           title: "Адреса на мерна точка", field: "adresa",
           validate: rowData => rowData.adresa === undefined || rowData.adresa === "" ? "Required" : true,
           filtering:true,
-        },
-        {
-          title: "Број на место на потрошувачка", field: "brojMestoPotrosuvacka",
-          validate: rowData => rowData.brojMestoPotrosuvacka === undefined || rowData.brojMestoPotrosuvacka === "" ? "Required" : true,
-          filtering:true,
         }
-      ]
+      ])
     
     
         return (
@@ -114,11 +78,10 @@ export default function FirmiTable () {
             
             <MaterialTable
               title="Мерни точки"
-              columns={columns}
+              columns={[...columns]}
               data={query=>new Promise((resolve,reject)=>{
 
                 reasociraj()
-                
                 var firmiNiza = []
                 var field = null
                 var dir = null
@@ -126,15 +89,17 @@ export default function FirmiTable () {
                   field="id"
                   dir="desc"
                 }
-
+                
                 axios.post("/firmi/zemiFirmi",{
-                  search: query.search, 
+                  
                  },{withCredentials:true}).then((firmi)=>{
                   firmi.data.rows.forEach((firma)=>{
                     firmiNiza[firma.id] = firma.name 
                     })
-                      setFirmi(firmiNiza)
-                  var field = null
+                    setFirmi(firmiNiza)
+                    
+                  
+                    var field = null
                   var dir = null
                   if(query.orderBy === undefined){
                     field="id"
@@ -145,7 +110,7 @@ export default function FirmiTable () {
                     dir = query.orderDirection
                   }
                    axios.post("/mernaTocka/getMerniTocki",{
-                    search: query.search, 
+                    filters: query.filters, 
                     pageSize:query.pageSize, 
                     page:query.page,
                     sortField:field,
@@ -156,15 +121,14 @@ export default function FirmiTable () {
                           data: response.data.rows,
                           page: query.page,
                           totalCount: response.data.count,
+                          filters:query.filters
                       });
                     })
         
                 })
-
+                console.log(firmi)
               })}
-              components={{
-                Pagination: PatchedPagination,
-              }}
+
               editable={{
                 onRowAdd: (newRow) => new Promise((resolve, reject) => {
                 axios.post("/mernaTocka/dodadiMernaTocka",{
@@ -207,6 +171,8 @@ export default function FirmiTable () {
               }}
               options={{
                 paging:true,
+                search:false,
+                filtering:true,
                 pageSize:20,       // make initial page size
                 emptyRowsWhenPaging: true,   //to make page size fix in case of less data rows
                 pageSizeOptions:[5,10,20],
