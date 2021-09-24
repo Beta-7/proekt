@@ -86,10 +86,15 @@ const izbrisiUser = async (req,res) =>{
 }
 
 
+const getUsers = async (req, res)=>{
+    const users = await User.findAll({
+        attributes:["id", "username"]
+    })
+    return res.json(users).send()
+}
 
 
 
 
 
-
-module.exports={dodadiUser, promeniUser, izbrisiUser}
+module.exports={dodadiUser, promeniUser, izbrisiUser, getUsers}

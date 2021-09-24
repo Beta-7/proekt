@@ -11,4 +11,6 @@ const auth = require("../controllers/authController.js")
 app.post("/dodadiUser",auth.authMiddleware,user.dodadiUser)
 app.post("/promeniUser", auth.authMiddleware, user.promeniUser)
 app.post("/izbrisiUser", auth.authMiddleware, user.izbrisiUser)
+app.post("/getUsers", auth.authMiddleware, user.getUsers)
+
 module.exports = app;
